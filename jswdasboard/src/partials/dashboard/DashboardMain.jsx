@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LineChart from "../../charts/LineChart01";
 import Icon from "../../images/icon-01.svg";
@@ -11,45 +11,63 @@ import Datepicker from "../../components/Datepicker";
 // Import utilities
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
 import MainTrend from "../../charts/MainTrend";
+import { AccountContext } from "../../context/context";
 
 function DashboardMain() {
   const date = new Date(Date.now()).toDateString();
+  const [coils, setCoils] = useState();
+  const [ton, setTon] = useState();
+  const [delay, setDelay] = useState();
+  const [reject, setReject] = useState();
+  const [avg, setAvg] = useState();
+  const { period, setPeriod, data, mainData } = useContext(AccountContext);
+
+  const getData = () => {
+    let arr1 = [];
+    let arr2 = [];
+    let arr3 = [];
+    let arr4 = [];
+    let arr5 = [];
+    if (mainData) {
+      mainData.array.map((item) => {
+        arr1.push(item?.report?.Total_Coils);
+        arr2.push(item?.report?.Total_Coil_Weight / 1000);
+        arr3.push(item?.report?.Tot_Delay_2to5 + item?.report["Tot_Delay_>5"]);
+        arr4.push(item?.report?.Total_Rejects);
+      });
+      setCoils(arr1);
+      setTon(arr2);
+      setDelay(arr3);
+      setReject(arr4);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, [data]);
+
+  const month = new Date().getMonth() + 1;
+  const year = new Date().getFullYear();
+  const time = "00:00:00";
+  const day = 1;
+  const dateObj = year + " " + month + " " + day + " " + time;
+  var getDaysArray = function (s, e) {
+    for (
+      var a = [], d = new Date(s);
+      d <= new Date(e);
+      d.setDate(d.getDate() + 1)
+    ) {
+      a.push(new Date(d).toDateString().split(" ").slice(1, 3));
+    }
+    return a;
+  };
+
   const chartData = {
-    labels: [
-      "12-01-2020",
-      "01-01-2021",
-      "02-01-2021",
-      "03-01-2021",
-      "04-01-2021",
-      "05-01-2021",
-      "06-01-2021",
-      "07-01-2021",
-      "08-01-2021",
-      "09-01-2021",
-      "10-01-2021",
-      "11-01-2021",
-      "12-01-2021",
-      "01-01-2022",
-      "02-01-2022",
-      "03-01-2022",
-      "04-01-2022",
-      "05-01-2022",
-      "06-01-2022",
-      "07-01-2022",
-      "08-01-2022",
-      "09-01-2022",
-      "10-01-2022",
-      "11-01-2022",
-      "12-01-2022",
-      "01-01-2023",
-    ],
+    labels: getDaysArray(new Date(dateObj), new Date()),
     datasets: [
       // Indigo line
       {
-        data: [
-          732, 610, 610, 504, 504, 504, 349, 349, 504, 342, 504, 610, 391, 192,
-          154, 273, 191, 191, 126, 263, 349, 252, 423, 622, 470, 532,
-        ],
+        data: ton,
         fill: true,
 
         backgroundColor: `rgba(${hexToRGB(
@@ -70,10 +88,7 @@ function DashboardMain() {
       },
 
       {
-        data: [
-          600, 120, 52, 365, 122, 88, 349, 349, 21, 342, 556, 335, 114, 551,
-          225, 669, 471, 222, 126, 263, 349, 252, 423, 622, 470, 532,
-        ],
+        data: coils,
         fill: true,
         label: "Coils",
         backgroundColor: `rgba(${hexToRGB(
@@ -93,37 +108,7 @@ function DashboardMain() {
       },
 
       {
-        data: [
-          600,
-          669,
-          471,
-          222,
-          126,
-          263,
-          349,
-          252,
-          423,
-          622,
-          470,
-          532,
-          120,
-          52,
-          225,
-          20,
-          52,
-          365,
-          122,
-          88,
-          349,
-          349,
-          21,
-          342,
-          556,
-          335,
-          114,
-          551,
-          ,
-        ],
+        data: reject,
         fill: true,
         label: "Rejects",
         backgroundColor: `rgba(${hexToRGB(
@@ -143,37 +128,7 @@ function DashboardMain() {
       },
 
       {
-        data: [
-          600,
-          669,
-          445,
-          222,
-          225,
-          113,
-          112,
-          252,
-          423,
-          622,
-          470,
-          556,
-          120,
-          52,
-          225,
-          20,
-          332,
-          224,
-          112,
-          88,
-          349,
-          575,
-          544,
-          775,
-          44,
-          667,
-          55,
-          114,
-          ,
-        ],
+        data: delay,
         fill: true,
         label: "Delay",
         backgroundColor: `rgba(${hexToRGB(
@@ -227,7 +182,9 @@ function DashboardMain() {
       <div className="mt-8 grid xl:grid-cols-10 grid-cols-12 gap-6 text-center mx-2 pb-6">
         <div className="flex py-2 flex-col col-span-full sm:col-span-6 xl:col-span-2  dark:bg-slate-800 shadow-lg rounded-sm border border-black/30 dark:border-slate-700 pb-2s">
           <p className=" text-gray-600  text-sm tracking-wide ">Coils</p>
-          <p className="text-gray-800 font-semibold italic text-sm">65 coils</p>
+          <p className="text-gray-800 font-semibold italic text-sm">
+            {coils && coils[coils?.length - 1]} coils
+          </p>
           <div className="px-2 my-2">
             <ProgressBar
               completed={80}
@@ -239,7 +196,10 @@ function DashboardMain() {
         </div>
         <div className="flex py-2 flex-col col-span-full sm:col-span-6 xl:col-span-2  dark:bg-slate-800 shadow-lg rounded-sm border border-black/30 dark:border-slate-700 pb-2s">
           <p className=" text-gray-600  text-sm tracking-wide ">Tonnage</p>
-          <p className="text-gray-800 font-semibold italic text-sm">233 tons</p>
+          <p className="text-gray-800 font-semibold italic text-sm">
+            {" "}
+            {ton && ton[ton?.length - 1]} tons
+          </p>
           <div className="px-2 my-2">
             <ProgressBar
               completed={32}
@@ -251,7 +211,9 @@ function DashboardMain() {
         </div>
         <div className="flex py-2 flex-col col-span-full sm:col-span-6 xl:col-span-2  dark:bg-slate-800 shadow-lg rounded-sm border border-black/30 dark:border-slate-700 pb-2s">
           <p className=" text-gray-600  text-sm tracking-wide ">Delay</p>
-          <p className="text-gray-800 font-semibold italic text-sm">36 Hours</p>
+          <p className="text-gray-800 font-semibold italic text-sm">
+            {delay && delay[delay?.length - 1]} Mins
+          </p>
           <div className="px-2 my-2">
             <ProgressBar
               completed={25}
@@ -264,7 +226,7 @@ function DashboardMain() {
         <div className="flex py-2 flex-col col-span-full sm:col-span-6 xl:col-span-2  dark:bg-slate-800 shadow-lg rounded-sm border border-black/30 dark:border-slate-700 pb-2s">
           <p className=" text-gray-600  text-sm tracking-wide ">Rejects</p>
           <p className="text-gray-800 font-semibold italic text-sm">
-            29 slabs/coils
+            {reject && reject[reject?.length - 1]} Rejects
           </p>
           <div className="px-2 my-2">
             <ProgressBar

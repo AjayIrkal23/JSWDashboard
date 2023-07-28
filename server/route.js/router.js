@@ -1,6 +1,6 @@
 import express from "express";
 import { DumpAll, Start } from "../controller/DumpData.js";
-import { Check2 } from "../controller/Production.js";
+import { Check1, Check2 } from "../controller/Production.js";
 import { SendData } from "../controller/sendData.js";
 
 const route = express.Router();
@@ -9,7 +9,8 @@ route.get("/start", Start);
 route.get("/dumpAll", DumpAll);
 
 route.post("/sendData", SendData);
-route.get("/add2", Check2);
+route.get("/add", Check2);
+route.get("/add1", Check1);
 
 // route.post('/file/upload',upload.single("file"), uploadFile )
 

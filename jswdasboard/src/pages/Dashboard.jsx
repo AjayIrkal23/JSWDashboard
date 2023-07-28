@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
@@ -18,9 +18,11 @@ import D15 from "../partials/dashboard/d15";
 import D16 from "../partials/dashboard/D16";
 import DashboardExtra from "../partials/dashboard/Dashboardextra";
 import DashboardMain from "../partials/dashboard/DashboardMain";
+import { AccountContext } from "../context/context";
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { period, setPeriod, data, mainData } = useContext(AccountContext);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -48,10 +50,8 @@ function Dashboard() {
               <DashboardExtra />
 
               <DashboardCard03 />
-              <DashboardMain />
+              <DashboardMain mainData={mainData} />
               <DashboardCard06 />
-
-            
 
               <D15 />
 

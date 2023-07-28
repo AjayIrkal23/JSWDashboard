@@ -66,14 +66,6 @@ function MainTrend({ data, width, height, title }) {
             beginAtZero: true,
           },
           x: {
-            type: "time",
-            time: {
-              parser: "MM-DD-YYYY",
-              unit: "day",
-              displayFormats: {
-                day: "DD MM",
-              },
-            },
             border: {
               display: false,
             },
@@ -118,11 +110,10 @@ function MainTrend({ data, width, height, title }) {
     setChart(newChart);
     return () => newChart.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, data?.labels]);
 
   useEffect(() => {
     if (!chart) return;
-
     if (darkMode) {
       chart.options.chartArea.backgroundColor = chartAreaBg.dark;
       chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.dark;
