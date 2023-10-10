@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const FM = ({ open, setOpen }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -94,22 +95,22 @@ const FM = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>FM Rocking Man Count </p>
         <p>-</p>
-        <p className="font-semibold">{FmRockManCount()}</p>
+        <p className="font-semibold">{roundOff(FmRockManCount())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>FM Rocking Auto Count</p>
         <p>-</p>
-        <p className="font-semibold">{FmRockAutoCount()}</p>
+        <p className="font-semibold">{roundOff(FmRockAutoCount())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Manual Rock Time </p>
         <p>-</p>
-        <p className="font-semibold ">{ManualRockMin()}</p>
+        <p className="font-semibold ">{roundOff(ManualRockMin())}</p>
       </div>
       <div className="flex text-xs justify-between px-1  pb-2 items-center pt-1 italic pr-2 ">
         <p>Manual Rock Time </p>
         <p>-</p>
-        <p className="font-semibold ">{ManualRockMin()}</p>
+        <p className="font-semibold ">{roundOff(ManualRockMin())}</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LineChart from "../../charts/LineChart01";
 import Icon from "../../images/icon-02.svg";
@@ -6,10 +6,31 @@ import EditMenu from "../../components/DropdownEditMenu";
 
 // Import utilities
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
+import { getLabels } from "../../utils/roundoff";
+import { AccountContext } from "../../context/context";
 
 function DashboardCard02() {
+  const [dataLine, setDataLine] = useState(null);
+  const [lab, setLab] = useState(null);
+  const [data, setData] = useState(null);
+  const { eightData } = useContext(AccountContext);
+
+  const getData = () => {
+    const data = eightData?.map((item) => item?.data?.Total_Coils);
+    setData(data);
+  };
+
+  console.log(data);
+
+  useEffect(() => {
+    setDataLine(getLabels());
+    getData();
+  }, [eightData]);
+
+  console.log(dataLine);
+
   const chartData = {
-    labels: ["00:00", "01:00", "02", "03", "04", "05", "06", "07"],
+    labels: dataLine,
     datasets: [
       // Indigo line
       {
@@ -56,10 +77,14 @@ function DashboardCard02() {
         </header>
       </div>
       {/* Chart built with Chart.js 3 */}
-      <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
-        {/* Change the height attribute to adjust the chart height */}
-        <LineChart data={chartData} width={389} height={128} title="Tonnage" />
-      </div>
+      {dataLine ? (
+        <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
+          {/* Change the height attribute to adjust the chart height */}
+          <LineChart data={chartData} width={389} height={128} title="Tons" />
+        </div>
+      ) : (
+        "Loading"
+      )}
     </div>
   );
 }

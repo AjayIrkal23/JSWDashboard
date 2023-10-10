@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const SSP = ({ open, setOpen }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -131,40 +132,40 @@ const SSP = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>% of SSP Usage </p>
         <p>-</p>
-        <p className="font-semibold">{SSPUse(1, "%")}</p>
+        <p className="font-semibold">{roundOff(SSPUse(1, "%"))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>SSP Use </p>
         <p>-</p>
-        <p className="font-semibold">{SSPUse(1)}</p>
+        <p className="font-semibold">{roundOff(SSPUse(1))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>SSP No Use </p>
         <p>-</p>
-        <p className="font-semibold">{SSPUse(0)}</p>
+        <p className="font-semibold">{roundOff(SSPUse(0))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>SSP Process Delay</p>
         <p>-</p>
-        <p className="font-semibold">{SSPProcess()}</p>
+        <p className="font-semibold">{roundOff(SSPProcess())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>SSP Process Time</p>
         <p>-</p>
-        <p className="font-semibold ">{SSPProcessTime()}</p>
+        <p className="font-semibold ">{roundOff(SSPProcessTime())}</p>
       </div>
       {period !== "Last Piece" && (
         <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
           <p>Process Time Average</p>
           <p>-</p>
-          <p className="font-semibold ">{SSPProcessTime("a")}</p>
+          <p className="font-semibold ">{roundOff(SSPProcessTime("a"))}</p>
         </div>
       )}
 
       <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
         <p>Gap Time Actual</p>
         <p>-</p>
-        <p className="font-semibold ">{GapTime()}</p>
+        <p className="font-semibold ">{roundOff(GapTime())}</p>
       </div>
     </div>
   );

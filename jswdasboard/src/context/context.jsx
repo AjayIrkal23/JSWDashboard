@@ -8,9 +8,11 @@ export const AccountContext = createContext(null);
 export const Accountprovider = ({ children }) => {
   const [period, setPeriod] = useState("Last Coil");
   const [mainData, setMainData] = useState(null);
-  console.log(mainData);
+  const [eightData, setEightData] = useState(null);
+
+  console.log(eightData, "eightData");
+
   const [data, setData] = useState(null);
-  console.log(data);
 
   function useInterval(callback, delay) {
     const savedCallback = useRef();
@@ -37,6 +39,13 @@ export const Accountprovider = ({ children }) => {
       setMainData(resp.data);
     });
   };
+
+  const getData3 = async () => {
+    axios.get("http://localhost:8000/add1").then((resp) => {
+      console.log(resp?.data?.arr);
+      setEightData(resp?.data?.arr);
+    });
+  };
   useInterval(async () => {
     // Your custom logic here
     toast.loading("Loading Data");
@@ -48,49 +57,7 @@ export const Accountprovider = ({ children }) => {
           toast.dismiss();
           toast.success("Data Fetching Successfull");
         });
-    } else if (period == "Last 5 Coil") {
-      await axios
-        .post("http://localhost:8000/sendData", { period: period })
-        .then((resp) => {
-          setData(resp?.data);
-          toast.dismiss();
-          toast.success("Data Fetching Successfull");
-        });
-    } else if (period == "Last Hour") {
-      await axios
-        .post("http://localhost:8000/sendData", { period: period })
-        .then((resp) => {
-          setData(resp?.data);
-          toast.dismiss();
-          toast.success("Data Fetching Successfull");
-        });
-    } else if (period == "Last Day") {
-      await axios
-        .post("http://localhost:8000/sendData", { period: period })
-        .then((resp) => {
-          setData(resp?.data);
-          toast.dismiss();
-          toast.success("Data Fetching Successfull");
-        });
-    } else if (period.customp) {
-      await axios
-        .post("http://localhost:8000/sendData", { period: period })
-        .then((resp) => {
-          setData(resp?.data);
-          toast.dismiss();
-          toast.success("Data Fetching Successfull");
-        });
-    } else if (period.date && period.time) {
-      await axios
-        .post("http://localhost:8000/sendData", { period: period })
-        .then((resp) => {
-          setData(resp?.data);
-          toast.dismiss();
-          toast.success("Data Fetching Successfull");
-        });
     }
-
-    setPeriod("Last Coil");
   }, 60000);
 
   useInterval(async () => {
@@ -151,12 +118,15 @@ export const Accountprovider = ({ children }) => {
   };
 
   useEffect(() => {
+    getData3();
     getData();
     getData2();
   }, [period]);
 
   return (
-    <AccountContext.Provider value={{ period, setPeriod, data, mainData }}>
+    <AccountContext.Provider
+      value={{ period, setPeriod, data, mainData, eightData }}
+    >
       {children}
     </AccountContext.Provider>
   );

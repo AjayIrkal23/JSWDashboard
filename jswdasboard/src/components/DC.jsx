@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const DC = ({ open, setOpen, setTitle }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -64,12 +65,12 @@ const DC = ({ open, setOpen, setTitle }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
         <p>DC Gap Time</p>
         <p>-</p>
-        <p className="font-semibold">{DCGapTime()}</p>
+        <p className="font-semibold">{roundOff(DCGapTime())}</p>
       </div>
       <div className="flex text-xs justify-between px-1  pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Dc Process Time</p>
         <p>-</p>
-        <p className="font-semibold">{DCProcessTime()}</p>
+        <p className="font-semibold">{roundOff(DCProcessTime())}</p>
       </div>
     </div>
   );

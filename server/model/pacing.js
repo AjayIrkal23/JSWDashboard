@@ -10,7 +10,8 @@ const pacingData = new mongoose.Schema(
       type: mongoose.SchemaTypes.Mixed,
     },
     gt_HistoryKeyTm: {
-      type: mongoose.SchemaTypes.Mixed,
+      type: Date,
+      required: true,
     },
     gt_FceDisChgTm: {
       type: mongoose.SchemaTypes.Mixed,

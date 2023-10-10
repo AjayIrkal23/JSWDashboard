@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const Three = ({ open, setOpen }) => {
   function Passes(fw, sy) {
@@ -71,22 +72,22 @@ const Three = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
         <p>% of R2 3Passes Count</p>
         <p>-</p>
-        <p className="font-semibold">{Passes(3, "%")}</p>
+        <p className="font-semibold">{roundOff(Passes(3, "%"))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
         <p>R2 3Passes Count</p>
         <p>-</p>
-        <p className="font-semibold">{Passes(3)}</p>
+        <p className="font-semibold">{roundOff(Passes(3))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
         <p>R2 5Passes Count</p>
         <p>-</p>
-        <p className="font-semibold">{Passes(5)}</p>
+        <p className="font-semibold">{roundOff(Passes(5))}</p>
       </div>
       <div className="flex text-xs justify-between px-1  pb-1 items-center pt-1 italic pr-2 ">
         <p>% of R2 5Passes Count</p>
         <p>-</p>
-        <p className="font-semibold">{Passes(5, "%")}</p>
+        <p className="font-semibold">{roundOff(Passes(5, "%"))}</p>
       </div>
     </div>
   );

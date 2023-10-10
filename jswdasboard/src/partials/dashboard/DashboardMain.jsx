@@ -22,6 +22,8 @@ function DashboardMain() {
   const [avg, setAvg] = useState();
   const { period, setPeriod, data, mainData } = useContext(AccountContext);
 
+  console.log(mainData?.array);
+
   const getData = () => {
     let arr1 = [];
     let arr2 = [];
@@ -29,7 +31,7 @@ function DashboardMain() {
     let arr4 = [];
     let arr5 = [];
     if (mainData) {
-      mainData.array.map((item) => {
+      mainData?.array.map((item) => {
         arr1.push(item?.report?.Total_Coils);
         arr2.push(item?.report?.Total_Coil_Weight / 1000);
         arr3.push(item?.report?.Tot_Delay_2to5 + item?.report["Tot_Delay_>5"]);
@@ -187,7 +189,7 @@ function DashboardMain() {
           </p>
           <div className="px-2 my-2">
             <ProgressBar
-              completed={80}
+              completed={coils && coils[coils?.length - 1]}
               bgColor="green"
               height="10px"
               labelClassName="hidden"
@@ -202,7 +204,7 @@ function DashboardMain() {
           </p>
           <div className="px-2 my-2">
             <ProgressBar
-              completed={32}
+              completed={ton && ton[ton?.length - 1]}
               bgColor="gray"
               height="10px"
               labelClassName="hidden"
@@ -216,7 +218,7 @@ function DashboardMain() {
           </p>
           <div className="px-2 my-2">
             <ProgressBar
-              completed={25}
+              completed={delay && delay[delay?.length - 1]}
               bgColor="orange"
               height="10px"
               labelClassName="hidden"
@@ -230,7 +232,7 @@ function DashboardMain() {
           </p>
           <div className="px-2 my-2">
             <ProgressBar
-              completed={68}
+              completed={reject && reject[reject?.length - 1]}
               bgColor="red"
               height="10px"
               labelClassName="hidden"

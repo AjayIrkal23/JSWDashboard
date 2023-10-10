@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const R1 = ({ open, setOpen }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -131,30 +132,30 @@ const R1 = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>R1 Gap Time Actual </p>
         <p>-</p>
-        <p className="font-semibold">{R1GapTimeAct()}</p>
+        <p className="font-semibold">{roundOff(R1GapTimeAct())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>R1 Process Time Actual</p>
         <p>-</p>
-        <p className="font-semibold">{R1ProcessTimeAct()}</p>
+        <p className="font-semibold">{roundOff(R1ProcessTimeAct())}</p>
       </div>
       {period !== "Last Coil" && (
         <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
           <p>R1 Process Time Average</p>
           <p>-</p>
-          <p className="font-semibold ">{R1ProcessTimeAct("a")}</p>
+          <p className="font-semibold ">{roundOff(R1ProcessTimeAct("a"))}</p>
         </div>
       )}
 
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>R1 Travel Delay</p>
         <p>-</p>
-        <p className="font-semibold ">{TravelDelay()}</p>
+        <p className="font-semibold ">{roundOff(TravelDelay())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
         <p>R1 Process Delay</p>
         <p>-</p>
-        <p className="font-semibold ">{ProcessDelay()}</p>
+        <p className="font-semibold ">{roundOff(ProcessDelay())}</p>
       </div>
     </div>
   );

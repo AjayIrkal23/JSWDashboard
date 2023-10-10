@@ -21,7 +21,6 @@ const DateJoin = (check) => {
 };
 
 export const SendData = async (req, res) => {
-  console.log(req.body.period.date && req.body.period.time);
   try {
     if (req?.body?.period == "Last Coil") {
       const Excel = await ExcelData.find()
@@ -31,7 +30,6 @@ export const SendData = async (req, res) => {
         .sort({ gt_HistoryKeyTm: -1 })
         .limit(1);
 
-      console.log(Excel[Excel.length - 1], pacing[pacing.length - 1]);
       if (Excel.length > 0 && pacing.length > 0) {
         res.status(200).json({
           Excel: Excel[Excel.length - 1],
@@ -47,7 +45,7 @@ export const SendData = async (req, res) => {
       const pacing = await PacingData.find()
         .sort({ gt_HistoryKeyTm: -1 })
         .limit(5);
-      console.log(Excel[Excel.length - 1], pacing[pacing.length - 1]);
+
       if (Excel.length > 0 && pacing.length > 0) {
         res.status(200).json({
           Excel: Excel,
@@ -58,7 +56,9 @@ export const SendData = async (req, res) => {
       }
     } else if (req?.body?.period == "Last Hour") {
       const currentDateTime = new Date(); // Get the current date and time
-      const oneHourAgo = new Date(currentDateTime.getTime() - 60 * 60 * 1000);
+      const oneHourAgo = new Date(
+        currentDateTime.getTime() - 60 * 60 * 1000
+      ).toISOString();
 
       const pacing = await PacingData.find({
         gt_HistoryKeyTm: { $gte: oneHourAgo },
@@ -95,11 +95,15 @@ export const SendData = async (req, res) => {
       }
     } else if (req?.body?.period == "Last Day") {
       const Excel = await ExcelData.find({
-        gt_HistoryKeyTm: { $gt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        gt_HistoryKeyTm: {
+          $gt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        },
       }).sort();
 
       const pacing = await PacingData.find({
-        gt_HistoryKeyTm: { $gt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        gt_HistoryKeyTm: {
+          $gt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        },
       }).sort();
 
       if (Excel && pacing) {
@@ -108,35 +112,28 @@ export const SendData = async (req, res) => {
         res.status(202).json("No ID Match found in Db");
       }
     } else if (req?.body?.period?.date && req?.body?.period?.time) {
+      const start = new Date(
+        req?.body?.period?.date[0] + " " + req?.body?.period?.time[0]
+      ).toISOString();
+      const end = new Date(
+        req?.body?.period?.date[1] + " " + req?.body?.period?.time[1]
+      ).toISOString();
+
       const Excel = await ExcelData.find({
-        createdAt: {
-          $gte: new Date(
-            req?.body?.period?.date[0] + " " + req?.body?.period?.time[0]
-          ),
-          $lte: new Date(
-            req?.body?.period?.date[1] + " " + req?.body?.period?.time[1]
-          ),
+        gt_HistoryKeyTm: {
+          $gte: start,
+          $lte: end,
         },
       });
-
       const pacing = await PacingData.find({
-        createdAt: {
-          $gte: new Date(
-            req?.body?.period?.date[0] + " " + req?.body?.period?.time[0]
-          ),
-          $lte: new Date(
-            req?.body?.period?.date[1] + " " + req?.body?.period?.time[1]
-          ),
+        gt_HistoryKeyTm: {
+          $gte: start,
+          $lte: end,
         },
       });
-
-      console.log(pacing.length);
 
       if (Excel && pacing) {
-        console.log("hello");
-        res.status(200).json({ Excel: Excel, pacing: pacing });
-      } else {
-        res.status(202).json("No Date Match found in Db");
+        res.status(200).json({ Excel, pacing });
       }
     }
   } catch (error) {

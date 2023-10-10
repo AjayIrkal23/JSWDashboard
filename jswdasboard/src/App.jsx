@@ -12,7 +12,8 @@ import { AccountContext } from "./context/context";
 
 function App() {
   const location = useLocation();
-  const { period, setPeriod, data, mainData } = useContext(AccountContext);
+  const { period, setPeriod, data, mainData, eightData } =
+    useContext(AccountContext);
   useEffect(() => {
     document.querySelector("html").style.scrollBehavior = "auto";
     window.scroll({ top: 0 });
@@ -48,7 +49,8 @@ function App() {
       />
       {data?.Excel?.c_PieceName ||
       data?.Excel?.length > 1 ||
-      mainData?.date?.length > 1 ? (
+      mainData?.date?.length > 1 ||
+      eightData ? (
         <>
           <Routes>
             <Route exact path="/" element={<Dashboard />} />

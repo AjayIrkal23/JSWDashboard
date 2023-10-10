@@ -44,7 +44,11 @@ const Live = () => {
     <div>
       <div>
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="bg-[url('/d.jpg')] relative h-[90vh] bg-cover bg-no-repeat ">
+        <div className=" relative h-[90vh] bg-cover bg-no-repeat ">
+          <img
+            src="http://127.0.0.1:5000/video"
+            className="absolute w-screen h-screen"
+          />
           <div className="sticky top-[15%] px-4 flex gap-6  !text-xs justify-start ml-14">
             <div className=" w-[300px] ">
               <LoadingG data={data} />

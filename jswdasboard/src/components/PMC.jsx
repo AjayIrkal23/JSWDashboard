@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const PMC = ({ open, setOpen, setTitle }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -136,12 +137,12 @@ const PMC = ({ open, setOpen, setTitle }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
         <p>Discharge Gap Time</p>
         <p>-</p>
-        <p className="font-semibold">{minutesDiff()}</p>
+        <p className="font-semibold">{roundOff(minutesDiff())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
         <p>FCE-SSP Travel Time</p>
         <p>-</p>
-        <p className="font-semibold">{FCESSPTravelTime()}</p>
+        <p className="font-semibold">{roundOff(FCESSPTravelTime())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
         <p>PMA Count</p>
@@ -151,12 +152,12 @@ const PMC = ({ open, setOpen, setTitle }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Pacing Offset (+)</p>
         <p>-</p>
-        <p className="font-semibold">{PacingOffset("+")}</p>
+        <p className="font-semibold">{roundOff(PacingOffset("+"))}</p>
       </div>
       <div className="flex text-xs justify-between px-1  items-center pt-1 italic pb-1 pr-2 border-black/40">
         <p>Pacing Offset (-)</p>
         <p>-</p>
-        <p className="font-semibold ">{PacingOffset("-")}</p>
+        <p className="font-semibold ">{roundOff(PacingOffset("-"))}</p>
       </div>
     </div>
   );

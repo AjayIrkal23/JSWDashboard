@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const Wise = ({ open, setOpen }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -149,32 +150,32 @@ const Wise = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Furnace 1 Slab Count</p>
         <p>-</p>
-        <p className="font-semibold">{FCESlabCount(1)}</p>
+        <p className="font-semibold">{roundOff(FCESlabCount(1))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Furnace 2 Slab Count</p>
         <p>-</p>
-        <p className="font-semibold">{FCESlabCount(2)}</p>
+        <p className="font-semibold">{roundOff(FCESlabCount(2))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Furnace 3 Slab Count</p>
         <p>-</p>
-        <p className="font-semibold">{FCESlabCount(3)}</p>
+        <p className="font-semibold">{roundOff(FCESlabCount(3))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>FCE Discharge Delay</p>
         <p>-</p>
-        <p className="font-semibold">{FceDischarge()}</p>
+        <p className="font-semibold">{roundOff(FceDischarge())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>FCE Extractor Delay</p>
         <p>-</p>
-        <p className="font-semibold ">{FceExtrator()}</p>
+        <p className="font-semibold ">{roundOff(FceExtrator())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
         <p>FCE Slip Delay</p>
         <p>-</p>
-        <p className="font-semibold ">{FceSlipDelay()}</p>
+        <p className="font-semibold ">{roundOff(FceSlipDelay())}</p>
       </div>
     </div>
   );

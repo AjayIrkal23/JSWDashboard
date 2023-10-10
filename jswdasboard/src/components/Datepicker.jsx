@@ -2,6 +2,15 @@ import React from "react";
 import Flatpickr from "react-flatpickr";
 
 function Datepicker({ align, setDateValue }) {
+  const setDates = (selectedDates) => {
+    if (selectedDates.length > 1) {
+      const item = selectedDates.map((item) => {
+        return new Date(item).toISOString().split("T")[0];
+      });
+
+      setDateValue(item);
+    }
+  };
   const options = {
     mode: "range",
     static: true,
@@ -16,14 +25,10 @@ function Datepicker({ align, setDateValue }) {
       instance.element.value = dateStr.replace("to", "-");
       const customClass = align ? align : "";
       instance.calendarContainer.classList.add(`flatpickr-${customClass}`);
-      setDateValue(
-        selectedDates.map((item) => {
-          return item.toISOString().split("T")[0];
-        })
-      );
     },
     onChange: (selectedDates, dateStr, instance) => {
       instance.element.value = dateStr.replace("to", "-");
+      setDates(dateStr.split("to"));
     },
   };
 

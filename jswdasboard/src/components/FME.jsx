@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
+import { roundOff } from "../utils/roundoff";
 
 const FM = ({ open, setOpen }) => {
   const { period, setPeriod, data } = useContext(AccountContext);
@@ -179,30 +180,30 @@ const FM = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>FM Predicted Gap Time </p>
         <p>-</p>
-        <p className="font-semibold">{FMEPredicted()}</p>
+        <p className="font-semibold">{roundOff(FMEPredicted())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
         <p>FM Travel Delay </p>
         <p>-</p>
-        <p className="font-semibold">{FMTravelDelay()}</p>
+        <p className="font-semibold">{roundOff(FMTravelDelay())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>FM Process Time Actual</p>
         <p>-</p>
-        <p className="font-semibold">{FMProcessTime()}</p>
+        <p className="font-semibold">{roundOff(FMProcessTime())}</p>
       </div>
       {period !== "Last Piece" && (
         <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
           <p>FM Process Time Average</p>
           <p>-</p>
-          <p className="font-semibold ">{FMProcessTime("a")}</p>
+          <p className="font-semibold ">{roundOff(FMProcessTime("a"))}</p>
         </div>
       )}
 
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>FM Gap Time Average</p>
         <p>-</p>
-        <p className="font-semibold ">{FMGapTime("a")}</p>
+        <p className="font-semibold ">{roundOff(FMGapTime("a"))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Role Change Delay</p>
@@ -212,7 +213,7 @@ const FM = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b items-center border-black/40 pt-1 italic pr-2">
         <p>FM Process Delay Time </p>
         <p>-</p>
-        <p className="font-semibold">{FMProcessDelay()}</p>
+        <p className="font-semibold">{roundOff(FMProcessDelay())}</p>
       </div>
     </div>
   );

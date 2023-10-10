@@ -10,7 +10,8 @@ const excelSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.Mixed,
     },
     gt_HistoryKeyTm: {
-      type: mongoose.SchemaTypes.Mixed,
+      type: Date,
+      required: true,
     },
     f_FEntF1TravelTimePre: {
       type: mongoose.SchemaTypes.Mixed,
