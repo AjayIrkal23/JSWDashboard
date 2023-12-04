@@ -1,12 +1,15 @@
 import sql2 from "mssql";
 import { get } from "../database/pool-manager.js";
 
+
 let config = {
-  user: "sa", //default is sa
-  password: "loloklol",
-  server: "localhost", // for local machine
+  user: "Dashboard", //default is sa
+  password: "Dashboard",
+  server: "10.11.2.41", // for local machine
   database: "Production", // name of database
   trustServerCertificate: true,
+  encrypt:false,
+  port:1433,
   requestTimeout: 1800000,
 };
 

@@ -33,6 +33,7 @@ const BottleNeck = () => {
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -95,39 +96,39 @@ const BottleNeck = () => {
   return (
     <div className="flex flex-col justify-center border border-black/40     !text-xs bg-[whitesmoke] shadow-md pr-[0.25px]">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p className="!text-center w-full">Bottle Neck</p>
+        <p className="!text-center w-full font-semibold">Bottle Neck</p>
       </div>
       <div className="flex">
         <div className="flex flex-col text-center border-r border-black/40 w-[50px]">
-          <p className="border-b border-black/40 px-2 pb-1 text-center text-xs">
+          <p className="border-b font-semibold border-black/40 px-2 pb-1 text-center text-xs">
             FCE
           </p>
-          <p className="pt-1 pb-1">{BN("FCE")}</p>
+          <p className="pt-1 font-semibold pb-1">{BN("FCE")}</p>
         </div>
 
         <div className="flex flex-col text-center border-r border-black/40 w-[50px]">
-          <p className="border-b border-black/40 px-2 pb-1 text-center text-xs">
+          <p className="border-b font-semibold border-black/40 px-2 pb-1 text-center text-xs">
             R1
           </p>
-          <p className="pt-1 pb-1">{BN("R1")}</p>
+          <p className="pt-1 font-semibold pb-1">{BN("R1")}</p>
         </div>
         <div className="flex flex-col text-center border-r border-black/40 w-[50px]">
-          <p className="border-b border-black/40 px-2 pb-1 text-center text-xs">
+          <p className="border-b font-semibold border-black/40 px-2 pb-1 text-center text-xs">
             R2
           </p>
-          <p className="pt-1 pb-1">{BN("R2")}</p>
+          <p className="pt-1 font-semibold pb-1">{BN("R2")}</p>
         </div>
         <div className="flex flex-col text-center border-r border-black/40 w-[50px]">
-          <p className="border-b border-black/40 px-2 pb-1 text-center text-xs">
+          <p className="border-b font-semibold border-black/40 px-2 pb-1 text-center text-xs">
             FM
           </p>
-          <p className="pt-1 pb-1">{BN("FM")}</p>
-        </div>
+          <p className="pt-1 font-semibold pb-1">{BN("FM")}</p>
+        </div> 
         <div className="flex flex-col text-center  border-black/40 border-r-0w-[50px]">
-          <p className="border-b border-black/40 px-2 pb-1 text-center text-xs">
+          <p className="border-b font-semibold border-black/40 px-2 pb-1 text-center text-xs">
             DC
           </p>
-          <p className="pt-1 pb-1">{BN("DC")}</p>
+          <p className="pt-1 font-semibold pb-1">{BN("DC")}</p>
         </div>
       </div>
     </div>

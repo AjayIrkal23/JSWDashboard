@@ -17,7 +17,7 @@ function Header({ sidebarOpen, setSidebarOpen }) {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 -mb-px">
           <img
-            src="https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/JSW_Group_logo.svg/1200px-JSW_Group_logo.svg.png"
+            src="/logo.png"
             alt=""
             className="h-8 w-20  "
           />

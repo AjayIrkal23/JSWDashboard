@@ -15,6 +15,7 @@ const SSP = ({ open, setOpen }) => {
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -32,15 +33,15 @@ const SSP = ({ open, setOpen }) => {
         return total1;
       }
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function GapTime() {
     if (period == "Last Coil" || period.customp) {
       return (
-        (Math.floor(Math.abs(data?.Excel?.f_SSPGapTimeAct) * 100) * -1) / 100
-      );
+      data?.Excel?.f_SSPGapTimeAct) 
+      
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -57,20 +58,19 @@ const SSP = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      return value1
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function SSPProcess() {
     if (period == "Last Coil" || period.customp) {
       return (
-        (Math.floor(Math.abs(data?.Excel?.f_SSPProcessTimeDelay) * 100) * -1) /
-        100
-      );
+       data?.Excel?.f_SSPProcessTimeDelay) 
+       
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -87,20 +87,19 @@ const SSP = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      return (value1) 
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function SSPProcessTime(a) {
     if (period == "Last Coil" || period.customp) {
       return (
-        (Math.floor(Math.abs(data?.Excel?.f_SSPProcessTimeAct) * 100) * -1) /
-        100
-      );
+       data?.Excel?.f_SSPProcessTimeAct)
+     
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -118,52 +117,52 @@ const SSP = ({ open, setOpen }) => {
       console.log(total1);
 
       if (a == "a") {
-        let value1 = total1 / data?.pacing?.length;
-        return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+        let value1 = total1 
+        return value1
       } else {
-        return (Math.floor(Math.abs(total1) * 100) * -1) / 100;
+        return (total1) 
       }
     } else {
-      return "--";
+      return 0;
     }
   }
   return (
     <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p>% of SSP Usage </p>
+        <p className="font-semibold">% of SSP Usage </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(SSPUse(1, "%"))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p>SSP Use </p>
+        <p className="font-semibold">SSP Use </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(SSPUse(1))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p>SSP No Use </p>
+        <p className="font-semibold">SSP No Use </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(SSPUse(0))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>SSP Process Delay</p>
+        <p className="font-semibold">SSP Process Delay</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(SSPProcess())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>SSP Process Time</p>
+        <p className="font-semibold">SSP Process Time</p>
         <p>-</p>
         <p className="font-semibold ">{roundOff(SSPProcessTime())}</p>
       </div>
       {period !== "Last Piece" && (
         <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-          <p>Process Time Average</p>
+          <p className="font-semibold">Process Time Average</p>
           <p>-</p>
           <p className="font-semibold ">{roundOff(SSPProcessTime("a"))}</p>
         </div>
       )}
 
       <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
-        <p>Gap Time Actual</p>
+        <p className="font-semibold">Gap Time Actual</p>
         <p>-</p>
         <p className="font-semibold ">{roundOff(GapTime())}</p>
       </div>

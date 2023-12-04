@@ -316,7 +316,7 @@ const GRT = ({ open, setOpen }) => {
             </header>
             {/* Chart built with Chart.js 3 */}
             {/* Change the height attribute to adjust the chart height */}
-            <ProcessStacked data={chartData3} width={900} height={548} />
+            <ProcessStacked data={chartData3} width={1800} height={800} />
           </div>
         </div>
       </Modal>

@@ -21,6 +21,7 @@ const Wise = ({ open, setOpen }) => {
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -58,16 +59,16 @@ const Wise = ({ open, setOpen }) => {
         return 0;
       }
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function FceDischarge() {
     if (period == "Last Coil" || period.customp) {
       return (
-        (Math.floor(Math.abs(data?.Excel?.f_L2L1ExtRdyTimeDiff) * 100) * -1) /
-        100
-      );
+        data?.Excel?.f_L2L1ExtRdyTimeDiff) 
+    
+    
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -82,20 +83,19 @@ const Wise = ({ open, setOpen }) => {
           0
         );
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      return value1
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function FceExtrator() {
     if (period == "Last Coil" || period.customp) {
       return (
-        (Math.floor(Math.abs(data?.Excel?.f_ExtractCycleTimeDiff) * 100) * -1) /
-        100
-      );
+        data?.Excel?.f_ExtractCycleTimeDiff) 
+    
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -110,11 +110,10 @@ const Wise = ({ open, setOpen }) => {
           0
         );
 
-      let value1 = total1 / data?.pacing?.length;
-
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      let value1 = total1 
+      return value1
     } else {
-      return "--";
+      return 0;
     }
   }
 
@@ -137,43 +136,43 @@ const Wise = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
       return value1;
     } else {
-      return "--";
+      return 0;
     }
   }
 
   return (
     <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>Furnace 1 Slab Count</p>
+        <p className="font-semibold">Furnace 1 Slab Count</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FCESlabCount(1))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>Furnace 2 Slab Count</p>
+        <p className="font-semibold">Furnace 2 Slab Count</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FCESlabCount(2))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>Furnace 3 Slab Count</p>
+        <p className="font-semibold">Furnace 3 Slab Count</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FCESlabCount(3))}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>FCE Discharge Delay</p>
+        <p className="font-semibold">FCE Discharge Delay</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FceDischarge())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>FCE Extractor Delay</p>
+        <p className="font-semibold">FCE Extractor Delay</p>
         <p>-</p>
         <p className="font-semibold ">{roundOff(FceExtrator())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
-        <p>FCE Slip Delay</p>
+        <p className="font-semibold">FCE Slip Delay</p>
         <p>-</p>
         <p className="font-semibold ">{roundOff(FceSlipDelay())}</p>
       </div>

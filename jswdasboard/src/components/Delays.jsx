@@ -160,7 +160,7 @@ const Delays = ({ open, setOpen }) => {
             </header>
             {/* Chart built with Chart.js 3 */}
             {/* Change the height attribute to adjust the chart height */}
-            <DelayChart data={chartData} width={900} height={548} />
+            <DelayChart data={chartData} width={1800} height={800} />
           </div>
         </div>
       </Modal>

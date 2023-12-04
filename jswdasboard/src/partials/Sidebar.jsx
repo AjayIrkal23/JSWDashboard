@@ -90,7 +90,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           {/* Logo */}
           <NavLink end to="/" className="flex justify-center items-center">
             <img
-              src="https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/JSW_Group_logo.svg/1200px-JSW_Group_logo.svg.png"
+              src="/logo.png"
               className="bg-white p-3 rounded-md w-[80%] h-[80%]"
               alt=""
             />

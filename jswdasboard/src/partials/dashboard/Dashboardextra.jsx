@@ -8,7 +8,7 @@ import EditMenu from "../../components/DropdownEditMenu";
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
 import BarChart01 from "../../charts/BarChart01";
 import BarChart02 from "../../charts/BarChart02";
-import RejBar from "../../charts/rejBar";
+import RejBar from "../../charts/RejBar";
 import { getLabels } from "../../utils/roundoff";
 import { AccountContext } from "../../context/context";
 

@@ -198,7 +198,7 @@ const WRT = ({ open, setOpen }) => {
             </header>
             {/* Chart built with Chart.js 3 */}
             {/* Change the height attribute to adjust the chart height */}
-            <FCE1BarChart data={chartData3} width={900} height={548} />
+            <FCE1BarChart data={chartData3} width={1800} height={800} />
           </div>
         </div>
       </Modal>

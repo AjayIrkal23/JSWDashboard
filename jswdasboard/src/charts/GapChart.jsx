@@ -492,7 +492,7 @@ function GapChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <FCE1BarChart data={chartData} width={900} height={548} />
+              <FCE1BarChart data={chartData} width={1800} height={800} />
             </div>
           )}
           {modal == 1 && (
@@ -504,7 +504,7 @@ function GapChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <FCE1BarChart data={chartData1} width={900} height={548} />
+              <FCE1BarChart data={chartData1} width={1800} height={800} />
             </div>
           )}
           {modal == 2 && (
@@ -516,7 +516,7 @@ function GapChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <FCE1BarChart data={chartData2} width={900} height={548} />
+              <FCE1BarChart data={chartData2} width={1800} height={800} />
             </div>
           )}
           {modal == 3 && (
@@ -528,7 +528,7 @@ function GapChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <FCE1BarChart data={chartData3} width={900} height={548} />
+              <FCE1BarChart data={chartData3} width={1800} height={800} />
             </div>
           )}
         </div>

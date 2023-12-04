@@ -113,7 +113,7 @@ const Gaps = ({ open, setOpen }) => {
             </header>
             {/* Chart built with Chart.js 3 */}
             {/* Change the height attribute to adjust the chart height */}
-            <GapChart data={chartData} width={900} height={548} />
+            <GapChart data={chartData} width={1800} height={800} />
           </div>
         </div>
       </Modal>

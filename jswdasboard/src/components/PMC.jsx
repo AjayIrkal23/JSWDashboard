@@ -9,11 +9,13 @@ const PMC = ({ open, setOpen, setTitle }) => {
     if (period == "Last Coil" || period.customp) {
       if (data?.pacing?.i_PacingMode == 2) {
         let value = 1;
-        return value;
+        return Number(value);
+       
       }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -25,9 +27,9 @@ const PMC = ({ open, setOpen, setTitle }) => {
           }
           return accumulator;
         }, 0);
-      return total1;
+      return  Number(total1);
     } else {
-      return "--";
+      return 0;
     }
   }
 
@@ -38,10 +40,11 @@ const PMC = ({ open, setOpen, setTitle }) => {
           new Date(data?.pacing?.gt_PrevFceDisChgTm)?.getTime()) /
         1000;
       differenceValue /= 60;
-      return Math.abs(Math.round(differenceValue));
+      return (differenceValue)
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -61,13 +64,12 @@ const PMC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = (total1 - total2) / data?.pacing?.length;
-
+      let value1 = (total1 - total2)
       var differenceValue = value1 / 1000;
       differenceValue /= 60;
       return Math.abs(Math.round(differenceValue));
     } else {
-      return "--";
+      return 0;
     }
   }
 
@@ -78,6 +80,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
       period == "Last Day" ||
+      period == "Last Shift" ||
       period?.date
     ) {
       let total1 =
@@ -88,11 +91,11 @@ const PMC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
       return value1;
     } else {
-      return "--";
+      return 0;
     }
   }
 
@@ -108,6 +111,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+        period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -119,7 +123,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
       if (pm == "+" && value1 >= 0) {
         return value1;
@@ -129,33 +133,33 @@ const PMC = ({ open, setOpen, setTitle }) => {
         return 0;
       }
     } else {
-      return "--";
+      return 0;
     }
   }
   return (
     <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-        <p>Discharge Gap Time</p>
+        <p className="font-semibold">Discharge Gap Time</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(minutesDiff())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-        <p>FCE-SSP Travel Time</p>
+        <p className="font-semibold">FCE-SSP Travel Time</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FCESSPTravelTime())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-        <p>PMA Count</p>
+        <p className="font-semibold">PMA Count</p>
         <p>-</p>
         <p className="font-semibold">{PMACount()}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>Pacing Offset (+)</p>
+        <p className="font-semibold">Pacing Offset (+)</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(PacingOffset("+"))}</p>
       </div>
       <div className="flex text-xs justify-between px-1  items-center pt-1 italic pb-1 pr-2 border-black/40">
-        <p>Pacing Offset (-)</p>
+        <p className="font-semibold">Pacing Offset (-)</p>
         <p>-</p>
         <p className="font-semibold ">{roundOff(PacingOffset("-"))}</p>
       </div>

@@ -57,11 +57,11 @@ const Live = () => {
               <Charging />
             </div>
           </div>
-          <div className="sticky top-[30%] px-4 flex gap-6  !text-xs justify-end ml-14">
+          <div className="sticky top-[25%] px-4 flex gap-6  !text-xs justify-end mr-20">
             <div className=" w-[200px] ">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-                  <p>Rev Pass Kick Out Time</p>
+                  <p className="font-semibold">Rev Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
                 </div>
@@ -70,7 +70,7 @@ const Live = () => {
             <div className=" w-[200px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-                  <p>Fwd Pass Kick Out Time</p>
+                  <p className="font-semibold">Fwd Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
                 </div>
@@ -80,7 +80,7 @@ const Live = () => {
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 {" "}
                 <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-                  <p>Rev Pass Kick Out Time</p>
+                  <p className="font-semibold">Rev Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
                 </div>
@@ -89,7 +89,7 @@ const Live = () => {
             <div className=" w-[200px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-                  <p>Fwd Pass Kick Out Time</p>
+                  <p className="font-semibold">Fwd Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
                 </div>
@@ -98,14 +98,14 @@ const Live = () => {
             <div className=" w-[200px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-                  <p>RM Transfer Bar Thickness</p>
+                  <p className="font-semibold">RM Transfer Bar Thickness</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="sticky top-[37%] px-4 flex gap-6  !text-xs justify-center">
+          <div className="sticky top-[47%] px-4 flex gap-12  !text-xs justify-center">
             <div className=" w-[250px] ">
               <PMC />
             </div>
@@ -129,21 +129,21 @@ const Live = () => {
             </div>
           </div>
 
-          <div className="sticky top-[71%] px-4 flex gap-6  !text-xs justify-between ml-52">
-            <div className=" w-[250px]">
+          <div className="sticky top-[75%] px-4 flex gap-6  !text-xs justify-between ml-52">
+            <div className=" w-[750px]">
               <FME />
             </div>
-            <div className="  ml-[200px] mt-6">
+            <div className="  ml-[200px] mt-8">
               <BottleNeck />
             </div>
-            <div className="ml-[100px] mt-6 w-[200px] mr-24">
+            <div className="ml-[100px] mt-10 w-[300px] mr-24">
               <DC />
             </div>
           </div>
 
           <div className="sticky top-[90%] pl-6 pt- pt-5 flex left-5 text-center gap-24">
             <div>
-              <p className="text-white text-sm italic pb-1">
+              <p className="text-white font-semibold text-sm italic pb-1">
                 Please Select An Option
               </p>
               <div className="  border flex  justify-center border-black cursor-pointer bg-white shadow-md">
@@ -171,14 +171,14 @@ const Live = () => {
                 >
                   <p>Last Hour</p>
                 </div>
-                <div
+                {/* <div
                   onClick={() => handleChange("Last Shift")}
                   className={`${
                     period === "Last Shift" && "bg-blue-500 !text-white"
                   } hover:bg-blue-500  p-3 italic font-semibold  hover:text-white text-sm border-r border-black`}
                 >
                   <p>Last Shift</p>
-                </div>
+                </div> */}
                 <div
                   onClick={() => handleChange("Last Day")}
                   className={`${
@@ -205,7 +205,7 @@ const Live = () => {
             </div>
 
             <div className="">
-              <p className="text-white text-sm italic pb-1">Visual Graphs</p>
+              <p className="text-white text-sm italic font-semibold pb-1">Visual Graphs</p>
               <div className="  flex  justify-center border-black cursor-pointer  gap-3">
                 <div
                   onClick={(e) => setOpen(true)}

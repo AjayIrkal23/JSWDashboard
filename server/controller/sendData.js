@@ -4,11 +4,13 @@ import ExcelData from "../model/excel.js";
 import PacingData from "../model/pacing.js";
 
 let config = {
-  user: "sa", //default is sa
-  password: "loloklol",
-  server: "localhost", // for local machine
-  database: "History", // name of database
+  user: "Dashboard", //default is sa
+  password: "Dashboard",
+  server: "10.11.2.41", // for local machine
+  database: "Production", // name of database
   trustServerCertificate: true,
+  encrypt:false,
+  port:1433,
   requestTimeout: 1800000,
 };
 

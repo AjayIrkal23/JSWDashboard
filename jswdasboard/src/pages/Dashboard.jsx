@@ -14,7 +14,7 @@ import DashboardCard06 from "../partials/dashboard/DashboardCard06";
 import DashboardCard07 from "../partials/dashboard/DashboardCard07";
 
 import DashboardCard14 from "../partials/dashboard/DashboardCard14";
-import D15 from "../partials/dashboard/d15";
+import D15 from "../partials/dashboard/D15";
 import D16 from "../partials/dashboard/D16";
 import DashboardExtra from "../partials/dashboard/Dashboardextra";
 import DashboardMain from "../partials/dashboard/DashboardMain";

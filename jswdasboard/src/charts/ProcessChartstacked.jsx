@@ -18,7 +18,7 @@ import { Modal } from "@mui/material";
 // Import utilities
 import { tailwindConfig, formatValue } from "../utils/Utils";
 import BarChart02 from "./BarChart02";
-import D15 from "../partials/dashboard/d15";
+import D15 from "../partials/dashboard/D15";
 import D17 from "../partials/dashboard/D17";
 import D18 from "../partials/dashboard/D18";
 

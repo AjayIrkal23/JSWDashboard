@@ -58,7 +58,7 @@ export const Accountprovider = ({ children }) => {
           toast.success("Data Fetching Successfull");
         });
     }
-  }, 60000);
+  }, 30000);
 
   useInterval(async () => {
     // Your custom logic here
@@ -92,7 +92,16 @@ export const Accountprovider = ({ children }) => {
           toast.dismiss();
           toast.success("Data Fetching Successfull");
         });
-    } else if (period == "Last Day") {
+    }else if (period == "Last Shift") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    }
+     else if (period == "Last Day") {
       await axios
         .post("http://localhost:8000/sendData", { period: period })
         .then((resp) => {

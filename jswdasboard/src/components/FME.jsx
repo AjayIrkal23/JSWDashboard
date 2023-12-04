@@ -7,17 +7,12 @@ const FM = ({ open, setOpen }) => {
   function FMEPredicted() {
     if (period == "Last Coil" || period.customp) {
       return (
-        (Math.floor(
-          Math.abs(
-            data?.pacing?.f_FMProcessTimePred - data?.pacing?.f_FMProcessTimeAct
-          ) * 100
-        ) *
-          -1) /
-        100
+    data?.pacing?.f_FMProcessTimePred - data?.pacing?.f_FMProcessTimeAct 
       );
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -39,19 +34,17 @@ const FM = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = (total1 - total2) / data?.pacing?.length;
+      let value1 = (total1 - total2) 
 
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      return (value1) 
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function FMProcessTime(a) {
     if (period == "Last Coil" || period.customp) {
-      return (
-        (Math.floor(Math.abs(data?.Excel?.f_FMProcessTimeAct) * 100) * -1) / 100
-      );
+      return (data?.Excel?.f_FMProcessTimeAct)
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -72,20 +65,18 @@ const FM = ({ open, setOpen }) => {
 
       if (a == "a") {
         let value1 = total1 / data?.pacing?.length;
-        return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+        return (value1) 
       } else {
-        return (Math.floor(Math.abs(total1) * 100) * -1) / 100;
+        return (total1)
       }
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function FMGapTime(a) {
     if (period == "Last Coil" || period.customp) {
-      return (
-        (Math.floor(Math.abs(data?.Excel?.f_F1GapTimeAct) * 100) * -1) / 100
-      );
+      return (data?.Excel?.f_F1GapTimeAct)
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -106,21 +97,20 @@ const FM = ({ open, setOpen }) => {
 
       if (a == "a") {
         let value1 = total1 / data?.pacing?.length;
-        return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+        return (value1) 
       } else {
-        return (Math.floor(Math.abs(total1) * 100) * -1) / 100;
+        return (total1)
       }
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function FMProcessDelay() {
     if (period == "Last Coil" || period.customp) {
-      return (
-        (Math.floor(Math.abs(data?.Excel?.f_R1R2TravelTimeDelay) * 100) * -1) /
-        100
-      );
+      return (data?.pacing?.f_FMProcessTimePred - data?.pacing?.f_FMProcessTimeAct) 
+      
+     
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -128,29 +118,35 @@ const FM = ({ open, setOpen }) => {
       period?.date
     ) {
       let total1 =
-        data?.Excel.length > 1 &&
-        data?.Excel?.reduce(
+        data?.pacing.length > 1 &&
+        data?.pacing?.reduce(
           (accumulator, currentValue) =>
-            accumulator + currentValue.f_R1R2TravelTimeDelay,
+            accumulator + currentValue.f_FMProcessTimePred,
+          0
+        );
+
+        let total2 =
+        data?.pacing.length > 1 &&
+        data?.pacing?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_FMProcessTimeAct,
           0
         );
 
       console.log(total1);
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 - total2
 
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      return (value1) 
     } else {
-      return "--";
+      return 0;
     }
   }
 
   function FMTravelDelay() {
     if (period == "Last Coil" || period.customp) {
-      return (
-        (Math.floor(Math.abs(data?.Excel?.f_R1R2TravelTimeDelay) * 100) * -1) /
-        100
-      );
+      return (data?.Excel?.f_R1R2TravelTimeDelay) 
+     
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -167,39 +163,44 @@ const FM = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 / data?.pacing?.length;
+      let value1 = total1 
 
-      return (Math.floor(Math.abs(value1) * 100) * -1) / 100;
+      return (value1) 
     } else {
-      return "--";
+      return 0;
     }
   }
 
   return (
-    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
+    <div className="flex gap-5 ">
+ <div className="flex flex-col w-[300px] justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p>FM Predicted Gap Time </p>
+        <p className="font-semibold">FM Predicted Gap Time </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FMEPredicted())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p>FM Travel Delay </p>
+        <p className="font-semibold">FM Travel Delay </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FMTravelDelay())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p>FM Process Time Actual</p>
+        <p className="font-semibold">FM Process Time Actual</p>
         <p>-</p>
         <p className="font-semibold">{roundOff(FMProcessTime())}</p>
       </div>
       {period !== "Last Piece" && (
         <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-          <p>FM Process Time Average</p>
+          <p className="font-semibold">FM Process Time Average</p>
           <p>-</p>
           <p className="font-semibold ">{roundOff(FMProcessTime("a"))}</p>
         </div>
       )}
 
+   
+    </div>
+    <div className="flex flex-col w-[250px]  border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
+ 
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>FM Gap Time Average</p>
         <p>-</p>
@@ -208,7 +209,7 @@ const FM = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p>Role Change Delay</p>
         <p>-</p>
-        <p className="font-semibold ">3</p>
+        <p className="font-semibold ">Not Done</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b items-center border-black/40 pt-1 italic pr-2">
         <p>FM Process Delay Time </p>
@@ -216,6 +217,8 @@ const FM = ({ open, setOpen }) => {
         <p className="font-semibold">{roundOff(FMProcessDelay())}</p>
       </div>
     </div>
+    </div>
+   
   );
 };
 
