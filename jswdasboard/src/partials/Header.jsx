@@ -16,11 +16,7 @@ function Header({ sidebarOpen, setSidebarOpen }) {
     <header className="sticky top-0 bg-white dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 -mb-px">
-          <img
-            src="/logo.png"
-            alt=""
-            className="h-8 w-20  "
-          />
+          <img src="/logo.png" alt="" className="h-8 w-20  " />
           {/* Header: Left side */}
           <div className="flex">
             {/* Hamburger button */}
@@ -57,6 +53,19 @@ function Header({ sidebarOpen, setSidebarOpen }) {
               </Link>
             ) : (
               <>
+                <div>
+                  {" "}
+                  <span className=" text-gray-700">Total Coils</span> -
+                  <span className="text-sm text-gray-600 mx-2 border mr-12 px-3 py-1.5 border-black/20 rounded-md shadow-md  font-bold">
+                    {period == "Last 5 Coil" ||
+                    period == "Last Hour" ||
+                    period == "Last Shift" ||
+                    period == "Last Day" ||
+                    period.date
+                      ? `${data?.Excel.length} `
+                      : 1}
+                  </span>
+                </div>
                 <div>
                   {" "}
                   <span className=" text-gray-700">Piece ID</span> -

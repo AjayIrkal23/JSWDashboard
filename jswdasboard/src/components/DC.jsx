@@ -1,13 +1,17 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 
 const DC = ({ open, setOpen, setTitle }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
 
   function DCProcessTime(a) {
     if (period == "Last Coil" || period.customp) {
-      return (data?.pacing?.f_DCProcessTimeAct)
+      if (mins) {
+        return ToMins(data?.pacing?.f_DCProcessTimeAct);
+      } else {
+        return data?.pacing?.f_DCProcessTimeAct;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -23,9 +27,14 @@ const DC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = total1 
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
 
-      return (value1)
+      return value1;
     } else {
       return 0;
     }
@@ -33,8 +42,12 @@ const DC = ({ open, setOpen, setTitle }) => {
 
   function DCGapTime(a) {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.f_DCGapTimeAct) 
-     
+      if (mins) {
+        return ToMins(data?.Excel?.f_DCGapTimeAct);
+      } else {
+        return data?.Excel?.f_DCGapTimeAct;
+      }
+      return data?.Excel?.f_DCGapTimeAct;
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -49,9 +62,13 @@ const DC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return (value1) 
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }

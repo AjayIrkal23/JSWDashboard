@@ -66,8 +66,8 @@ function ProcessChart({ data, width, height, shift }) {
   const [modal, setModal] = useState(null);
   const get135Labels = () => {
     let arr = [];
-    for (let index = 1; index < 100; index++) {
-      if (index * 5 != 135) {
+    for (let index = 0; index < 100; index++) {
+      if (index * 5 != 140) {
         arr.push(index * 5);
       } else {
         console.log(arr);
@@ -75,7 +75,6 @@ function ProcessChart({ data, width, height, shift }) {
       }
     }
   };
-
   const GapData = () => {
     if (period == "Last Coil" || period.customp) {
       const start = 0;
@@ -92,8 +91,8 @@ function ProcessChart({ data, width, height, shift }) {
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
         ) {
-          if (EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) <= 0) {
-            arr1.push(EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1));
+          if (EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) <= 1) {
+            arr1.push(1);
           } else {
             arr1.push(0);
           }
@@ -101,7 +100,7 @@ function ProcessChart({ data, width, height, shift }) {
             EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) > 1 &&
             EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) <= 5
           ) {
-            arr2.push(EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1));
+            arr2.push(1);
           } else {
             arr2.push(0);
           }
@@ -109,7 +108,7 @@ function ProcessChart({ data, width, height, shift }) {
             EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) > 5 &&
             EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) <= 10
           ) {
-            arr3.push(EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1));
+            arr3.push(1);
           } else {
             arr3.push(0);
           }
@@ -117,7 +116,7 @@ function ProcessChart({ data, width, height, shift }) {
             EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) > 11 &&
             EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1) <= 999
           ) {
-            arr4.push(EP?.pacing?.f_SSPProcessTimeDelay?.toFixed(1));
+            arr4.push(1);
           } else {
             arr4.push(0);
           }
@@ -144,35 +143,123 @@ function ProcessChart({ data, width, height, shift }) {
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
         console.log(index, plus5);
-        let total = EP?.pacing?.reduce((accumulator, currentValue) => {
+        let one = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_SSPProcessTimeDelay;
+            if (currentValue.f_SSPProcessTimeDelay <= 1) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.f_SSPProcessTimeDelay <= 1) {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
-        if (total <= 0) {
-          arr1.push(total?.toFixed(1));
-        } else {
-          arr1.push(0);
-        }
-        if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
-          arr2.push(total?.toFixed(1));
-        } else {
-          arr2.push(0);
-        }
-        if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
-          arr3.push(total?.toFixed(1));
-        } else {
-          arr3.push(0);
-        }
-        if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
-          arr4.push(total?.toFixed(1));
-        } else {
-          arr4.push(0);
-        }
+        let five = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_SSPProcessTimeDelay > 1 &&
+              currentValue.f_SSPProcessTimeDelay <= 5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_SSPProcessTimeDelay > 1 &&
+              currentValue.f_SSPProcessTimeDelay <= 5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let ten = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_SSPProcessTimeDelay >= 5 &&
+              currentValue.f_SSPProcessTimeDelay <= 10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_SSPProcessTimeDelay >= 5 &&
+              currentValue.f_SSPProcessTimeDelay <= 10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let nine = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_SSPProcessTimeDelay >= 10 &&
+              currentValue.f_SSPProcessTimeDelay <= 999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_SSPProcessTimeDelay >= 10 &&
+              currentValue.f_SSPProcessTimeDelay <= 999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        arr1.push(one);
+        arr2.push(five);
+        arr3.push(ten);
+        arr4.push(nine);
+        // if (total <= 0) {
+        //   arr1.push(total?.toFixed(1));
+        // } else {
+        //   arr1.push(0);
+        // }
+        // if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
+        //   arr2.push(total?.toFixed(1));
+        // } else {
+        //   arr2.push(0);
+        // }
+        // if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
+        //   arr3.push(total?.toFixed(1));
+        // } else {
+        //   arr3.push(0);
+        // }
+        // if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
+        //   arr4.push(total?.toFixed(1));
+        // } else {
+        //   arr4.push(0);
+        // }
       }
 
       setOne(arr1);
@@ -199,63 +286,47 @@ function ProcessChart({ data, width, height, shift }) {
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
         ) {
           if (
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            ).toFixed(1) <= 0
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) <=
+            1
           ) {
-            arr1.push(
-              (
-                EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-              )?.toFixed(1)
-            );
+            arr1.push(1);
           } else {
             arr1.push(0);
           }
           if (
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            )?.toFixed(1) > 1 &&
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            ).toFixed(1) <= 5
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) >
+              1 &&
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) <=
+              5
           ) {
-            arr2.push(
-              (
-                EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-              )?.toFixed(1)
-            );
+            arr2.push(1);
           } else {
             arr2.push(0);
           }
           if (
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            ).toFixed(1) > 5 &&
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            ).toFixed(1) <= 10
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) >
+              5 &&
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) <=
+              10
           ) {
-            arr3.push(
-              (
-                EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-              )?.toFixed(1)
-            );
+            arr3.push(1);
           } else {
             arr3.push(0);
           }
           if (
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            ).toFixed(1) > 11 &&
-            (
-              EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-            ).toFixed(1) <= 999
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) >
+              11 &&
+            EP?.pacing?.f_FMProcessTimePred -
+              EP?.pacing?.f_FMProcessTimeAct?.toFixed(1) <=
+              999
           ) {
-            arr4.push(
-              (
-                EP?.pacing?.f_FMProcessTimePred - EP?.pacing?.f_FMProcessTimeAct
-              )?.toFixed(1)
-            );
+            arr4.push(1);
           } else {
             arr4.push(0);
           }
@@ -282,38 +353,155 @@ function ProcessChart({ data, width, height, shift }) {
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
         console.log(index, plus5);
-        let total = EP?.pacing?.reduce((accumulator, currentValue) => {
+        let one = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
           ) {
-            accumulator =
-              accumulator +
-              (currentValue.f_FMProcessTimePred -
-                currentValue.f_FMProcessTimeAct);
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+              1
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+              1
+            ) {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
-        if (total <= 0) {
-          arr1.push(total?.toFixed(1));
-        } else {
-          arr1.push(0);
-        }
-        if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
-          arr2.push(total?.toFixed(1));
-        } else {
-          arr2.push(0);
-        }
-        if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
-          arr3.push(total?.toFixed(1));
-        } else {
-          arr3.push(0);
-        }
-        if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
-          arr4.push(total?.toFixed(1));
-        } else {
-          arr4.push(0);
-        }
+        let five = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct >=
+                1 &&
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+                5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct >=
+                1 &&
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+                5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let ten = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct >=
+                5 &&
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+                10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct >=
+                5 &&
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+                10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let nine = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct >=
+                10 &&
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+                999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct >=
+                10 &&
+              currentValue.f_FMProcessTimePred -
+                currentValue.f_FMProcessTimeAct <=
+                999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        arr1.push(one);
+        arr2.push(five);
+        arr3.push(ten);
+        arr4.push(nine);
+        // if (total <= 0) {
+        //   arr1.push(total?.toFixed(1));
+        // } else {
+        //   arr1.push(0);
+        // }
+        // if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
+        //   arr2.push(total?.toFixed(1));
+        // } else {
+        //   arr2.push(0);
+        // }
+        // if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
+        //   arr3.push(total?.toFixed(1));
+        // } else {
+        //   arr3.push(0);
+        // }
+        // if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
+        //   arr4.push(total?.toFixed(1));
+        // } else {
+        //   arr4.push(0);
+        // }
       }
 
       setOne4(arr1);
@@ -336,35 +524,35 @@ function ProcessChart({ data, width, height, shift }) {
         let plus5 = index + 5;
         console.log(index, plus5);
         if (
-          EP?.Excel?.f_F1GapTimeAct?.toFixed(1) >= index &&
-          EP?.Excel?.f_F1GapTimeAct?.toFixed(1) <= plus5
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
         ) {
-          if (EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) <= 0) {
-            arr1.push(EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1));
+          if (EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) <= 1) {
+            arr1.push(1);
           } else {
             arr1.push(0);
           }
           if (
-            EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) > 1 &&
-            EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) <= 5
+            EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) > 1 &&
+            EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) <= 5
           ) {
-            arr2.push(EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1));
+            arr2.push(1);
           } else {
             arr2.push(0);
           }
           if (
-            EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) > 5 &&
-            EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) <= 10
+            EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) > 5 &&
+            EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) <= 10
           ) {
-            arr3.push(EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1));
+            arr3.push(1);
           } else {
             arr3.push(0);
           }
           if (
-            EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) > 11 &&
-            EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1) <= 999
+            EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) > 11 &&
+            EP?.pacing?.f_R2ProcessTimeDelay?.toFixed(1) <= 999
           ) {
-            arr4.push(EP?.Excel?.f_R2ProcessTimeDelay?.toFixed(1));
+            arr4.push(1);
           } else {
             arr4.push(0);
           }
@@ -391,35 +579,123 @@ function ProcessChart({ data, width, height, shift }) {
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
         console.log(index, plus5);
-        let total = EP?.Excel?.reduce((accumulator, currentValue) => {
+        let one = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_R2ProcessTimeDelay;
+            if (currentValue.f_R2ProcessTimeDelay <= 1) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.f_R2ProcessTimeDelay <= 1) {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
-        if (total <= 0) {
-          arr1.push(total?.toFixed(1));
-        } else {
-          arr1.push(0);
-        }
-        if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
-          arr2.push(total?.toFixed(1));
-        } else {
-          arr2.push(0);
-        }
-        if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
-          arr3.push(total?.toFixed(1));
-        } else {
-          arr3.push(0);
-        }
-        if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
-          arr4.push(total?.toFixed(1));
-        } else {
-          arr4.push(0);
-        }
+        let five = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_R2ProcessTimeDelay > 1 &&
+              currentValue.f_R2ProcessTimeDelay <= 5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_R2ProcessTimeDelay > 1 &&
+              currentValue.f_R2ProcessTimeDelay <= 5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let ten = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_R2ProcessTimeDelay >= 5 &&
+              currentValue.f_R2ProcessTimeDelay <= 10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_R2ProcessTimeDelay >= 5 &&
+              currentValue.f_R2ProcessTimeDelay <= 10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let nine = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_R2ProcessTimeDelay >= 10 &&
+              currentValue.f_R2ProcessTimeDelay <= 999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_R2ProcessTimeDelay >= 10 &&
+              currentValue.f_R2ProcessTimeDelay <= 999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        arr1.push(one);
+        arr2.push(five);
+        arr3.push(ten);
+        arr4.push(nine);
+        // if (total <= 0) {
+        //   arr1.push(total?.toFixed(1));
+        // } else {
+        //   arr1.push(0);
+        // }
+        // if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
+        //   arr2.push(total?.toFixed(1));
+        // } else {
+        //   arr2.push(0);
+        // }
+        // if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
+        //   arr3.push(total?.toFixed(1));
+        // } else {
+        //   arr3.push(0);
+        // }
+        // if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
+        //   arr4.push(total?.toFixed(1));
+        // } else {
+        //   arr4.push(0);
+        // }
       }
 
       setOne2(arr1);
@@ -442,35 +718,35 @@ function ProcessChart({ data, width, height, shift }) {
         let plus5 = index + 5;
         console.log(index, plus5);
         if (
-          EP?.Excel?.f_F1GapTimeAct?.toFixed(1) >= index &&
-          EP?.Excel?.f_F1GapTimeAct?.toFixed(1) <= plus5
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
         ) {
-          if (EP?.Excel?.f_SSPGapTimeAct?.toFixed(1) <= 0) {
-            arr1.push(EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1));
+          if (EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) <= 1) {
+            arr1.push(1);
           } else {
             arr1.push(0);
           }
           if (
-            EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1) > 1 &&
-            EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1) <= 5
+            EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) > 1 &&
+            EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) <= 5
           ) {
-            arr2.push(EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1));
+            arr2.push(1);
           } else {
             arr2.push(0);
           }
           if (
-            EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1) > 5 &&
-            EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1) <= 10
+            EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) > 5 &&
+            EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) <= 10
           ) {
-            arr3.push(EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1));
+            arr3.push(1);
           } else {
             arr3.push(0);
           }
           if (
-            EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1) > 11 &&
-            EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1) <= 999
+            EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) > 11 &&
+            EP?.pacing?.f_R1ProcessTimeDelay?.toFixed(1) <= 999
           ) {
-            arr4.push(EP?.Excel?.f_R1ProcessTimeDelay?.toFixed(1));
+            arr4.push(1);
           } else {
             arr4.push(0);
           }
@@ -497,35 +773,123 @@ function ProcessChart({ data, width, height, shift }) {
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
         console.log(index, plus5);
-        let total = EP?.Excel?.reduce((accumulator, currentValue) => {
+        let one = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_R1ProcessTimeDelay;
+            if (currentValue.f_R1ProcessTimeDelay <= 1) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.f_R1ProcessTimeDelay <= 1) {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
-        if (total <= 0) {
-          arr1.push(total?.toFixed(1));
-        } else {
-          arr1.push(0);
-        }
-        if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
-          arr2.push(total?.toFixed(1));
-        } else {
-          arr2.push(0);
-        }
-        if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
-          arr3.push(total?.toFixed(1));
-        } else {
-          arr3.push(0);
-        }
-        if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
-          arr4.push(total?.toFixed(1));
-        } else {
-          arr4.push(0);
-        }
+        let five = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_R1ProcessTimeDelay > 1 &&
+              currentValue.f_R1ProcessTimeDelay <= 5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_R1ProcessTimeDelay > 1 &&
+              currentValue.f_R1ProcessTimeDelay <= 5
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let ten = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_R1ProcessTimeDelay >= 5 &&
+              currentValue.f_R1ProcessTimeDelay <= 10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_R1ProcessTimeDelay >= 5 &&
+              currentValue.f_R1ProcessTimeDelay <= 10
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        let nine = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.f_R1ProcessTimeDelay >= 10 &&
+              currentValue.f_R1ProcessTimeDelay <= 999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.f_R1ProcessTimeDelay >= 10 &&
+              currentValue.f_R1ProcessTimeDelay <= 999
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        arr1.push(one);
+        arr2.push(five);
+        arr3.push(ten);
+        arr4.push(nine);
+        // if (total <= 0) {
+        //   arr1.push(total?.toFixed(1));
+        // } else {
+        //   arr1.push(0);
+        // }
+        // if (total?.toFixed(2) > 1 && total?.toFixed(2) <= 5) {
+        //   arr2.push(total?.toFixed(1));
+        // } else {
+        //   arr2.push(0);
+        // }
+        // if (total?.toFixed(2) > 5 && total?.toFixed(2) <= 10) {
+        //   arr3.push(total?.toFixed(1));
+        // } else {
+        //   arr3.push(0);
+        // }
+        // if (total?.toFixed(2) > 11 && total?.toFixed(2) <= 999) {
+        //   arr4.push(total?.toFixed(1));
+        // } else {
+        //   arr4.push(0);
+        // }
       }
 
       setOne1(arr1);
@@ -583,7 +947,7 @@ function ProcessChart({ data, width, height, shift }) {
       // Light blue bars
       {
         data: oneMin1,
-        label: "R1 Process Time Delay[<=0]",
+        label: "R1 Process Time Delay[<=1]",
         backgroundColor: tailwindConfig().theme.colors.orange[700],
         hoverBackgroundColor: tailwindConfig().theme.colors.orange[800],
         barPercentage: 0.66,
@@ -625,7 +989,7 @@ function ProcessChart({ data, width, height, shift }) {
       // Light blue bars
       {
         data: oneMin2,
-        label: "R2 Process Time Delay[<=0]",
+        label: "R2 Process Time Delay[<=1]",
         backgroundColor: tailwindConfig().theme.colors.orange[700],
         hoverBackgroundColor: tailwindConfig().theme.colors.orange[800],
         barPercentage: 0.66,
@@ -733,7 +1097,7 @@ function ProcessChart({ data, width, height, shift }) {
       options: {
         layout: {
           padding: {
-            top: 12,
+            top: 40, // Increase the top padding value
             bottom: 16,
             left: 20,
             right: 20,
@@ -871,7 +1235,7 @@ function ProcessChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <ProcessStacked data={chartData} width={900} height={548} />
+              <ProcessStacked data={chartData} width={1800} height={800} />
             </div>
           )}
           {modal == 1 && (
@@ -883,7 +1247,7 @@ function ProcessChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <ProcessStacked data={chartData1} width={900} height={548} />
+              <ProcessStacked data={chartData1} width={1800} height={800} />
             </div>
           )}
           {modal == 2 && (
@@ -895,7 +1259,7 @@ function ProcessChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <ProcessStacked data={chartData2} width={900} height={548} />
+              <ProcessStacked data={chartData2} width={1800} height={800} />
             </div>
           )}
           {modal == 3 && (
@@ -907,7 +1271,7 @@ function ProcessChart({ data, width, height, shift }) {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <ProcessStacked data={chartData3} width={900} height={548} />
+              <ProcessStacked data={chartData3} width={1800} height={800} />
             </div>
           )}
         </div>

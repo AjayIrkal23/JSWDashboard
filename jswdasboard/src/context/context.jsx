@@ -9,6 +9,7 @@ export const Accountprovider = ({ children }) => {
   const [period, setPeriod] = useState("Last Coil");
   const [mainData, setMainData] = useState(null);
   const [eightData, setEightData] = useState(null);
+  const [mins, setMins] = useState(false);
 
   console.log(eightData, "eightData");
 
@@ -92,7 +93,7 @@ export const Accountprovider = ({ children }) => {
           toast.dismiss();
           toast.success("Data Fetching Successfull");
         });
-    }else if (period == "Last Shift") {
+    } else if (period == "Last Shift") {
       await axios
         .post("http://localhost:8000/sendData", { period: period })
         .then((resp) => {
@@ -100,8 +101,7 @@ export const Accountprovider = ({ children }) => {
           toast.dismiss();
           toast.success("Data Fetching Successfull");
         });
-    }
-     else if (period == "Last Day") {
+    } else if (period == "Last Day") {
       await axios
         .post("http://localhost:8000/sendData", { period: period })
         .then((resp) => {
@@ -122,6 +122,11 @@ export const Accountprovider = ({ children }) => {
         .post("http://localhost:8000/sendData", { period: period })
         .then((resp) => {
           setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        })
+        .catch((resp) => {
+          toast.error("Data Fetching Successfull");
         });
     }
   };
@@ -130,11 +135,11 @@ export const Accountprovider = ({ children }) => {
     getData3();
     getData();
     getData2();
-  }, [period]);
+  }, [period, mins]);
 
   return (
     <AccountContext.Provider
-      value={{ period, setPeriod, data, mainData, eightData }}
+      value={{ period, setPeriod, data, mainData, eightData, setMins, mins }}
     >
       {children}
     </AccountContext.Provider>

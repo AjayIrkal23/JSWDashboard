@@ -9,8 +9,8 @@ let config = {
   server: "10.11.2.41", // for local machine
   database: "Production", // name of database
   trustServerCertificate: true,
-  encrypt:false,
-  port:1433,
+  encrypt: false,
+  port: 1433,
   requestTimeout: 1800000,
 };
 
@@ -84,11 +84,12 @@ export const SendData = async (req, res) => {
       let check = d.toUTCString();
       let dateObj = d.toTimeString().split(" ")[0];
     } else if (req?.body?.period.customp) {
+      const customPieceName = req?.body?.period.customp;
       const Excel = await ExcelData.findOne({
-        c_PieceName: req?.body?.period.customp,
+        c_PieceName: new RegExp(customPieceName.replace(/\s+/g, "\\s*")),
       });
       const pacing = await PacingData.findOne({
-        c_PieceName: req?.body?.period.customp,
+        c_PieceName: new RegExp(customPieceName.replace(/\s+/g, "\\s*")),
       });
       if (Excel && pacing) {
         res.status(200).json({ Excel, pacing });
@@ -114,25 +115,28 @@ export const SendData = async (req, res) => {
         res.status(202).json("No ID Match found in Db");
       }
     } else if (req?.body?.period?.date && req?.body?.period?.time) {
-      const start = new Date(
+      const startDate = new Date(
         req?.body?.period?.date[0] + " " + req?.body?.period?.time[0]
-      ).toISOString();
-      const end = new Date(
+      );
+      const endDate = new Date(
         req?.body?.period?.date[1] + " " + req?.body?.period?.time[1]
-      ).toISOString();
+      );
 
       const Excel = await ExcelData.find({
         gt_HistoryKeyTm: {
-          $gte: start,
-          $lte: end,
+          $gte: startDate,
+          $lte: endDate,
         },
       });
+
       const pacing = await PacingData.find({
         gt_HistoryKeyTm: {
-          $gte: start,
-          $lte: end,
+          $gte: startDate,
+          $lte: endDate,
         },
       });
+
+      console.log(Excel, pacing);
 
       if (Excel && pacing) {
         res.status(200).json({ Excel, pacing });

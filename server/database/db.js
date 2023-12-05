@@ -4,7 +4,7 @@ dotenv.config();
 
 const Connection = async () => {
   try {
-    await mongoose.connect("mongodb://docketrun:docketrun@localhost:27017/?authMechanism=DEFAULT", {
+    await mongoose.connect("mongodb://localhost:27017/", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

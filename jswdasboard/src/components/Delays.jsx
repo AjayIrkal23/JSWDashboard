@@ -25,6 +25,7 @@ const Delays = ({ open, setOpen }) => {
       arr.push(data?.Excel?.f_R1R2TravelTimeDelay?.toFixed(2));
       arr.push(data?.Excel?.f_R2ProcessTimeDelay?.toFixed(2));
       arr.push(data?.Excel?.f_R2FEntTravelTimeDelay?.toFixed(2));
+      arr.push(data?.pacing?.f_FCE1SSPTravelTimeDelay?.toFixed(2));
 
       setChartData(arr);
     } else if (
@@ -95,6 +96,14 @@ const Delays = ({ open, setOpen }) => {
           0
         );
 
+      let total9 =
+        data?.pacing.length > 1 &&
+        data?.pacing?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_FCE1SSPTravelTimeDelay,
+          0
+        );
+
       arr.push(total1?.toFixed(2));
       arr.push(total2?.toFixed(2));
       arr.push(total3?.toFixed(2));
@@ -103,6 +112,7 @@ const Delays = ({ open, setOpen }) => {
       arr.push(total6?.toFixed(2));
       arr.push(total7?.toFixed(2));
       arr.push(total8?.toFixed(2));
+      arr.push(total9?.toFixed(2));
 
       setChartData(arr);
     } else {
@@ -124,6 +134,7 @@ const Delays = ({ open, setOpen }) => {
       ["R2", "Travel", "delay"],
       ["R2", "Process", "Delay"],
       ["FME", "Travel", "Delay"],
+      ["FCE ", "To", "SSP", "Travel", "Delay"],
     ],
     datasets: [
       // Light blue bars

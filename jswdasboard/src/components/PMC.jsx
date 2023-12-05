@@ -1,16 +1,15 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 
 const PMC = ({ open, setOpen, setTitle }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
 
   function PMACount(fw) {
     if (period == "Last Coil" || period.customp) {
       if (data?.pacing?.i_PacingMode == 2) {
         let value = 1;
         return Number(value);
-       
       }
     } else if (
       period == "Last 5 Coil" ||
@@ -27,7 +26,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
           }
           return accumulator;
         }, 0);
-      return  Number(total1);
+      return Number(total1);
     } else {
       return 0;
     }
@@ -40,7 +39,12 @@ const PMC = ({ open, setOpen, setTitle }) => {
           new Date(data?.pacing?.gt_PrevFceDisChgTm)?.getTime()) /
         1000;
       differenceValue /= 60;
-      return (differenceValue)
+
+      if (mins) {
+        return ToMins(differenceValue);
+      } else {
+        return differenceValue;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -64,10 +68,14 @@ const PMC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = (total1 - total2)
+      let value1 = total1 - total2;
       var differenceValue = value1 / 1000;
       differenceValue /= 60;
-      return Math.abs(Math.round(differenceValue));
+      if (mins) {
+        return ToMins(Math.abs(Math.round(differenceValue)));
+      } else {
+        return Math.abs(Math.round(differenceValue));
+      }
     } else {
       return 0;
     }
@@ -75,7 +83,11 @@ const PMC = ({ open, setOpen, setTitle }) => {
 
   function FCESSPTravelTime() {
     if (period == "Last Coil" || period.customp) {
-      return data?.Excel?.f_SSPR1TravelTimeDelay;
+      if (mins) {
+        return ToMins(data?.Excel?.f_SSPR1TravelTimeDelay);
+      } else {
+        return data?.Excel?.f_SSPR1TravelTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -91,9 +103,13 @@ const PMC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return value1;
+      if (mins) {
+        return ToMins(total1);
+      } else {
+        return total1;
+      }
     } else {
       return 0;
     }
@@ -111,7 +127,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
-        period == "Last Shift" ||
+      period == "Last Shift" ||
       period == "Last Day" ||
       period?.date
     ) {
@@ -123,7 +139,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
           0
         );
 
-      let value1 = total1 
+      let value1 = total1;
 
       if (pm == "+" && value1 >= 0) {
         return value1;

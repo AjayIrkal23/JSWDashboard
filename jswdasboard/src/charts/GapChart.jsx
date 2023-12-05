@@ -63,15 +63,21 @@ function GapChart({ data, width, height, shift }) {
     if (period == "Last Coil" || period.customp) {
       const start = 0;
       const end = 140;
+
       let arr = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
         console.log(index, plus5);
         if (
-          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
-          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) <= plus5
+          EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) >= index &&
+          EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) <= plus5
         ) {
-          arr.push(EP?.pacing?.f_SSPGapTimeAct?.toFixed(2));
+          arr.push(1);
+        } else if (
+          EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) >= index &&
+          index >= 135
+        ) {
+          arr.push(1);
         } else {
           arr.push(0);
         }
@@ -90,13 +96,18 @@ function GapChart({ data, width, height, shift }) {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         let total = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
-            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
-            currentValue.f_F1GapTimeAct?.toFixed(2) <= plus5
+            currentValue.f_SSPGapTimeAct?.toFixed(2) >= index &&
+            currentValue.f_SSPGapTimeAct?.toFixed(2) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_SSPGapTimeAct;
+            accumulator = accumulator + 1;
+          } else if (
+            currentValue?.f_SSPGapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            accumulator = accumulator + 1;
           }
           return accumulator;
         }, 0);
@@ -114,12 +125,17 @@ function GapChart({ data, width, height, shift }) {
       let arr = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+        console.log(EP?.pacing?.f_R1GapTimeAct?.toFixed(2), "f_R1GapTimeAct");
         if (
-          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
-          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) <= plus5
+          EP?.pacing?.f_R1GapTimeAct?.toFixed(2) >= index &&
+          EP?.pacing?.f_R1GapTimeAct?.toFixed(2) <= plus5
         ) {
-          arr.push(EP?.pacing?.f_R1GapTimeAct?.toFixed(2));
+          arr.push(1);
+        } else if (
+          EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) >= index &&
+          index >= 135
+        ) {
+          arr.push(1);
         } else {
           arr.push(0);
         }
@@ -141,10 +157,15 @@ function GapChart({ data, width, height, shift }) {
         console.log(index, plus5);
         let total = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
-            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
-            currentValue.f_F1GapTimeAct?.toFixed(2) <= plus5
+            currentValue.f_R1GapTimeAct?.toFixed(2) >= index &&
+            currentValue.f_R1GapTimeAct?.toFixed(2) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_R1GapTimeAct;
+            accumulator = accumulator + 1;
+          } else if (
+            currentValue.f_R1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            accumulator = accumulator + 1;
           }
           return accumulator;
         }, 0);
@@ -167,7 +188,7 @@ function GapChart({ data, width, height, shift }) {
           EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
           EP?.pacing?.f_F1GapTimeAct?.toFixed(2) <= plus5
         ) {
-          arr.push(EP?.pacing?.f_F1GapTimeAct?.toFixed(2));
+          arr.push();
         } else {
           arr.push(0);
         }
@@ -192,7 +213,12 @@ function GapChart({ data, width, height, shift }) {
             currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(2) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_F1GapTimeAct;
+            accumulator = accumulator + 1;
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            accumulator = accumulator + 1;
           }
           return accumulator;
         }, 0);
@@ -212,10 +238,15 @@ function GapChart({ data, width, height, shift }) {
         let plus5 = index + 5;
         console.log(index, plus5);
         if (
-          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
-          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) <= plus5
+          EP?.pacing?.f_R2GapTimeAct?.toFixed(2) >= index &&
+          EP?.pacing?.f_R2GapTimeAct?.toFixed(2) <= plus5
         ) {
-          arr.push(EP?.pacing?.f_R2GapTimeAct?.toFixed(2));
+          arr.push(1);
+        } else if (
+          EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) >= index &&
+          index >= 135
+        ) {
+          arr.push(1);
         } else {
           arr.push(0);
         }
@@ -237,10 +268,15 @@ function GapChart({ data, width, height, shift }) {
         console.log(index, plus5);
         let total = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
-            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
-            currentValue.f_F1GapTimeAct?.toFixed(2) <= plus5
+            currentValue.f_R2GapTimeAct?.toFixed(2) >= index &&
+            currentValue.f_R2GapTimeAct?.toFixed(2) <= plus5
           ) {
-            accumulator = accumulator + currentValue.f_R2GapTimeAct;
+            accumulator = accumulator + 1;
+          } else if (
+            currentValue?.f_R2GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            accumulator = accumulator + 1;
           }
           return accumulator;
         }, 0);
@@ -354,7 +390,7 @@ function GapChart({ data, width, height, shift }) {
       options: {
         layout: {
           padding: {
-            top: 12,
+            top: 40, // Increase the top padding value
             bottom: 16,
             left: 20,
             right: 20,

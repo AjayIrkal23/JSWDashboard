@@ -17,13 +17,16 @@ const Processes = ({ open, setOpen }) => {
   const [three, setThree] = useState();
   const [two, setTwo] = useState();
   const [one, setOne] = useState();
+  const [six, setSix] = useState();
+  const [seven, setSeven] = useState();
 
   const get135Labels = () => {
     let arr = [];
-    for (let index = 1; index < 100; index++) {
+    for (let index = 0; index < 100; index++) {
       if (index * 5 != 140) {
         arr.push(index * 5);
       } else {
+        console.log(arr);
         return arr;
       }
     }
@@ -42,6 +45,8 @@ const Processes = ({ open, setOpen }) => {
       let arr3 = [];
       let arr4 = [];
       let arr5 = [];
+      let arr6 = [];
+      let arr7 = [];
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
@@ -49,6 +54,45 @@ const Processes = ({ open, setOpen }) => {
         if (
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
+        ) {
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
+            arr1.push(1);
+          } else {
+            arr1.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1") {
+            arr6.push(1);
+          } else {
+            arr6.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R2") {
+            arr7.push(1);
+          } else {
+            arr7.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
+            arr2.push(1);
+          } else {
+            arr2.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1R2") {
+            arr3.push(1);
+          } else {
+            arr3.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
+            arr4.push(1);
+          } else {
+            arr4.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
+            arr3.push(1);
+          } else {
+            arr3.push(0);
+          }
+        } else if (
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
+          index >= 135
         ) {
           if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
             arr1.push(1);
@@ -83,6 +127,8 @@ const Processes = ({ open, setOpen }) => {
       setThree(arr3);
       setFour(arr4);
       setFive(arr5);
+      setSix(arr6);
+      setSeven(arr7);
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -96,6 +142,8 @@ const Processes = ({ open, setOpen }) => {
       let arr3 = [];
       let arr4 = [];
       let arr5 = [];
+      let arr6 = [];
+      let arr7 = [];
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
@@ -108,6 +156,13 @@ const Processes = ({ open, setOpen }) => {
             if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
               accumulator = accumulator + 1;
             }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
@@ -115,6 +170,13 @@ const Processes = ({ open, setOpen }) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
           ) {
             if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
               accumulator = accumulator + 1;
@@ -132,6 +194,51 @@ const Processes = ({ open, setOpen }) => {
             ) {
               accumulator = accumulator + 1;
             }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1R2"
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let R1 = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let R2 = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R2") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R2") {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
@@ -139,6 +246,13 @@ const Processes = ({ open, setOpen }) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
             currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
           ) {
             if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
               accumulator = accumulator + 1;
@@ -154,6 +268,13 @@ const Processes = ({ open, setOpen }) => {
             if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
               accumulator = accumulator + 1;
             }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
+              accumulator = accumulator + 1;
+            }
           }
           return accumulator;
         }, 0);
@@ -163,15 +284,23 @@ const Processes = ({ open, setOpen }) => {
         arr3.push(R1R2);
         arr4.push(FM);
         arr5.push(DC);
+        arr6.push(R1);
+        arr7.push(R2);
       }
 
-      setOne(arr1);
-      setTwo(arr2);
-      setThree(arr3);
-      setFour(arr4);
-      setFive(arr5);
+      console.log(arr1, arr2, arr3, arr4, arr5, arr6, arr7);
+
+      setOne(arr1, "arr1");
+      setTwo(arr2, "arr2");
+      setThree(arr3, "arr3");
+      setFour(arr4, "arr4");
+      setFive(arr5, "arr5");
+      setSix(arr6, "arr6");
+      setSeven(arr7, "arr7");
     }
   };
+
+  console.log(one, "FCE");
 
   const chartData3 = {
     labels: get135Labels(),
@@ -194,7 +323,7 @@ const Processes = ({ open, setOpen }) => {
         categoryPercentage: 0.66,
       },
       {
-        data: three,
+        data: six,
         label: "BOTTLE NECK [R1]",
         backgroundColor: tailwindConfig().theme.colors.blue[700],
         hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
@@ -202,10 +331,18 @@ const Processes = ({ open, setOpen }) => {
         categoryPercentage: 0.66,
       },
       {
-        data: three,
+        data: seven,
         label: "BOTTLE NECK [R2]",
         backgroundColor: tailwindConfig().theme.colors.yellow[700],
         hoverBackgroundColor: tailwindConfig().theme.colors.yellow[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: three,
+        label: "BOTTLE NECK [R1R2]",
+        backgroundColor: tailwindConfig().theme.colors.gray[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.gray[800],
         barPercentage: 0.66,
         categoryPercentage: 0.66,
       },

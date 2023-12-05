@@ -1,5 +1,9 @@
 export const roundOff = (value) => {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
+  return Math.round(value);
+};
+
+export const ToMins = (value) => {
+  return value / 60;
 };
 
 export const getLabels = () => {

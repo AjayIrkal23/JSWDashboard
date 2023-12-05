@@ -1,17 +1,19 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 
 const FM = ({ open, setOpen }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
   function FmRockManCount(a) {
-    if(a == "man"){
+    if (a == "man") {
       if (period == "Last Coil" || period.customp) {
-        if(data?.Excel?.i_FMEntryOpInhibit ==1 && data?.Excel?.f_FEntF1TravelTimeDelay > 0 ){
-          return 1
-        }
-        else {
-          return 0
+        if (
+          data?.Excel?.i_FMEntryOpInhibit == 1 &&
+          data?.Excel?.f_FEntF1TravelTimeDelay > 0
+        ) {
+          return 1;
+        } else {
+          return 0;
         }
       } else if (
         period == "Last 5 Coil" ||
@@ -24,74 +26,79 @@ const FM = ({ open, setOpen }) => {
           data?.Excel.length > 1 &&
           data?.Excel?.reduce(
             (accumulator, currentValue) =>
-            currentValue.i_FMEntryOpInhibit == 1 &&  accumulator + 1,
+              currentValue.i_FMEntryOpInhibit == 1 && accumulator + 1,
             0
           );
-  
-          let total2 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-              accumulator + currentValue.f_FEntF1TravelTimeDelay,
-            0
-          );
-  
-          if( total2 >0){
-            return total1
-          }
-  
-        
-      } else {
-        return 0;
-      }
-    }
-    else{
-      if (period == "Last Coil" || period.customp) {
-        if(data?.Excel?.i_FMEntryOpInhibit ==0 && data?.Excel?.f_FEntF1TravelTimeDelay > 0 ){
-          return 1
-        }
-        else {
-          return 0
-        }
-      } else if (
-        period == "Last 5 Coil" ||
-        period == "Last Hour" ||
-        period == "Last Shift" ||
-        period == "Last Day" ||
-        period?.date
-      ) {
-        let total1 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-            currentValue.i_FMEntryOpInhibit == 0 &&  accumulator + 1,
-            0
-          );
-  
-          let total2 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-              accumulator + currentValue.f_FEntF1TravelTimeDelay,
-            0
-          );
-  
-          if( total2 >0){
-            return total1
-          }
-  
-        
-      } else {
-        return 0;
-      }
-    }
-    }
-   
 
+        let total2 =
+          data?.Excel.length > 1 &&
+          data?.Excel?.reduce(
+            (accumulator, currentValue) =>
+              accumulator + currentValue.f_FEntF1TravelTimeDelay,
+            0
+          );
+
+        if (total2 > 0) {
+          return total1;
+        }
+      } else {
+        return 0;
+      }
+    } else {
+      if (period == "Last Coil" || period.customp) {
+        if (
+          data?.Excel?.i_FMEntryOpInhibit == 0 &&
+          data?.Excel?.f_FEntF1TravelTimeDelay > 0
+        ) {
+          return 1;
+        } else {
+          return 0;
+        }
+      } else if (
+        period == "Last 5 Coil" ||
+        period == "Last Hour" ||
+        period == "Last Shift" ||
+        period == "Last Day" ||
+        period?.date
+      ) {
+        let total1 =
+          data?.Excel.length > 1 &&
+          data?.Excel?.reduce(
+            (accumulator, currentValue) =>
+              currentValue.i_FMEntryOpInhibit == 0 && accumulator + 1,
+            0
+          );
+
+        let total2 =
+          data?.Excel.length > 1 &&
+          data?.Excel?.reduce(
+            (accumulator, currentValue) =>
+              accumulator + currentValue.f_FEntF1TravelTimeDelay,
+            0
+          );
+
+        if (total2 > 0) {
+          return total1;
+        }
+      } else {
+        return 0;
+      }
+    }
+  }
 
   function ManualRockMin(a) {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.i_FMEntryOpInhibit == a && data?.Excel?.f_FEntF1TravelTimeDelay ) 
+      if (mins) {
+        return ToMins(
+          data?.Excel?.i_FMEntryOpInhibit == a &&
+            data?.Excel?.f_FEntF1TravelTimeDelay
+        );
+      } else {
+        return (
+          data?.Excel?.i_FMEntryOpInhibit == a &&
+          data?.Excel?.f_FEntF1TravelTimeDelay
+        );
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -102,15 +109,20 @@ const FM = ({ open, setOpen }) => {
         data?.Excel.length > 1 &&
         data?.Excel?.reduce(
           (accumulator, currentValue) =>
-          currentValue.i_FMEntryOpInhibit == a && accumulator + currentValue.f_FEntF1TravelTimeDelay,
+            currentValue.i_FMEntryOpInhibit == a &&
+            accumulator + currentValue.f_FEntF1TravelTimeDelay,
           0
         );
 
       console.log(total1);
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return (value1) 
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }

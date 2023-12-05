@@ -1,12 +1,15 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 const R2 = ({ open, setOpen }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
   function R1R2TimeTravel() {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.f_R1R2TravelTimeDelay)
-      
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1R2TravelTimeDelay);
+      } else {
+        return data?.Excel?.f_R1R2TravelTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -24,9 +27,12 @@ const R2 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
-
-      return value1
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -34,7 +40,11 @@ const R2 = ({ open, setOpen }) => {
 
   function R1ProcessTimeAct(a) {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.f_R2ProcessTimeAct) 
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2ProcessTimeAct);
+      } else {
+        return data?.Excel?.f_R2ProcessTimeAct;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -51,13 +61,19 @@ const R2 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 / data?.pacing?.length;
-
       if (a == "a") {
         let value1 = total1 / data?.pacing?.length;
-        return (value1) 
+        if (mins) {
+          return ToMins(value1);
+        } else {
+          return value1;
+        }
       } else {
-        return (total1) 
+        if (mins) {
+          return ToMins(total1);
+        } else {
+          return total1;
+        }
       }
     } else {
       return 0;
@@ -66,7 +82,11 @@ const R2 = ({ open, setOpen }) => {
 
   function R2GapAct() {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.f_R2GapTimeAct) 
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2GapTimeAct);
+      } else {
+        return data?.Excel?.f_R2GapTimeAct;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -83,9 +103,12 @@ const R2 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
-
-      return value1
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -93,7 +116,11 @@ const R2 = ({ open, setOpen }) => {
 
   function R2TravelDelay() {
     if (period == "Last Coil" || period.customp) {
-      return data?.Excel?.f_R1R2TravelTimeDelay
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1R2TravelTimeDelay);
+      } else {
+        return data?.Excel?.f_R1R2TravelTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -110,9 +137,12 @@ const R2 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
-
-      return value1
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -120,7 +150,11 @@ const R2 = ({ open, setOpen }) => {
 
   function R2ProcessDelay() {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.f_R2ProcessTimeDelay) 
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2ProcessTimeDelay);
+      } else {
+        return data?.Excel?.f_R2ProcessTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -137,9 +171,12 @@ const R2 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
-
-      return (value1) ;
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }

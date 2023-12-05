@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 
 const SSP = ({ open, setOpen }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
   function SSPUse(fw, sy) {
     if (period == "Last Coil" || period.customp) {
       if (data?.Excel?.i_SSPUse == fw) {
@@ -39,9 +39,11 @@ const SSP = ({ open, setOpen }) => {
 
   function GapTime() {
     if (period == "Last Coil" || period.customp) {
-      return (
-      data?.Excel?.f_SSPGapTimeAct) 
-      
+      if (mins) {
+        return ToMins(data?.Excel?.f_SSPGapTimeAct);
+      } else {
+        return data?.Excel?.f_SSPGapTimeAct;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -58,9 +60,13 @@ const SSP = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return value1
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -68,9 +74,11 @@ const SSP = ({ open, setOpen }) => {
 
   function SSPProcess() {
     if (period == "Last Coil" || period.customp) {
-      return (
-       data?.Excel?.f_SSPProcessTimeDelay) 
-       
+      if (mins) {
+        return ToMins(data?.Excel?.f_SSPProcessTimeDelay);
+      } else {
+        return data?.Excel?.f_SSPProcessTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -87,9 +95,13 @@ const SSP = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return (value1) 
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -97,9 +109,11 @@ const SSP = ({ open, setOpen }) => {
 
   function SSPProcessTime(a) {
     if (period == "Last Coil" || period.customp) {
-      return (
-       data?.Excel?.f_SSPProcessTimeAct)
-     
+      if (mins) {
+        return ToMins(data?.Excel?.f_SSPProcessTimeAct);
+      } else {
+        return data?.Excel?.f_SSPProcessTimeAct;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -117,10 +131,18 @@ const SSP = ({ open, setOpen }) => {
       console.log(total1);
 
       if (a == "a") {
-        let value1 = total1 
-        return value1
+        let value1 = total1 / data?.Excel.length;
+        if (mins) {
+          return ToMins(value1);
+        } else {
+          return value1;
+        }
       } else {
-        return (total1) 
+        if (mins) {
+          return ToMins(total1);
+        } else {
+          return total1;
+        }
       }
     } else {
       return 0;

@@ -1,14 +1,16 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 
 const R1 = ({ open, setOpen }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
   function R1GapTimeAct() {
     if (period == "Last Coil" || period.customp) {
-      return (
-       data?.Excel?.f_R1GapTimeAct
-      );
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1GapTimeAct);
+      } else {
+        return data?.Excel?.f_R1GapTimeAct;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -26,9 +28,13 @@ const R1 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return value1
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -36,10 +42,11 @@ const R1 = ({ open, setOpen }) => {
 
   function TravelDelay() {
     if (period == "Last Coil" || period.customp) {
-      return (
-        data?.Excel?.f_SSPR1TravelTimeDelay) 
-       
-      
+      if (mins) {
+        return ToMins(data?.Excel?.f_SSPR1TravelTimeDelay);
+      } else {
+        return data?.Excel?.f_SSPR1TravelTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -56,9 +63,12 @@ const R1 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
-
-      return (value1) 
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -66,8 +76,11 @@ const R1 = ({ open, setOpen }) => {
 
   function ProcessDelay() {
     if (period == "Last Coil" || period.customp) {
-      return (data?.Excel?.f_R1ProcessTimeDelay)
-     
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1ProcessTimeDelay);
+      } else {
+        return data?.Excel?.f_R1ProcessTimeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -84,9 +97,13 @@ const R1 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return (value1)
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -94,9 +111,12 @@ const R1 = ({ open, setOpen }) => {
 
   function R1ProcessTimeAct(a) {
     if (period == "Last Coil" || period.customp) {
-      return (
-        (data?.Excel?.f_R1ProcessTimeAct)
-      );
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1ProcessTimeAct);
+      } else {
+        return data?.Excel?.f_R1ProcessTimeAct;
+      }
+      return data?.Excel?.f_R1ProcessTimeAct;
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -113,13 +133,19 @@ const R1 = ({ open, setOpen }) => {
 
       console.log(total1);
 
-    
-
       if (a == "a") {
         let value1 = total1 / data?.pacing?.length;
-        return (value1)
+        if (mins) {
+          return ToMins(value1);
+        } else {
+          return value1;
+        }
       } else {
-        return total1
+        if (mins) {
+          return ToMins(total1);
+        } else {
+          return total1;
+        }
       }
     } else {
       return 0;

@@ -54,7 +54,7 @@ function FCE1BarChart({ data, width, height, shift }) {
       options: {
         layout: {
           padding: {
-            top: 12,
+            top: 40, // Increase the top padding value
             bottom: 16,
             left: 20,
             right: 20,

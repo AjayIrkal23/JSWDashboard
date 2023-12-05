@@ -38,7 +38,7 @@ const Live = () => {
   const [open6, setOpen6] = useState(false);
   const [pieceId, setPieceId] = useState(false);
   const [date, setDate] = useState(false);
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, setMins, mins } = useContext(AccountContext);
 
   return (
     <div>
@@ -105,7 +105,7 @@ const Live = () => {
               </div>
             </div>
           </div>
-          <div className="sticky top-[47%] px-4 flex gap-12  !text-xs justify-center">
+          <div className="sticky top-[47%] px-4 flex gap-24  !text-xs justify-center">
             <div className=" w-[250px] ">
               <PMC />
             </div>
@@ -205,7 +205,9 @@ const Live = () => {
             </div>
 
             <div className="">
-              <p className="text-white text-sm italic font-semibold pb-1">Visual Graphs</p>
+              <p className="text-white text-sm italic font-semibold pb-1">
+                Visual Graphs
+              </p>
               <div className="  flex  justify-center border-black cursor-pointer  gap-3">
                 <div
                   onClick={(e) => setOpen(true)}
@@ -256,6 +258,25 @@ const Live = () => {
                 >
                   <p>WRT Trend</p>
                 </div>
+              </div>
+            </div>
+            <div className="flex     justify-center items-center mt-6">
+              {" "}
+              <div
+                onClick={() => setMins(false)}
+                className={`${
+                  mins === false && " bg-blue-500  !text-white"
+                } hover:bg-blue-500 hover:text-white w-[100px] border-black/40 py-2 !border-r-0  border   italic !cursor-pointer font-semibold  border-black  text-sm `}
+              >
+                <p>Seconds</p>
+              </div>
+              <div
+                onClick={() => setMins(true)}
+                className={`${
+                  mins === true && " bg-blue-500  !text-white"
+                } hover:bg-blue-500 hover:text-white w-[100px] py-2  border-black/40 border  italic !cursor-pointer font-semibold border-r border-black  text-sm `}
+              >
+                <p>Mins</p>
               </div>
             </div>
           </div>

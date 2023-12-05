@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { AccountContext } from "../context/context";
-import { roundOff } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 
 const Wise = ({ open, setOpen }) => {
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
   function FCESlabCount(fw) {
     if (period == "Last Coil" || period.customp) {
       if (fw == 1 && data?.Excel?.i_FceNum == 1) {
@@ -65,10 +65,7 @@ const Wise = ({ open, setOpen }) => {
 
   function FceDischarge() {
     if (period == "Last Coil" || period.customp) {
-      return (
-        data?.Excel?.f_L2L1ExtRdyTimeDiff) 
-    
-    
+      return data?.Excel?.f_L2L1ExtRdyTimeDiff;
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -83,9 +80,13 @@ const Wise = ({ open, setOpen }) => {
           0
         );
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return value1
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -93,9 +94,11 @@ const Wise = ({ open, setOpen }) => {
 
   function FceExtrator() {
     if (period == "Last Coil" || period.customp) {
-      return (
-        data?.Excel?.f_ExtractCycleTimeDiff) 
-    
+      if (mins) {
+        return ToMins(data?.Excel?.f_ExtractCycleTimeDiff);
+      } else {
+        return data?.Excel?.f_ExtractCycleTimeDiff;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -110,8 +113,12 @@ const Wise = ({ open, setOpen }) => {
           0
         );
 
-      let value1 = total1 
-      return value1
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -119,7 +126,11 @@ const Wise = ({ open, setOpen }) => {
 
   function FceSlipDelay() {
     if (period == "Last Coil" || period.customp) {
-      return data?.Excel?.f_FCDTravelTmeDelay;
+      if (mins) {
+        return ToMins(data?.Excel?.f_FCDTravelTmeDelay);
+      } else {
+        return data?.Excel?.f_FCDTravelTmeDelay;
+      }
     } else if (
       period == "Last 5 Coil" ||
       period == "Last Hour" ||
@@ -136,9 +147,47 @@ const Wise = ({ open, setOpen }) => {
 
       console.log(total1);
 
-      let value1 = total1 
+      let value1 = total1;
 
-      return value1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  function FCESSPTravelTime() {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.pacing?.f_FCE1SSPTravelTimeAct);
+      } else {
+        return data?.pacing?.f_FCE1SSPTravelTimeAct;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.pacing.length > 1 &&
+        data?.pacing?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_FCE1SSPTravelTimeAct,
+          0
+        );
+
+      console.log(total1);
+
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
     } else {
       return 0;
     }
@@ -171,10 +220,15 @@ const Wise = ({ open, setOpen }) => {
         <p>-</p>
         <p className="font-semibold ">{roundOff(FceExtrator())}</p>
       </div>
-      <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
+      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p className="font-semibold">FCE Slip Delay</p>
         <p>-</p>
         <p className="font-semibold ">{roundOff(FceSlipDelay())}</p>
+      </div>
+      <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
+        <p className="font-semibold">FCE to SSP Travel Time</p>
+        <p>-</p>
+        <p className="font-semibold ">{roundOff(FCESSPTravelTime())}</p>
       </div>
     </div>
   );
