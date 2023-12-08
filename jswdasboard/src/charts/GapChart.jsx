@@ -53,7 +53,6 @@ function GapChart({ data, width, height, shift }) {
       if (index * 5 != 140) {
         arr.push(index * 5);
       } else {
-        console.log(arr);
         return arr;
       }
     }
@@ -67,7 +66,7 @@ function GapChart({ data, width, height, shift }) {
       let arr = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         if (
           EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) >= index &&
           EP?.pacing?.f_SSPGapTimeAct?.toFixed(2) <= plus5
@@ -113,7 +112,7 @@ function GapChart({ data, width, height, shift }) {
         }, 0);
         arr.push(total.toFixed(1));
       }
-      console.log(arr);
+
       setChartData(arr);
     }
   };
@@ -125,7 +124,7 @@ function GapChart({ data, width, height, shift }) {
       let arr = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(EP?.pacing?.f_R1GapTimeAct?.toFixed(2), "f_R1GapTimeAct");
+
         if (
           EP?.pacing?.f_R1GapTimeAct?.toFixed(2) >= index &&
           EP?.pacing?.f_R1GapTimeAct?.toFixed(2) <= plus5
@@ -154,7 +153,7 @@ function GapChart({ data, width, height, shift }) {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         let total = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_R1GapTimeAct?.toFixed(2) >= index &&
@@ -171,7 +170,7 @@ function GapChart({ data, width, height, shift }) {
         }, 0);
         arr.push(total.toFixed(1));
       }
-      console.log(arr);
+
       setChartData1(arr);
     }
   };
@@ -183,7 +182,7 @@ function GapChart({ data, width, height, shift }) {
       let arr = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         if (
           EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
           EP?.pacing?.f_F1GapTimeAct?.toFixed(2) <= plus5
@@ -207,7 +206,7 @@ function GapChart({ data, width, height, shift }) {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         let total = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
@@ -224,7 +223,7 @@ function GapChart({ data, width, height, shift }) {
         }, 0);
         arr.push(total.toFixed(1));
       }
-      console.log(arr);
+
       setChartData4(arr);
     }
   };
@@ -236,7 +235,7 @@ function GapChart({ data, width, height, shift }) {
       let arr = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         if (
           EP?.pacing?.f_R2GapTimeAct?.toFixed(2) >= index &&
           EP?.pacing?.f_R2GapTimeAct?.toFixed(2) <= plus5
@@ -265,7 +264,7 @@ function GapChart({ data, width, height, shift }) {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         let total = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_R2GapTimeAct?.toFixed(2) >= index &&
@@ -282,7 +281,7 @@ function GapChart({ data, width, height, shift }) {
         }, 0);
         arr.push(total.toFixed(1));
       }
-      console.log(arr);
+
       setChartData2(arr);
     }
   };

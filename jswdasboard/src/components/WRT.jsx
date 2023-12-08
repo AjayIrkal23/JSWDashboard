@@ -34,7 +34,6 @@ const GRT = ({ open, setOpen }) => {
       if (index * 5 != 140) {
         arr.push(index * 5);
       } else {
-        console.log(arr);
         return arr;
       }
     }
@@ -55,7 +54,7 @@ const GRT = ({ open, setOpen }) => {
       let arr9 = [];
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         if (
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
@@ -143,7 +142,7 @@ const GRT = ({ open, setOpen }) => {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         let grt0 = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&

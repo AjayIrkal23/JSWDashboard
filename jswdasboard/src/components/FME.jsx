@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
 import { ToMins, roundOff } from "../utils/roundoff";
+import axios from "axios";
 
 const FM = ({ open, setOpen }) => {
   const { period, setPeriod, data, mins } = useContext(AccountContext);
@@ -51,6 +52,23 @@ const FM = ({ open, setOpen }) => {
       return 0;
     }
   }
+
+  const RoleChange = () => {
+    if (data?.Excel?.length > 5) {
+      const dateString = data?.Excel[0]?.gt_HistoryKeyTm;
+
+      const dateString1 = data.Excel[data.Excel.length - 1].gt_HistoryKeyTm;
+
+      if (dateString && dateString1) {
+        const res = axios.post("http://localhost:8000/FMDelay", {
+          start: dateString,
+          end: dateString1,
+        });
+      }
+    } else {
+      return "--";
+    }
+  };
 
   function FMProcessTime(a) {
     if (period == "Last Coil" || period.customp) {
@@ -254,11 +272,14 @@ const FM = ({ open, setOpen }) => {
           <p>-</p>
           <p className="font-semibold ">{roundOff(FMGapTime("a"))}</p>
         </div>
-        <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-          <p>Role Change Delay</p>
-          <p>-</p>
-          <p className="font-semibold ">Not Done</p>
-        </div>
+        {data?.Excel?.length > 5 && (
+          <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
+            <p>Role Change Delay</p>
+            <p>-</p>
+            <p className="font-semibold ">{RoleChange()}</p>
+          </div>
+        )}
+
         <div className="flex text-xs justify-between px-1 border-b items-center border-black/40 pt-1 italic pr-2">
           <p>FM Process Delay Time </p>
           <p>-</p>

@@ -8,9 +8,10 @@ import BarChart01 from "../charts/BarChart01";
 import GapChart from "../charts/GapChart";
 import ProcessChart from "../charts/ProcessChart";
 import { AccountContext } from "../context/context";
+import { ToMins } from "../utils/roundoff";
 const Processes = ({ open, setOpen }) => {
   const [chartDataEntry, setChartData] = useState();
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
 
   function Process() {
     let arr = [];
@@ -69,10 +70,18 @@ const Processes = ({ open, setOpen }) => {
           0
         );
 
-      arr.push(total1?.toFixed(2));
-      arr.push(total2?.toFixed(2));
-      arr.push(total3?.toFixed(2));
-      arr.push((total4 - total5).toFixed(2));
+      if (mins) {
+        let total6 = total4 - total5;
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+        arr.push(ToMins(total6));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+        arr.push((total4 - total5).toFixed(2));
+      }
 
       setChartData(arr);
     } else {

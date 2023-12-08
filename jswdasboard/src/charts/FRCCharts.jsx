@@ -40,7 +40,6 @@ function FRCCharts({ data, width, height, shift }) {
       if (index * 5 != 135) {
         arr.push(index * 5);
       } else {
-        console.log(arr);
         return arr;
       }
     }

@@ -6,9 +6,10 @@ import { tailwindConfig } from "../utils/Utils";
 import BarChart01 from "../charts/BarChart01";
 import DelayChart from "../charts/DelayChart";
 import { AccountContext } from "../context/context";
+import { ToMins } from "../utils/roundoff";
 const Delays = ({ open, setOpen }) => {
   const [chartDataEntry, setChartData] = useState();
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
 
   const getData = () => {
     return [1, 2, 3, 4, 5, 6, 7];
@@ -104,15 +105,27 @@ const Delays = ({ open, setOpen }) => {
           0
         );
 
-      arr.push(total1?.toFixed(2));
-      arr.push(total2?.toFixed(2));
-      arr.push(total3?.toFixed(2));
-      arr.push(total4?.toFixed(2));
-      arr.push(total5?.toFixed(2));
-      arr.push(total6?.toFixed(2));
-      arr.push(total7?.toFixed(2));
-      arr.push(total8?.toFixed(2));
-      arr.push(total9?.toFixed(2));
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+        arr.push(ToMins(total4));
+        arr.push(ToMins(total5));
+        arr.push(ToMins(total6));
+        arr.push(ToMins(total7));
+        arr.push(ToMins(total8));
+        arr.push(ToMins(total9));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+        arr.push(total4?.toFixed(2));
+        arr.push(total5?.toFixed(2));
+        arr.push(total6?.toFixed(2));
+        arr.push(total7?.toFixed(2));
+        arr.push(total8?.toFixed(2));
+        arr.push(total9?.toFixed(2));
+      }
 
       setChartData(arr);
     } else {

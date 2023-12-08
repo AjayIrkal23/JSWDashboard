@@ -90,8 +90,6 @@ const Three = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
 
       if (mins) {

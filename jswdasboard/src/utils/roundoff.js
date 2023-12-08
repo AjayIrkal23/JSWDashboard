@@ -3,7 +3,11 @@ export const roundOff = (value) => {
 };
 
 export const ToMins = (value) => {
-  return value / 60;
+  return Math.round(value / 60);
+};
+
+export const ToAverage = (length, value) => {
+  return value / length;
 };
 
 export const getLabels = () => {

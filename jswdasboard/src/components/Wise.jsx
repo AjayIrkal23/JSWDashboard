@@ -145,8 +145,6 @@ const Wise = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
 
       if (mins) {
@@ -179,8 +177,6 @@ const Wise = ({ open, setOpen }) => {
             accumulator + currentValue.f_FCE1SSPTravelTimeAct,
           0
         );
-
-      console.log(total1);
 
       let value1 = total1;
       if (mins) {

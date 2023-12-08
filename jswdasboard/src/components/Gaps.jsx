@@ -7,9 +7,10 @@ import BarChart01 from "../charts/BarChart01";
 
 import GapChart from "../charts/GapChart";
 import { AccountContext } from "../context/context";
+import { ToMins } from "../utils/roundoff";
 const Gaps = ({ open, setOpen }) => {
   const [chartDataEntry, setChartData] = useState();
-  const { period, setPeriod, data } = useContext(AccountContext);
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
 
   function GapData() {
     let arr = [];
@@ -56,10 +57,17 @@ const Gaps = ({ open, setOpen }) => {
           0
         );
 
-      arr.push(total1?.toFixed(2));
-      arr.push(total2?.toFixed(2));
-      arr.push(total3?.toFixed(2));
-      arr.push(total4?.toFixed(2));
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+        arr.push(ToMins(total4));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+        arr.push(total4?.toFixed(2));
+      }
 
       setChartData(arr);
     } else {

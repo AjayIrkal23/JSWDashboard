@@ -25,8 +25,6 @@ const R2 = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
       if (mins) {
         return ToMins(value1);
@@ -58,8 +56,6 @@ const R2 = ({ open, setOpen }) => {
             accumulator + currentValue.f_R2ProcessTimeAct,
           0
         );
-
-      console.log(total1);
 
       if (a == "a") {
         let value1 = total1 / data?.pacing?.length;
@@ -101,8 +97,6 @@ const R2 = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
       if (mins) {
         return ToMins(value1);
@@ -135,8 +129,6 @@ const R2 = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
       if (mins) {
         return ToMins(value1);
@@ -168,8 +160,6 @@ const R2 = ({ open, setOpen }) => {
             accumulator + currentValue.f_R2ProcessTimeDelay,
           0
         );
-
-      console.log(total1);
 
       let value1 = total1;
       if (mins) {

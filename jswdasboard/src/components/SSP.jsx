@@ -58,8 +58,6 @@ const SSP = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
 
       if (mins) {
@@ -93,8 +91,6 @@ const SSP = ({ open, setOpen }) => {
           0
         );
 
-      console.log(total1);
-
       let value1 = total1;
 
       if (mins) {
@@ -127,8 +123,6 @@ const SSP = ({ open, setOpen }) => {
             accumulator + currentValue.f_SSPProcessTimeAct,
           0
         );
-
-      console.log(total1);
 
       if (a == "a") {
         let value1 = total1 / data?.Excel.length;

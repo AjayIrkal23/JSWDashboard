@@ -20,6 +20,7 @@ import { tailwindConfig, formatValue } from "../utils/Utils";
 import BarChart02 from "./BarChart02";
 import FCE1BarChart from "./FCE1BarChart";
 import { AccountContext } from "../context/context";
+import { ToMins } from "../utils/roundoff";
 
 Chart.register(
   BarController,
@@ -37,7 +38,7 @@ function DelayChart({ data, width, height, shift }) {
   const [chartDataEntry, setChartData] = useState();
   const [chartDataEntry1, setChartData1] = useState();
   const [chartDataEntry2, setChartData2] = useState();
-  const { period, setPeriod, data: EP } = useContext(AccountContext);
+  const { period, setPeriod, data: EP, mins } = useContext(AccountContext);
 
   useEffect(() => {
     DelayData1();
@@ -84,9 +85,15 @@ function DelayChart({ data, width, height, shift }) {
           0
         );
 
-      arr.push(total1?.toFixed(2));
-      arr.push(total2?.toFixed(2));
-      arr.push(total3?.toFixed(2));
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+      }
 
       setChartData3(arr);
     } else {
@@ -123,8 +130,13 @@ function DelayChart({ data, width, height, shift }) {
           0
         );
 
-      arr.push(total1?.toFixed(2));
-      arr.push(total2?.toFixed(2));
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+      }
 
       setChartData4(arr);
     } else {
@@ -165,7 +177,7 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 1) {
             accumulator = accumulator + currentValue.f_FCDTravelTmeDelay;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
       let total2 =
@@ -174,7 +186,7 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 2) {
             accumulator = accumulator + currentValue.f_FCDTravelTmeDelay;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
       let total3 =
@@ -183,15 +195,19 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 3) {
             accumulator = accumulator + currentValue.f_FCDTravelTmeDelay;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
 
-      console.log(total1, total2, total3);
-      arr.push(total1.toFixed(2));
-      arr.push(total2.toFixed(2));
-      arr.push(total3.toFixed(2));
-
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+      }
       setChartData2(arr);
     } else {
       return "--";
@@ -231,7 +247,7 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 1) {
             accumulator = accumulator + currentValue.f_L2L1ExtRdyTimeDiff;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
       let total2 =
@@ -240,7 +256,7 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 2) {
             accumulator = accumulator + currentValue.f_L2L1ExtRdyTimeDiff;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
       let total3 =
@@ -249,14 +265,19 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 3) {
             accumulator = accumulator + currentValue.f_L2L1ExtRdyTimeDiff;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
 
-      console.log(total1, total2, total3);
-      arr.push(total1.toFixed(2));
-      arr.push(total2.toFixed(2));
-      arr.push(total3.toFixed(2));
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+      }
 
       setChartData(arr);
     } else {
@@ -297,7 +318,7 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 1) {
             accumulator = accumulator + currentValue.f_ExtractCycleTimeDiff;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
       let total2 =
@@ -306,7 +327,7 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 2) {
             accumulator = accumulator + currentValue.f_ExtractCycleTimeDiff;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
       let total3 =
@@ -315,14 +336,19 @@ function DelayChart({ data, width, height, shift }) {
           if (currentValue.i_FceNum == 3) {
             accumulator = accumulator + currentValue.f_ExtractCycleTimeDiff;
           }
-          console.log(accumulator);
+
           return accumulator;
         }, 0);
 
-      console.log(total1, total2, total3);
-      arr.push(total1.toFixed(2));
-      arr.push(total2.toFixed(2));
-      arr.push(total3.toFixed(2));
+      if (mins) {
+        arr.push(ToMins(total1));
+        arr.push(ToMins(total2));
+        arr.push(ToMins(total3));
+      } else {
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+      }
 
       setChartData1(arr);
     } else {

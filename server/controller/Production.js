@@ -1,15 +1,14 @@
 import sql2 from "mssql";
 import { get } from "../database/pool-manager.js";
 
-
 let config = {
   user: "Dashboard", //default is sa
   password: "Dashboard",
   server: "10.11.2.41", // for local machine
   database: "Production", // name of database
   trustServerCertificate: true,
-  encrypt:false,
-  port:1433,
+  encrypt: false,
+  port: 1433,
   requestTimeout: 1800000,
 };
 
@@ -58,6 +57,23 @@ export const Check2 = async (req, res) => {
     res.status(200).json({ array: arr });
   } catch (err) {
     res.status(500).json({ Message: "Failed" });
+  }
+};
+
+export const FmDelay = async (req, res) => {
+  try {
+    // const pool = await get("Production", config);
+    console.log(req.body.start);
+
+    // const report = await pool.request().query(
+    //   `SELECT ISNULL((SUM(i_duration)/60.0),0)
+    //     FROM Operations.dbo.r_RchDelay r_RchDelay
+    //     WHERE (r_RchDelay.gt_StartTime>= ${req.body.start}) AND (r_RchDelay.gt_EndTime<=${req.body.end})`
+    // );
+
+    res.status(200).json("success");
+  } catch (err) {
+    res.status(500).json({ Message: "Failed", err: err });
   }
 };
 

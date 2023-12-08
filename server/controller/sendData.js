@@ -136,8 +136,6 @@ export const SendData = async (req, res) => {
         },
       });
 
-      console.log(Excel, pacing);
-
       if (Excel && pacing) {
         res.status(200).json({ Excel, pacing });
       }

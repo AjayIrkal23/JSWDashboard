@@ -26,7 +26,6 @@ const Processes = ({ open, setOpen }) => {
       if (index * 5 != 140) {
         arr.push(index * 5);
       } else {
-        console.log(arr);
         return arr;
       }
     }
@@ -50,7 +49,7 @@ const Processes = ({ open, setOpen }) => {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         if (
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
           EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
@@ -147,7 +146,7 @@ const Processes = ({ open, setOpen }) => {
 
       for (let index = start; index < end; index = index + 5) {
         let plus5 = index + 5;
-        console.log(index, plus5);
+
         let FCE = EP?.pacing?.reduce((accumulator, currentValue) => {
           if (
             currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
@@ -288,8 +287,6 @@ const Processes = ({ open, setOpen }) => {
         arr7.push(R2);
       }
 
-      console.log(arr1, arr2, arr3, arr4, arr5, arr6, arr7);
-
       setOne(arr1, "arr1");
       setTwo(arr2, "arr2");
       setThree(arr3, "arr3");
@@ -299,8 +296,6 @@ const Processes = ({ open, setOpen }) => {
       setSeven(arr7, "arr7");
     }
   };
-
-  console.log(one, "FCE");
 
   const chartData3 = {
     labels: get135Labels(),
