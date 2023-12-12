@@ -32,13 +32,19 @@ Chart.register(
   Legend
 );
 
-function DelayChart({ data, width, height, shift }) {
+function DelayChart({ data, width, height, shift, frc }) {
   const [chartDataEntry3, setChartData3] = useState();
   const [chartDataEntry4, setChartData4] = useState();
   const [chartDataEntry, setChartData] = useState();
   const [chartDataEntry1, setChartData1] = useState();
   const [chartDataEntry2, setChartData2] = useState();
-  const { period, setPeriod, data: EP, mins } = useContext(AccountContext);
+  const {
+    period,
+    setPeriod,
+    data: EP,
+    mins,
+    rollChange,
+  } = useContext(AccountContext);
 
   useEffect(() => {
     DelayData1();
@@ -131,13 +137,17 @@ function DelayChart({ data, width, height, shift }) {
         );
 
       if (mins) {
-        arr.push(ToMins(total1));
+        arr.push(total1);
         arr.push(ToMins(total2));
+        arr.push(ToMins(EP?.RollChange?.two));
+        arr.push(ToMins(EP?.RollChange?.five));
       } else {
         arr.push(total1?.toFixed(2));
         arr.push(total2?.toFixed(2));
+        arr.push(EP?.RollChange?.two);
+        arr.push(EP?.RollChange?.five);
       }
-
+      console.log(arr);
       setChartData4(arr);
     } else {
       return "--";
@@ -501,7 +511,7 @@ function DelayChart({ data, width, height, shift }) {
         onClick: (evt, element) => {
           if (element.length > 0) {
             var ind = element[0].index;
-            if (ind == 0) {
+            if (ind == 0 && !frc) {
               setModal(0);
               setOpen(true);
             } else if (ind == 1) {
@@ -515,6 +525,10 @@ function DelayChart({ data, width, height, shift }) {
               setOpen(true);
             } else if (ind == 7) {
               setModal(7);
+              setOpen(true);
+            } else if (frc == true) {
+              setModal(-1);
+              console.log("hello");
               setOpen(true);
             }
           }
@@ -624,6 +638,17 @@ function DelayChart({ data, width, height, shift }) {
         aria-describedby="modal-modal-description"
       >
         <div className="absolute  bg-white outline-none top-[5%] left-[50%] -translate-x-[50%] flex">
+          {modal == -1 && (
+            <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
+              <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
+                <h2 className="font-semibold text-slate-800 dark:text-slate-100">
+                  RoleChange Delay Details
+                </h2>
+              </header>
+              {/* Chart built with Chart.js 3 */}
+              {/* Change the height attribute to adjust the chart height */}
+            </div>
+          )}
           {modal == 0 && (
             <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
               <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">

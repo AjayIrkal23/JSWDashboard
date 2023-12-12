@@ -6,19 +6,21 @@ import { tailwindConfig } from "../utils/Utils";
 import BarChart01 from "../charts/BarChart01";
 
 import GapChart from "../charts/GapChart";
+import ProcessChart from "../charts/ProcessChart";
 import { AccountContext } from "../context/context";
 import { ToMins, roundOff } from "../utils/roundoff";
-const Gaps = ({ open, setOpen }) => {
+import ProcessTimeChart from "../charts/ProcessTimeChart";
+const ProcessTime = ({ open, setOpen }) => {
   const [chartDataEntry, setChartData] = useState();
   const { period, setPeriod, data, mins } = useContext(AccountContext);
 
-  function GapData() {
+  function Process() {
     let arr = [];
     if (period == "Last Coil" || period.customp) {
-      arr.push(data?.Excel?.f_SSPGapTimeAct?.toFixed(2));
-      arr.push(data?.Excel?.f_R1GapTimeAct?.toFixed(2));
-      arr.push(data?.Excel?.f_R2GapTimeAct?.toFixed(2));
-      arr.push(data?.Excel?.f_F1GapTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_SSPProcessTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_R1ProcessTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_R2ProcessTimeAct?.toFixed(2));
+      arr.push((data?.pacing?.f_FMProcessTimeAct).toFixed(2));
 
       setChartData(arr);
     } else if (
@@ -32,28 +34,28 @@ const Gaps = ({ open, setOpen }) => {
         data?.Excel?.length > 1 &&
         data?.Excel?.reduce(
           (accumulator, currentValue) =>
-            accumulator + currentValue.f_SSPGapTimeAct,
+            accumulator + currentValue.f_SSPProcessTimeAct,
           0
         );
       let total2 =
         data?.Excel?.length > 1 &&
         data?.Excel?.reduce(
           (accumulator, currentValue) =>
-            accumulator + currentValue.f_R1GapTimeAct,
+            accumulator + currentValue.f_R1ProcessTimeAct,
           0
         );
       let total3 =
         data?.Excel?.length > 1 &&
         data?.Excel?.reduce(
           (accumulator, currentValue) =>
-            accumulator + currentValue.f_R2GapTimeAct,
+            accumulator + currentValue.f_R2ProcessTimeAct,
           0
         );
       let total4 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
+        data?.pacing?.length > 1 &&
+        data?.pacing?.reduce(
           (accumulator, currentValue) =>
-            accumulator + currentValue.f_F1GapTimeAct,
+            accumulator + currentValue.f_FMProcessTimeAct,
           0
         );
 
@@ -76,15 +78,15 @@ const Gaps = ({ open, setOpen }) => {
   }
 
   useEffect(() => {
-    GapData();
+    Process();
   }, [data]);
 
   const chartData = {
     labels: [
-      ["SSP", "Gap", "Time"],
-      ["R1", "Gap", "Time"],
-      ["R2", "Gap", "Time"],
-      ["FM", "Gap", "Time"],
+      ["SSP", "Process", "Time"],
+      ["R1", "Process", "Time"],
+      ["R2", "Process", "Time"],
+      ["FM", "Process", "Time"],
     ],
     datasets: [
       // Light blue bars
@@ -116,12 +118,12 @@ const Gaps = ({ open, setOpen }) => {
           <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
             <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
               <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-                Gap Visualization
+                Process Time Visualization
               </h2>
             </header>
             {/* Chart built with Chart.js 3 */}
             {/* Change the height attribute to adjust the chart height */}
-            <GapChart data={chartData} width={1800} height={800} />
+            <ProcessTimeChart data={chartData} width={1800} height={800} />
           </div>
         </div>
       </Modal>
@@ -129,4 +131,4 @@ const Gaps = ({ open, setOpen }) => {
   );
 };
 
-export default Gaps;
+export default ProcessTime;

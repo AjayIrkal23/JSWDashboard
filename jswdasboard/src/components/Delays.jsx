@@ -6,7 +6,7 @@ import { tailwindConfig } from "../utils/Utils";
 import BarChart01 from "../charts/BarChart01";
 import DelayChart from "../charts/DelayChart";
 import { AccountContext } from "../context/context";
-import { ToMins } from "../utils/roundoff";
+import { ToMins, roundOff } from "../utils/roundoff";
 const Delays = ({ open, setOpen }) => {
   const [chartDataEntry, setChartData] = useState();
   const { period, setPeriod, data, mins } = useContext(AccountContext);
@@ -18,15 +18,15 @@ const Delays = ({ open, setOpen }) => {
   function DelayData() {
     let arr = [];
     if (period == "Last Coil" || period.customp) {
-      arr.push(data?.Excel?.f_L2L1ExtRdyTimeDiff?.toFixed(2));
-      arr.push(data?.Excel?.f_ExtractCycleTimeDiff?.toFixed(2));
-      arr.push(data?.Excel?.f_FCDTravelTmeDelay?.toFixed(2));
-      arr.push(data?.Excel?.f_SSPR1TravelTimeDelay?.toFixed(2));
-      arr.push(data?.Excel?.f_R1ProcessTimeDelay?.toFixed(2));
-      arr.push(data?.Excel?.f_R1R2TravelTimeDelay?.toFixed(2));
-      arr.push(data?.Excel?.f_R2ProcessTimeDelay?.toFixed(2));
-      arr.push(data?.Excel?.f_R2FEntTravelTimeDelay?.toFixed(2));
-      arr.push(data?.pacing?.f_FCE1SSPTravelTimeDelay?.toFixed(2));
+      arr.push(roundOff(data?.Excel?.f_L2L1ExtRdyTimeDiff?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_ExtractCycleTimeDiff?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_FCDTravelTmeDelay?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_SSPR1TravelTimeDelay?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_R1ProcessTimeDelay?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_R1R2TravelTimeDelay?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_R2ProcessTimeDelay?.toFixed(2)));
+      arr.push(roundOff(data?.Excel?.f_R2FEntTravelTimeDelay?.toFixed(2)));
+      arr.push(roundOff(data?.pacing?.f_FCE1SSPTravelTimeDelay?.toFixed(2)));
 
       setChartData(arr);
     } else if (
@@ -106,25 +106,25 @@ const Delays = ({ open, setOpen }) => {
         );
 
       if (mins) {
-        arr.push(ToMins(total1));
-        arr.push(ToMins(total2));
-        arr.push(ToMins(total3));
-        arr.push(ToMins(total4));
-        arr.push(ToMins(total5));
-        arr.push(ToMins(total6));
-        arr.push(ToMins(total7));
-        arr.push(ToMins(total8));
-        arr.push(ToMins(total9));
+        arr.push(roundOff(ToMins(total1)));
+        arr.push(roundOff(ToMins(total2)));
+        arr.push(roundOff(ToMins(total3)));
+        arr.push(roundOff(ToMins(total4)));
+        arr.push(roundOff(ToMins(total5)));
+        arr.push(roundOff(ToMins(total6)));
+        arr.push(roundOff(ToMins(total7)));
+        arr.push(roundOff(ToMins(total8)));
+        arr.push(roundOff(ToMins(total9)));
       } else {
-        arr.push(total1?.toFixed(2));
-        arr.push(total2?.toFixed(2));
-        arr.push(total3?.toFixed(2));
-        arr.push(total4?.toFixed(2));
-        arr.push(total5?.toFixed(2));
-        arr.push(total6?.toFixed(2));
-        arr.push(total7?.toFixed(2));
-        arr.push(total8?.toFixed(2));
-        arr.push(total9?.toFixed(2));
+        arr.push(roundOff(total1?.toFixed(2)));
+        arr.push(roundOff(total2?.toFixed(2)));
+        arr.push(roundOff(total3?.toFixed(2)));
+        arr.push(roundOff(total4?.toFixed(2)));
+        arr.push(roundOff(total5?.toFixed(2)));
+        arr.push(roundOff(total6?.toFixed(2)));
+        arr.push(roundOff(total7?.toFixed(2)));
+        arr.push(roundOff(total8?.toFixed(2)));
+        arr.push(roundOff(total9?.toFixed(2)));
       }
 
       setChartData(arr);

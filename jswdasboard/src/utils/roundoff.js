@@ -6,7 +6,7 @@ export const ToMins = (value) => {
   return Math.round(value / 60);
 };
 
-export const ToAverage = (length, value) => {
+export const ToAverage = (value, length) => {
   return value / length;
 };
 

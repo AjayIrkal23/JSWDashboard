@@ -22,6 +22,7 @@ import LoadingG from "../components/LoadingG";
 import Charging from "../components/Charging";
 import PieceID from "../components/PieceID";
 import Date from "../components/Date";
+import ProcessTime from "../components/ProcessTime";
 
 const Live = () => {
   const handleChange = (e) => {
@@ -36,9 +37,37 @@ const Live = () => {
   const [open4, setOpen4] = useState(false);
   const [open5, setOpen5] = useState(false);
   const [open6, setOpen6] = useState(false);
+  const [open7, setOpen7] = useState(false);
   const [pieceId, setPieceId] = useState(false);
   const [date, setDate] = useState(false);
-  const { period, setPeriod, data, setMins, mins } = useContext(AccountContext);
+  const { period, setPeriod, data, setMins, mins, rmBarThickness } =
+    useContext(AccountContext);
+
+  const getRM = () => {
+    if (data?.RM) {
+      if (period == "Last Coil" || period.customp) {
+        return data?.RM[0]?.f_R2StripThk;
+      } else if (
+        period == "Last 5 Coil" ||
+        period == "Last Hour" ||
+        period == "Last Shift" ||
+        period == "Last Day" ||
+        period?.date
+      ) {
+        console.log(data?.RM, "Rm");
+        let total1 =
+          data?.RM?.length > 1 &&
+          data?.RM?.reduce((accumulator, currentValue) => {
+            accumulator = accumulator + currentValue.f_R2StripThk;
+
+            return accumulator;
+          }, 0);
+        return Number(total1 / data?.RM.length);
+      } else {
+        return 0;
+      }
+    }
+  };
 
   return (
     <div>
@@ -95,12 +124,12 @@ const Live = () => {
                 </div>
               </div>
             </div>
-            <div className=" w-[200px] rounded-md">
+            <div className=" w-[250px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
                   <p className="font-semibold">RM Transfer Bar Thickness</p>
                   <p>-</p>
-                  <p className="font-semibold">25</p>
+                  <p className="font-semibold">{Math.round(getRM())}</p>
                 </div>
               </div>
             </div>
@@ -171,14 +200,14 @@ const Live = () => {
                 >
                   <p>Last Hour</p>
                 </div>
-                {/* <div
+                <div
                   onClick={() => handleChange("Last Shift")}
                   className={`${
                     period === "Last Shift" && "bg-blue-500 !text-white"
                   } hover:bg-blue-500  p-3 italic font-semibold  hover:text-white text-sm border-r border-black`}
                 >
                   <p>Last Shift</p>
-                </div> */}
+                </div>
                 <div
                   onClick={() => handleChange("Last Day")}
                   className={`${
@@ -225,6 +254,13 @@ const Live = () => {
                 </div>
                 <div
                   onClick={(e) => setOpen2(true)}
+                  className={`
+             hover:bg-blue-500 bg-blue-500 text-white hover:scale-105 transition-all duration-200 ease-in-out p-3 italic font-semibold bg-blue shadow-md rounded-md hover:text-white text-sm  `}
+                >
+                  <p>Process Delay Time</p>
+                </div>
+                <div
+                  onClick={(e) => setOpen7(true)}
                   className={`
              hover:bg-blue-500 bg-blue-500 text-white hover:scale-105 transition-all duration-200 ease-in-out p-3 italic font-semibold bg-blue shadow-md rounded-md hover:text-white text-sm  `}
                 >
@@ -285,6 +321,7 @@ const Live = () => {
       <Delays open={open} setOpen={setOpen} />
       <Gaps open={open1} setOpen={setOpen1} />
       <Processes open={open2} setOpen={setOpen2} />
+      <ProcessTime open={open7} setOpen={setOpen7} />
       <FRC open={open3} setOpen={setOpen3} />
       <BN open={open4} setOpen={setOpen4} />
       <GRT open={open5} setOpen={setOpen5} />

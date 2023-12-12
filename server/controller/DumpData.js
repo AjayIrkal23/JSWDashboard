@@ -6,13 +6,12 @@ import cron from "node-cron";
 import { get } from "../database/pool-manager.js";
 
 let config = {
-  user: "Dashboard", //default is sa
-  password: "Dashboard",
-  server: "10.11.2.41", // for local machine
-  database: "History", // name of database
+  user: "sa",
+  password: "loloklol",
+  server: "localhost",
   trustServerCertificate: true,
-  encrypt:false,
-  port:1433,
+  encrypt: false,
+  port: 1433,
   requestTimeout: 20000000,
 };
 
@@ -39,10 +38,10 @@ export const Start = async (req, res) => {
 };
 
 export const DumpAll = async (req, res) => {
-  console.log("hello")
+  console.log("hello");
   try {
-    const pool = await get("History", config)
-    console.log(pool)
+    const pool = await get("History", config);
+    console.log(pool);
     console.log("Connection Successful !");
     const start = new Date("Oct 2023 1");
     const end = new Date("Oct 2023 29");
@@ -86,14 +85,14 @@ export const DumpAll = async (req, res) => {
       res.status(200).json({ message: "success" });
     }
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ message: "Failed",err:err });
+    console.log(err);
+    res.status(500).json({ message: "Failed", err: err });
   }
 };
 
 export const GetExcelReport = async () => {
   const pool = await get("History", config);
-  console.log(pool)
+  console.log(pool);
 
   const excelReport = await pool
     .request()
@@ -105,41 +104,46 @@ export const GetExcelReport = async () => {
     .request()
     .query(`SELECT TOP (1) * FROM r_PacReport2 ORDER BY gt_HistoryKeyTm DESC`);
 
-    console.log(excelReport)
-    console.log(pacReport2)
+  console.log(excelReport);
+  console.log(pacReport2);
 
   if (excelReport.recordset[0] && pacReport2.recordset[0]) {
-    let exists = await ExcelData.findOne({c_PieceName:excelReport.recordset[0].c_PieceName})
-    let exists2 = await PacingData.findOne({c_PieceName:pacReport2.recordset[0].c_PieceName})
-    console.log("c_PieceName",excelReport.recordset[0].c_PieceName,exists)
-    console.log("c_PieceName",pacReport2.recordset[0].c_PieceName,exists2)
-    if(!exists && !exists2){
+    let exists = await ExcelData.findOne({
+      c_PieceName: excelReport.recordset[0].c_PieceName,
+    });
+    let exists2 = await PacingData.findOne({
+      c_PieceName: pacReport2.recordset[0].c_PieceName,
+    });
+    console.log("c_PieceName", excelReport.recordset[0].c_PieceName, exists);
+    console.log("c_PieceName", pacReport2.recordset[0].c_PieceName, exists2);
+    if (!exists && !exists2) {
       await ExcelData?.create({
         ...excelReport.recordset[0],
         gt_HistoryKeyTm: new Date(
           excelReport.recordset[0].gt_HistoryKeyTm
         ).toISOString(),
-      }).then((resp) => {
-        console.log(item.c_PieceName, "done");
       })
-      .catch((err) => {
-        return
-      });
+        .then((resp) => {
+          console.log(item.c_PieceName, "done");
+        })
+        .catch((err) => {
+          return;
+        });
 
       await PacingData.create({
         ...pacReport2.recordset[0],
         gt_HistoryKeyTm: new Date(
           pacReport2.recordset[0].gt_HistoryKeyTm
         ).toISOString(),
-      }).then((resp) => {
-        console.log(item.c_PieceName, "done");
       })
-      .catch((err) => {
-        return
-      });
+        .then((resp) => {
+          console.log(item.c_PieceName, "done");
+        })
+        .catch((err) => {
+          return;
+        });
     }
-   
-    
+
     // res.status(200).json("Success !");
     console.log("Success !");
   } else {

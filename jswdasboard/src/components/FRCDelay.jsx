@@ -64,7 +64,12 @@ const FRC = ({ open, setOpen }) => {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <DelayChart data={chartData} width={900} height={548} />
+              <DelayChart
+                data={chartData}
+                width={900}
+                height={548}
+                frc={true}
+              />
             </div>
             <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
               <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
@@ -74,7 +79,12 @@ const FRC = ({ open, setOpen }) => {
               </header>
               {/* Chart built with Chart.js 3 */}
               {/* Change the height attribute to adjust the chart height */}
-              <FRCCharts data={chartData1} width={900} height={548} />
+              <DelayChart
+                data={chartData1}
+                width={900}
+                height={548}
+                frc={true}
+              />
             </div>
           </div>
         </div>

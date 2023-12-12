@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { AccountContext } from "../context/context";
-import { ToMins, roundOff } from "../utils/roundoff";
+import { ToAverage, ToMins, roundOff } from "../utils/roundoff";
 
 const Wise = ({ open, setOpen }) => {
   const { period, setPeriod, data, mins } = useContext(AccountContext);
@@ -180,9 +180,9 @@ const Wise = ({ open, setOpen }) => {
 
       let value1 = total1;
       if (mins) {
-        return ToMins(value1);
+        return ToAverage(ToMins(value1), data?.Excel?.length);
       } else {
-        return value1;
+        return ToAverage(value1, data?.Excel?.length);
       }
     } else {
       return 0;

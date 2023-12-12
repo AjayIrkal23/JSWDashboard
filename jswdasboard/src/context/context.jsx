@@ -9,6 +9,9 @@ export const Accountprovider = ({ children }) => {
   const [period, setPeriod] = useState("Last Coil");
   const [mainData, setMainData] = useState(null);
   const [eightData, setEightData] = useState(null);
+  const [rmBarThickness, setRmBarThickness] = useState(null);
+  const [rollChange, setRollChange] = useState(null);
+  console.log(rollChange);
   const [mins, setMins] = useState(false);
 
   console.log(eightData, "eightData");
@@ -139,7 +142,15 @@ export const Accountprovider = ({ children }) => {
 
   return (
     <AccountContext.Provider
-      value={{ period, setPeriod, data, mainData, eightData, setMins, mins }}
+      value={{
+        period,
+        setPeriod,
+        data,
+        mainData,
+        eightData,
+        setMins,
+        mins,
+      }}
     >
       {children}
     </AccountContext.Provider>

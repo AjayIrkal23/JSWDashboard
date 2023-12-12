@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
-import { ToMins, roundOff } from "../utils/roundoff";
+import { ToAverage, ToMins, roundOff } from "../utils/roundoff";
 import axios from "axios";
 
 const FM = ({ open, setOpen }) => {
-  const { period, setPeriod, data, mins } = useContext(AccountContext);
+  const { period, setPeriod, data, mins, rollChange } =
+    useContext(AccountContext);
   function FMEPredicted() {
     if (period == "Last Coil" || period.customp) {
       if (mins) {
@@ -44,31 +45,14 @@ const FM = ({ open, setOpen }) => {
       let value1 = total1 - total2;
 
       if (mins) {
-        return ToMins(value1);
+        return ToAverage(ToMins(value1), data?.Excel?.length);
       } else {
-        return value1;
+        return ToAverage(value1, data?.Excel.length);
       }
     } else {
       return 0;
     }
   }
-
-  const RoleChange = () => {
-    if (data?.Excel?.length > 5) {
-      const dateString = data?.Excel[0]?.gt_HistoryKeyTm;
-
-      const dateString1 = data.Excel[data.Excel.length - 1].gt_HistoryKeyTm;
-
-      if (dateString && dateString1) {
-        const res = axios.post("http://localhost:8000/FMDelay", {
-          start: dateString,
-          end: dateString1,
-        });
-      }
-    } else {
-      return "--";
-    }
-  };
 
   function FMProcessTime(a) {
     if (period == "Last Coil" || period.customp) {
@@ -98,15 +82,15 @@ const FM = ({ open, setOpen }) => {
       if (a == "a") {
         let value1 = total1 / data?.pacing?.length;
         if (mins) {
-          return ToMins(value1);
+          return ToAverage(ToMins(value1), data?.Excel?.length);
         } else {
-          return value1;
+          return ToAverage(value1, data?.Excel?.length);
         }
       } else {
         if (mins) {
-          return ToMins(total1);
+          return ToMins(value1);
         } else {
-          return total1;
+          return value1;
         }
       }
     } else {
@@ -240,6 +224,55 @@ const FM = ({ open, setOpen }) => {
     }
   }
 
+  function GapTimeMinMax(a) {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_F1GapTimeAct);
+      } else {
+        return data?.Excel?.f_F1GapTimeAct;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let min = null;
+      let max = 0;
+      let total1 =
+        data?.Excel.length > 1 &&
+        data.Excel.map((item) => {
+          if (item.f_SSPGapTimeAct > max) {
+            max = item.f_F1GapTimeAct;
+          }
+          if (min == null) {
+            min = item.f_F1GapTimeAct;
+          }
+          if (item.f_SSPGapTimeAct < min) {
+            min = item.f_F1GapTimeAct;
+          }
+        });
+
+      if (a == "min") {
+        if (mins) {
+          return ToMins(min);
+        } else {
+          return min;
+        }
+      } else if (a == "max") {
+        if (mins) {
+          return ToMins(max);
+        } else {
+          return max;
+        }
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+  }
+
   return (
     <div className="flex gap-5 ">
       <div className="flex flex-col w-[300px] justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
@@ -258,30 +291,38 @@ const FM = ({ open, setOpen }) => {
           <p>-</p>
           <p className="font-semibold">{roundOff(FMProcessTime())}</p>
         </div>
-        {period !== "Last Piece" && (
-          <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-            <p className="font-semibold">FM Process Time Average</p>
-            <p>-</p>
-            <p className="font-semibold ">{roundOff(FMProcessTime("a"))}</p>
-          </div>
+        {period != "Last Coil" && (
+          <>
+            <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
+              <p className="font-semibold">Gap Time Min </p>
+              <p>-</p>
+              <p className="font-semibold">{roundOff(GapTimeMinMax("min"))}</p>
+            </div>
+            <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
+              <p className="font-semibold">Gap Time Max </p>
+              <p>-</p>
+              <p className="font-semibold">{roundOff(GapTimeMinMax("max"))}</p>
+            </div>
+          </>
         )}
       </div>
       <div className="flex flex-col w-[250px]  border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
         <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-          <p>FM Gap Time Average</p>
+          <p className="font-semibold">FM Gap Time</p>
           <p>-</p>
           <p className="font-semibold ">{roundOff(FMGapTime("a"))}</p>
         </div>
+
         {data?.Excel?.length > 5 && (
           <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-            <p>Role Change Delay</p>
+            <p className="font-semibold">Role Change Delay</p>
             <p>-</p>
-            <p className="font-semibold ">{RoleChange()}</p>
+            <p className="font-semibold ">{data?.RollChange?.total}</p>
           </div>
         )}
 
         <div className="flex text-xs justify-between px-1 border-b items-center border-black/40 pt-1 italic pr-2">
-          <p>FM Process Delay Time </p>
+          <p className="font-semibold">FM Process Delay Time </p>
           <p>-</p>
           <p className="font-semibold">{roundOff(FMProcessDelay())}</p>
         </div>

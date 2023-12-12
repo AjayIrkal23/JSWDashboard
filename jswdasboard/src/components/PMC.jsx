@@ -81,6 +81,55 @@ const PMC = ({ open, setOpen, setTitle }) => {
     }
   }
 
+  function minutesDiff() {
+    if (period == "Last Coil" || period.customp) {
+      var differenceValue =
+        (new Date(data?.pacing?.gt_FceDisChgTm)?.getTime() -
+          new Date(data?.pacing?.gt_PrevFceDisChgTm)?.getTime()) /
+        1000;
+      differenceValue /= 60;
+
+      if (mins) {
+        return ToMins(differenceValue);
+      } else {
+        return differenceValue;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Shift" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.pacing.length > 1 &&
+        data?.pacing?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + new Date(currentValue.gt_FceDisChgTm)?.getTime(),
+          0
+        );
+
+      let total2 =
+        data?.pacing.length > 1 &&
+        data?.pacing?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + new Date(currentValue.gt_PrevFceDisChgTm)?.getTime(),
+          0
+        );
+
+      let value1 = total1 - total2;
+      var differenceValue = value1 / 1000;
+      differenceValue /= 60;
+      if (mins) {
+        return ToMins(Math.abs(Math.round(differenceValue)));
+      } else {
+        return Math.abs(Math.round(differenceValue));
+      }
+    } else {
+      return 0;
+    }
+  }
+
   function FCESSPTravelTime() {
     if (period == "Last Coil" || period.customp) {
       if (mins) {
@@ -159,6 +208,7 @@ const PMC = ({ open, setOpen, setTitle }) => {
         <p>-</p>
         <p className="font-semibold">{roundOff(minutesDiff())}</p>
       </div>
+
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
         <p className="font-semibold">FCE-SSP Travel Time</p>
         <p>-</p>
