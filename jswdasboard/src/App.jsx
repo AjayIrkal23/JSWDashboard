@@ -47,10 +47,7 @@ function App() {
           },
         }}
       />
-      {data?.Excel?.c_PieceName ||
-      data?.Excel?.length > 1 ||
-      mainData?.date?.length > 1 ||
-      eightData ? (
+      {true ? (
         <>
           <Routes>
             <Route exact path="/" element={<Dashboard />} />

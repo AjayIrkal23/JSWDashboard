@@ -36,7 +36,11 @@
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.1",
     "react-table": "^7.8.0",
+    "chart.js": "^4.3.0",
+    "chartjs-adapter-moment": "^1.0.1",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "react-time-picker": "^6.3.0",
+    
     "react-to-print": "^2.14.10",
     "react-transition-group": "^4.4.5",
     "styled-components": "^5.3.11",

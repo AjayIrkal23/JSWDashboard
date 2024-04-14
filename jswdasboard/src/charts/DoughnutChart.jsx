@@ -41,9 +41,6 @@ function DoughnutChart({ data, width, height }) {
           padding: 24,
         },
         plugins: {
-          legend: {
-            display: false,
-          },
           tooltip: {
             titleColor: darkMode
               ? tooltipTitleColor.dark
