@@ -3,128 +3,78 @@ import { AccountContext } from "../context/context";
 import { ToMins, roundOff } from "../utils/roundoff";
 
 const FM = ({ open, setOpen }) => {
-  const { period, setPeriod, data, mins } = useContext(AccountContext);
-  function FmRockManCount(a) {
-    if (a == "man") {
-      if (period == "Last Coil" || period.customp) {
-        if (
-          data?.Excel?.i_FMEntryOpInhibit == 1 &&
-          data?.Excel?.f_FEntF1TravelTimeDelay > 0
-        ) {
-          return 1;
-        } else {
-          return 0;
-        }
-      } else if (
-        period == "Last 5 Coil" ||
-        period == "Last Hour" ||
-        period == "Last Shift" ||
-        period == "Last Day" ||
-        period?.date
-      ) {
-        let total1 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-              currentValue.i_FMEntryOpInhibit == 1 && accumulator + 1,
-            0
-          );
+  const { period, data, mins } = useContext(AccountContext);
 
-        let total2 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-              accumulator + currentValue.f_FEntF1TravelTimeDelay,
-            0
-          );
+  const FmRockManCount = (type) => {
+    if (!data || !data.Excel) return 0;
 
-        if (total2 > 0) {
-          return total1;
-        }
-      } else {
-        return 0;
+    const isManual = type === "man";
+    const inhibitValue = isManual ? 1 : 0;
+
+    if (period === "Last Coil" || period.customp) {
+      const entryOpInhibit = data.Excel.i_FMEntryOpInhibit;
+      const travelTimeDelay = data.Excel.f_FEntF1TravelTimeDelay;
+      if (entryOpInhibit === inhibitValue && travelTimeDelay > 0) {
+        return 1;
       }
-    } else {
-      if (period == "Last Coil" || period.customp) {
-        if (
-          data?.Excel?.i_FMEntryOpInhibit == 0 &&
-          data?.Excel?.f_FEntF1TravelTimeDelay > 0
-        ) {
-          return 1;
-        } else {
-          return 0;
-        }
-      } else if (
-        period == "Last 5 Coil" ||
-        period == "Last Hour" ||
-        period == "Last Shift" ||
-        period == "Last Day" ||
-        period?.date
-      ) {
-        let total1 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-              currentValue.i_FMEntryOpInhibit == 0 && accumulator + 1,
-            0
-          );
-
-        let total2 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce(
-            (accumulator, currentValue) =>
-              accumulator + currentValue.f_FEntF1TravelTimeDelay,
-            0
-          );
-
-        if (total2 > 0) {
-          return total1;
-        }
-      } else {
-        return 0;
-      }
-    }
-  }
-
-  function ManualRockMin(a) {
-    if (period == "Last Coil" || period.customp) {
-      if (mins) {
-        return ToMins(
-          data?.Excel?.i_FMEntryOpInhibit == a &&
-            data?.Excel?.f_FEntF1TravelTimeDelay
-        );
-      } else {
-        return (
-          data?.Excel?.i_FMEntryOpInhibit == a &&
-          data?.Excel?.f_FEntF1TravelTimeDelay
-        );
-      }
-    } else if (
-      period == "Last 5 Coil" ||
-      period == "Last Hour" ||
-      period == "Last Day" ||
-      period?.date
-    ) {
-      let total1 =
-        data?.Excel.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            currentValue.i_FMEntryOpInhibit == a &&
-            accumulator + currentValue.f_FEntF1TravelTimeDelay,
-          0
-        );
-
-      let value1 = total1;
-
-      if (mins) {
-        return ToMins(value1);
-      } else {
-        return value1;
-      }
-    } else {
       return 0;
     }
-  }
+
+    if (
+      period === "Last 5 Coil" ||
+      period === "Last Hour" ||
+      period === "Last Shift" ||
+      period === "Last Day" ||
+      period?.date
+    ) {
+      const totalCount = data.Excel.reduce(
+        (accumulator, currentValue) =>
+          currentValue.i_FMEntryOpInhibit === inhibitValue
+            ? accumulator + 1
+            : accumulator,
+        0
+      );
+
+      const totalDelay = data.Excel.reduce(
+        (accumulator, currentValue) =>
+          accumulator + currentValue.f_FEntF1TravelTimeDelay,
+        0
+      );
+
+      return totalDelay > 0 ? totalCount : 0;
+    }
+
+    return 0;
+  };
+
+  const ManualRockMin = (inhibitValue) => {
+    if (!data || !data.Excel) return 0;
+
+    if (period === "Last Coil" || period.customp) {
+      const travelTimeDelay = data.Excel.f_FEntF1TravelTimeDelay;
+      return mins ? ToMins(travelTimeDelay) : travelTimeDelay;
+    }
+
+    if (
+      period === "Last 5 Coil" ||
+      period === "Last Hour" ||
+      period === "Last Day" ||
+      period?.date
+    ) {
+      const totalDelay = data.Excel.reduce(
+        (accumulator, currentValue) =>
+          currentValue.i_FMEntryOpInhibit === inhibitValue
+            ? accumulator + currentValue.f_FEntF1TravelTimeDelay
+            : accumulator,
+        0
+      );
+
+      return mins ? ToMins(totalDelay) : totalDelay;
+    }
+
+    return 0;
+  };
+
   return (
     <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
@@ -140,12 +90,12 @@ const FM = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p className="font-semibold">Manual Rock Time </p>
         <p>-</p>
-        <p className="font-semibold ">{roundOff(ManualRockMin("1"))}</p>
+        <p className="font-semibold ">{roundOff(ManualRockMin(1))}</p>
       </div>
       <div className="flex text-xs justify-between px-1  pb-2 items-center pt-1 italic pr-2 ">
         <p className="font-semibold">Auto Rock Time </p>
         <p>-</p>
-        <p className="font-semibold ">{roundOff(ManualRockMin("0"))}</p>
+        <p className="font-semibold ">{roundOff(ManualRockMin(0))}</p>
       </div>
     </div>
   );

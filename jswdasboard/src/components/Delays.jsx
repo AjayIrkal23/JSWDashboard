@@ -3,139 +3,69 @@ import React, { useContext, useEffect, useState } from "react";
 
 // Import utilities
 import { tailwindConfig } from "../utils/Utils";
-import BarChart01 from "../charts/BarChart01";
 import DelayChart from "../charts/DelayChart";
 import { AccountContext } from "../context/context";
 import { ToMins, roundOff } from "../utils/roundoff";
+
 const Delays = ({ open, setOpen }) => {
-  const [chartDataEntry, setChartData] = useState();
-  const { period, setPeriod, data, mins } = useContext(AccountContext);
-
-  const getData = () => {
-    return [1, 2, 3, 4, 5, 6, 7];
-  };
-
-  function DelayData() {
-    let arr = [];
-    if (period == "Last Coil" || period.customp) {
-      arr.push(roundOff(data?.Excel?.f_L2L1ExtRdyTimeDiff?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_ExtractCycleTimeDiff?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_FCDTravelTmeDelay?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_SSPR1TravelTimeDelay?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_R1ProcessTimeDelay?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_R1R2TravelTimeDelay?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_R2ProcessTimeDelay?.toFixed(2)));
-      arr.push(roundOff(data?.Excel?.f_R2FEntTravelTimeDelay?.toFixed(2)));
-      arr.push(roundOff(data?.pacing?.f_FCE1SSPTravelTimeDelay?.toFixed(2)));
-
-      setChartData(arr);
-    } else if (
-      period == "Last 5 Coil" ||
-      period == "Last Hour" ||
-      period == "Last Day" ||
-      period?.date
-    ) {
-      let arr = [];
-      let total1 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_L2L1ExtRdyTimeDiff,
-          0
-        );
-      let total2 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_ExtractCycleTimeDiff,
-          0
-        );
-      let total3 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_FCDTravelTmeDelay,
-          0
-        );
-      let total4 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_SSPR1TravelTimeDelay,
-          0
-        );
-
-      let total5 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_R1ProcessTimeDelay,
-          0
-        );
-
-      let total6 =
-        data?.Excel?.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_R1R2TravelTimeDelay,
-          0
-        );
-
-      let total7 =
-        data?.Excel.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_R2ProcessTimeDelay,
-          0
-        );
-
-      let total8 =
-        data?.Excel.length > 1 &&
-        data?.Excel?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_R2FEntTravelTimeDelay,
-          0
-        );
-
-      let total9 =
-        data?.pacing.length > 1 &&
-        data?.pacing?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_FCE1SSPTravelTimeDelay,
-          0
-        );
-
-      if (mins) {
-        arr.push(roundOff(ToMins(total1)));
-        arr.push(roundOff(ToMins(total2)));
-        arr.push(roundOff(ToMins(total3)));
-        arr.push(roundOff(ToMins(total4)));
-        arr.push(roundOff(ToMins(total5)));
-        arr.push(roundOff(ToMins(total6)));
-        arr.push(roundOff(ToMins(total7)));
-        arr.push(roundOff(ToMins(total8)));
-        arr.push(roundOff(ToMins(total9)));
-      } else {
-        arr.push(roundOff(total1?.toFixed(2)));
-        arr.push(roundOff(total2?.toFixed(2)));
-        arr.push(roundOff(total3?.toFixed(2)));
-        arr.push(roundOff(total4?.toFixed(2)));
-        arr.push(roundOff(total5?.toFixed(2)));
-        arr.push(roundOff(total6?.toFixed(2)));
-        arr.push(roundOff(total7?.toFixed(2)));
-        arr.push(roundOff(total8?.toFixed(2)));
-        arr.push(roundOff(total9?.toFixed(2)));
-      }
-
-      setChartData(arr);
-    } else {
-      return "--";
-    }
-  }
+  const [chartDataEntry, setChartData] = useState([]);
+  const { period, data, mins } = useContext(AccountContext);
 
   useEffect(() => {
-    DelayData();
+    if (data) {
+      const delayData = calculateDelayData();
+      setChartData(delayData);
+    }
   }, [data]);
+
+  const calculateDelayData = () => {
+    const arr = [];
+    const roundingFunction = mins ? ToMins : (val) => val;
+    const addDelay = (value) => {
+      arr.push(roundOff(roundingFunction(value?.toFixed(2))));
+    };
+
+    if (period === "Last Coil" || period.customp) {
+      addDelay(data?.Excel?.f_L2L1ExtRdyTimeDiff);
+      addDelay(data?.Excel?.f_ExtractCycleTimeDiff);
+      addDelay(data?.Excel?.f_FCDTravelTmeDelay);
+      addDelay(data?.Excel?.f_SSPR1TravelTimeDelay);
+      addDelay(data?.Excel?.f_R1ProcessTimeDelay);
+      addDelay(data?.Excel?.f_R1R2TravelTimeDelay);
+      addDelay(data?.Excel?.f_R2ProcessTimeDelay);
+      addDelay(data?.Excel?.f_R2FEntTravelTimeDelay);
+      addDelay(data?.pacing?.f_FCE1SSPTravelTimeDelay);
+    } else if (
+      period === "Last 5 Coil" ||
+      period === "Last Hour" ||
+      period === "Last Day" ||
+      period?.date
+    ) {
+      const calculateTotalDelay = (key) => {
+        return data?.Excel?.reduce(
+          (accumulator, currentValue) => accumulator + currentValue[key],
+          0
+        );
+      };
+
+      addDelay(calculateTotalDelay("f_L2L1ExtRdyTimeDiff"));
+      addDelay(calculateTotalDelay("f_ExtractCycleTimeDiff"));
+      addDelay(calculateTotalDelay("f_FCDTravelTmeDelay"));
+      addDelay(calculateTotalDelay("f_SSPR1TravelTimeDelay"));
+      addDelay(calculateTotalDelay("f_R1ProcessTimeDelay"));
+      addDelay(calculateTotalDelay("f_R1R2TravelTimeDelay"));
+      addDelay(calculateTotalDelay("f_R2ProcessTimeDelay"));
+      addDelay(calculateTotalDelay("f_R2FEntTravelTimeDelay"));
+
+      const pacingTotalDelay = data?.pacing?.reduce(
+        (accumulator, currentValue) =>
+          accumulator + currentValue.f_FCE1SSPTravelTimeDelay,
+        0
+      );
+      addDelay(pacingTotalDelay);
+    }
+    return arr;
+  };
 
   const chartData = {
     labels: [
@@ -147,48 +77,41 @@ const Delays = ({ open, setOpen }) => {
       ["R2", "Travel", "delay"],
       ["R2", "Process", "Delay"],
       ["FME", "Travel", "Delay"],
-      ["FCE ", "To", "SSP", "Travel", "Delay"],
+      ["FCE ", "To", "SSP", "Travel", "Delay"]
     ],
     datasets: [
-      // Light blue bars
       {
         data: chartDataEntry,
         backgroundColor: tailwindConfig().theme.colors.blue[700],
         hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
         barPercentage: 0.66,
-        categoryPercentage: 0.66,
-      },
-      // Light blue bars
-
-      // Blue bars
-    ],
+        categoryPercentage: 0.66
+      }
+    ]
   };
+
   const handleClose = () => {
     setOpen(false);
   };
+
   return (
-    <>
-      {" "}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <div className="absolute  bg-white outline-none top-[5%] left-[50%] -translate-x-[50%] flex">
-          <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
-            <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
-              <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-                Delay Visualization
-              </h2>
-            </header>
-            {/* Chart built with Chart.js 3 */}
-            {/* Change the height attribute to adjust the chart height */}
-            <DelayChart data={chartData} width={1800} height={800} />
-          </div>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <div className="absolute bg-white outline-none top-[5%] left-[50%] -translate-x-[50%] flex">
+        <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
+          <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
+            <h2 className="font-semibold text-slate-800 dark:text-slate-100">
+              Delay Visualization
+            </h2>
+          </header>
+          <DelayChart data={chartData} width={1800} height={800} />
         </div>
-      </Modal>
-    </>
+      </div>
+    </Modal>
   );
 };
 

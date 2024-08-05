@@ -1,6 +1,6 @@
 {
   "name": "mosaic-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -40,7 +40,6 @@
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "react-time-picker": "^6.3.0",
-    
     "react-to-print": "^2.14.10",
     "react-transition-group": "^4.4.5",
     "styled-components": "^5.3.11",

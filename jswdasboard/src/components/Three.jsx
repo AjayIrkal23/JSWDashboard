@@ -3,136 +3,70 @@ import { AccountContext } from "../context/context";
 import { ToAverage, ToMins, roundOff } from "../utils/roundoff";
 
 const Three = ({ open, setOpen }) => {
-  const { period, setPeriod, data, mins } = useContext(AccountContext);
-  function Passes(fw, sy) {
-    if (period == "Last Coil" || period.customp) {
-      if (fw == 3 && data?.Excel?.i_R2PassAct == 3) {
-        let value = 1;
-        return value;
-      } else if (fw == 5 && data?.Excel?.i_R2PassAct == 5) {
-        let value = 1;
-        return value;
-      } else {
-        return 0;
-      }
-    } else if (
-      period == "Last 5 Coil" ||
-      period == "Last Hour" ||
-      period == "Last Shift" ||
-      period == "Last Day" ||
-      period?.date
-    ) {
-      if (fw == 3) {
-        let total1 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce((accumulator, currentValue) => {
-            if (currentValue.i_R2PassAct == 3) {
-              accumulator = accumulator + 1;
-            }
-            return accumulator;
-          }, 0);
-        if (fw == 3 && sy == "%") {
-          return (total1 / data?.Excel.length) * 100;
-        } else {
-          return total1;
-        }
-      } else if (fw == 5) {
-        let total1 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce((accumulator, currentValue) => {
-            if (currentValue.i_R2PassAct == 5) {
-              accumulator = accumulator + 1;
-            }
-            return accumulator;
-          }, 0);
+  const { period, data, mins } = useContext(AccountContext);
 
-        if (fw == 5 && sy == "%") {
-          return (total1 / data?.Excel.length) * 100;
-        } else {
-          return total1;
-        }
-      } else if (fw == 3) {
-        let total1 =
-          data?.Excel.length > 1 &&
-          data?.Excel?.reduce((accumulator, currentValue) => {
-            if (currentValue.i_FceNum == 3) {
-              accumulator = accumulator + 1;
-            }
-            return accumulator;
-          }, 0);
-        return total1;
-      } else {
-        return 0;
+  const calculatePasses = (fw, sy) => {
+    if (!data?.Excel?.length) return 0;
+
+    const total = data.Excel.reduce((acc, curr) => {
+      if (curr.i_R2PassAct === fw) {
+        return acc + 1;
       }
+      return acc;
+    }, 0);
+
+    if (sy === "%" && fw === 1) {
+      return (total / data.Excel.length) * 100;
     } else {
-      return 0;
+      return total;
     }
-  }
+  };
 
-  function FCESSPTravelTimeDelay() {
-    if (period == "Last Coil" || period.customp) {
-      if (mins) {
-        return ToMins(data?.pacing?.f_FCE1SSPTravelTimeDelay);
-      } else {
-        return data?.pacing?.f_FCE1SSPTravelTimeDelay;
-      }
-    } else if (
-      period == "Last 5 Coil" ||
-      period == "Last Hour" ||
-      period == "Last Day" ||
-      period?.date
-    ) {
-      let total1 =
-        data?.pacing.length > 1 &&
-        data?.pacing?.reduce(
-          (accumulator, currentValue) =>
-            accumulator + currentValue.f_FCE1SSPTravelTimeDelay,
-          0
-        );
+  const calculateTravelTimeDelay = () => {
+    if (!data?.pacing?.length) return 0;
 
-      let value1 = total1;
+    const total = data.pacing.reduce(
+      (acc, curr) => acc + curr.f_FCE1SSPTravelTimeDelay,
+      0
+    );
 
-      if (mins) {
-        return ToAverage(ToMins(value1), data?.Excel?.length);
-      } else {
-        return ToAverage(value1, data?.Excel?.length);
-      }
+    if (mins) {
+      return ToAverage(ToMins(total), data.Excel.length);
     } else {
-      return 0;
+      return ToAverage(total, data.Excel.length);
     }
-  }
+  };
 
   return (
-    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-      {period != "Last Coil" && (
-        <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
+    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md text-xs bg-[whitesmoke] shadow-md">
+      {period !== "Last Coil" && (
+        <div className="flex justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1">
           <p className="font-semibold">% of R2 3Passes Count</p>
           <p>-</p>
-          <p className="font-semibold">{roundOff(Passes(3, "%"))}</p>
+          <p className="font-semibold">{roundOff(calculatePasses(3, "%"))}</p>
         </div>
       )}
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
+      <div className="flex justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1">
         <p className="font-semibold">R2 3Passes Count</p>
         <p>-</p>
-        <p className="font-semibold">{roundOff(Passes(3))}</p>
+        <p className="font-semibold">{roundOff(calculatePasses(3))}</p>
       </div>
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
+      <div className="flex justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1">
         <p className="font-semibold">R2 5Passes Count</p>
         <p>-</p>
-        <p className="font-semibold">{roundOff(Passes(5))}</p>
+        <p className="font-semibold">{roundOff(calculatePasses(5))}</p>
       </div>
-
-      {period != "Last Coil" && (
-        <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
+      {period !== "Last Coil" && (
+        <div className="flex justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1">
           <p className="font-semibold">% of R2 5Passes Count</p>
           <p>-</p>
-          <p className="font-semibold">{roundOff(Passes(5, "%"))}</p>
+          <p className="font-semibold">{roundOff(calculatePasses(5, "%"))}</p>
         </div>
       )}
-      <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
+      <div className="flex justify-between px-1 pb-1 items-center pt-1 italic pr-2">
         <p className="font-semibold">FCE to SSP Travel Time Delay</p>
         <p>-</p>
-        <p className="font-semibold ">{roundOff(FCESSPTravelTimeDelay())}</p>
+        <p className="font-semibold">{roundOff(calculateTravelTimeDelay())}</p>
       </div>
     </div>
   );

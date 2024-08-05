@@ -1,221 +1,128 @@
 import sql2 from "mssql";
 import { get } from "../database/pool-manager.js";
 
-let config = {
+const config = {
   user: "sa",
   password: "loloklol",
   server: "localhost",
   trustServerCertificate: true,
   encrypt: false,
   port: 1433,
-  requestTimeout: 1800000,
+  requestTimeout: 1800000
+};
+
+const getDaysArray = (start, end) => {
+  const arr = [];
+  for (
+    let d = new Date(start);
+    d <= new Date(end);
+    d.setDate(d.getDate() + 1)
+  ) {
+    arr.push(new Date(d));
+  }
+  return arr;
 };
 
 export const Check2 = async (req, res) => {
   try {
     const pool = await get("Production", config);
-    console.log("Connection Successful !");
-    let arr = [];
-    const month =
-      new Date().getMonth()`                                                                                                    ````````````````````````````` +
-      1;
+    console.log("Connection Successful!");
+
+    const month = new Date().getMonth() + 1;
     const year = new Date().getFullYear();
-    const time = "00:00:00";
-    const day = 1;
-    const dateObj = year + " " + month + " " + day + " " + time;
-    const getDaysArray = function (s, e) {
-      for (
-        var a = [], d = new Date(s);
-        d <= new Date(e);
-        d.setDate(d.getDate() + 1)
-      ) {
-        a.push(new Date(d));
-      }
-      return a;
-    };
+    const dateObj = new Date(`${year}-${month}-01T00:00:00`);
+    const daylist = getDaysArray(dateObj, new Date());
+    const arr = [];
 
-    var daylist = getDaysArray(new Date(dateObj), new Date());
-
-    const end = new Date();
-    let run = await Promise.all(
-      daylist.map(async (item, index) => {
-        if (index != daylist.length - 1) {
-          const report = await pool
-            .request()
-            .query(
-              `EXEC spGet_Production_Summary_Stats '${item.toISOString()}','${daylist[
-                index + 1
-              ].toISOString()}'`
-            );
-
-          arr.push({ date: item, report: report.recordset[0] });
-        }
+    await Promise.all(
+      daylist.slice(0, -1).map(async (item, index) => {
+        const report = await pool
+          .request()
+          .query(
+            `EXEC spGet_Production_Summary_Stats '${item.toISOString()}', '${daylist[
+              index + 1
+            ].toISOString()}'`
+          );
+        arr.push({ date: item, report: report.recordset[0] });
       })
     );
 
     res.status(200).json({ array: arr });
   } catch (err) {
-    res.status(500).json({ Message: "Failed" });
+    console.error("Error in Check2:", err);
+    res.status(500).json({ message: "Failed", error: err });
   }
 };
 
 export const Check1 = async (req, res) => {
   try {
     const pool = await get("Production2", config);
+    const arr = [];
+    const arr1 = Array.from({ length: 8 }, (_, i) => i);
 
-    let arr = [];
-    let arr1 = [0, 1, 2, 3, 4, 5, 6, 7];
+    const currentdate = new Date();
+    const formatDateTime = (date) =>
+      `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
 
-    var currentdate = new Date();
+    const shifts = [
+      `${currentdate.getFullYear()}-${
+        currentdate.getMonth() + 1
+      }-${currentdate.getDate()} 06:30:00`,
+      `${currentdate.getFullYear()}-${
+        currentdate.getMonth() + 1
+      }-${currentdate.getDate()} 14:30:00`,
+      `${currentdate.getFullYear()}-${
+        currentdate.getMonth() + 1
+      }-${currentdate.getDate()} 21:30:00`,
+      `${currentdate.getFullYear()}-${currentdate.getMonth() + 1}-${new Date(
+        currentdate.setDate(currentdate.getDate() + 1)
+      ).getDate()} 06:30:00`
+    ];
 
-    let datetoday =
-      currentdate.getFullYear() +
-      " " +
-      (currentdate.getMonth() + 1) +
-      " " +
-      currentdate.getDate() +
-      " " +
-      currentdate.getHours() +
-      ":" +
-      currentdate.getMinutes();
+    const [shift1, shift2, shift3, end] = shifts.map((shift) =>
+      new Date(shift).getTime()
+    );
+    const datetoday = new Date(formatDateTime(currentdate)).getTime();
 
-    let shift1 =
-      currentdate.getFullYear() +
-      " " +
-      (currentdate.getMonth() + 1) +
-      " " +
-      currentdate.getDate() +
-      " " +
-      "6:30:00";
-
-    let shift2 =
-      currentdate.getFullYear() +
-      " " +
-      (currentdate.getMonth() + 1) +
-      " " +
-      currentdate.getDate() +
-      " " +
-      "14:30:00";
-
-    let shift3 =
-      currentdate.getFullYear() +
-      " " +
-      (currentdate.getMonth() + 1) +
-      " " +
-      currentdate.getDate() +
-      " " +
-      "21:30:00";
-
-    let end =
-      currentdate.getFullYear() +
-      " " +
-      (currentdate.getMonth() + 1) +
-      " " +
-      new Date(new Date().setDate(new Date().getDate() + 1)).getDate();
-    " " + "6:30:00";
-
-    if (
-      new Date(datetoday).getTime() > new Date(shift1).getTime() &&
-      new Date(datetoday).getTime() < new Date(shift2).getTime()
-    ) {
-      let run = await Promise.all(
+    const runQuery = async (shift) => {
+      await Promise.all(
         arr1.map(async (item) => {
-          let DateStart = new Date(shift1).setHours(
-            new Date(shift1).getHours() + item
+          const DateStart = new Date(shift).setHours(
+            new Date(shift).getHours() + item
           );
-          let DateEnd = new Date(DateStart).setHours(
+          const DateEnd = new Date(DateStart).setHours(
             new Date(DateStart).getHours() + 1
           );
-          let plus = new Date(DateStart).toISOString();
-          let plusOne = new Date(DateEnd).toISOString();
+          const plus = new Date(DateStart).toISOString();
+          const plusOne = new Date(DateEnd).toISOString();
 
           const report = await pool
             .request()
-            .query(`EXEC spGet_Production_Summary_Stats '${plus}','${plusOne}'`)
-            .then((resp) => {
-              arr.push({
-                start: plus,
-                end: plusOne,
-                data: resp.recordset[0],
-              });
-            });
+            .query(
+              `EXEC spGet_Production_Summary_Stats '${plus}', '${plusOne}'`
+            );
+
+          arr.push({ start: plus, end: plusOne, data: report.recordset[0] });
         })
       );
-      const report = await pool
-        .request()
-        .query(`EXEC spGet_Production_Summary_Stats '${plus}','${plusOne}'`)
-        .then((resp) => {
-          arr.push({
-            start: plus,
-            end: plusOne,
-            data: resp.recordset[0],
-          });
-        });
-      new Date(shift1).toISOString();
+    };
 
-      res.status(200).json({ arr });
-    } else if (
-      new Date(datetoday).getTime() > new Date(shift2).getTime() &&
-      new Date(datetoday).getTime() < new Date(shift3).getTime()
-    ) {
-      let run = await Promise.all(
-        arr1.map(async (item) => {
-          let DateStart = new Date(shift2).setHours(
-            new Date(shift2).getHours() + item
-          );
-          let DateEnd = new Date(DateStart).setHours(
-            new Date(DateStart).getHours() + 1
-          );
-          let plus = new Date(DateStart).toISOString();
-          let plusOne = new Date(DateEnd).toISOString();
-
-          const report = await pool
-            .request()
-            .query(`EXEC spGet_Production_Summary_Stats '${plus}','${plusOne}'`)
-            .then((resp) => {
-              arr.push({
-                start: plus,
-                end: plusOne,
-                data: resp.recordset[0],
-              });
-            });
-        })
-      );
-
-      res.status(200).json({ arr });
-    } else if (
-      new Date(datetoday).getTime() > new Date(shift3).getTime() &&
-      new Date(datetoday).getTime() < new Date(end).getTime()
-    ) {
-      let run = await Promise.all(
-        arr1.map(async (item) => {
-          let DateStart = new Date(shift3).setHours(
-            new Date(shift3).getHours() + item
-          );
-          let DateEnd = new Date(DateStart).setHours(
-            new Date(DateStart).getHours() + 1
-          );
-          let plus = new Date(DateStart).toISOString();
-          let plusOne = new Date(DateEnd).toISOString();
-
-          const report = await pool
-            .request()
-            .query(`EXEC spGet_Production_Summary_Stats '${plus}','${plusOne}'`)
-            .then((resp) => {
-              arr.push({
-                start: plus,
-                end: plusOne,
-                data: resp.recordset[0],
-              });
-            });
-        })
-      );
-      console.log(arr, "arr");
-      res.status(200).json({ arr });
+    if (datetoday > shift1 && datetoday < shift2) {
+      await runQuery(shift1);
+    } else if (datetoday > shift2 && datetoday < shift3) {
+      await runQuery(shift2);
+    } else if (datetoday > shift3 && datetoday < end) {
+      await runQuery(shift3);
     } else {
-      res.status(400).json("wait for 1:00");
+      res.status(400).json("Wait for 1:00");
+      return;
     }
+
+    res.status(200).json({ arr });
   } catch (error) {
-    res.status(500).json(error);
+    console.error("Error in Check1:", error);
+    res.status(500).json({ error });
   }
 };

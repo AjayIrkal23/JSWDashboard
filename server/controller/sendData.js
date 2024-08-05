@@ -1,427 +1,205 @@
 import sql from "mssql";
-import Data from "../model/allData.js";
 import ExcelData from "../model/excel.js";
 import PacingData from "../model/pacing.js";
 import { get } from "../database/pool-manager.js";
 
-let config = {
+const config = {
   user: "sa",
   password: "loloklol",
   server: "localhost",
   trustServerCertificate: true,
   encrypt: false,
   port: 1433,
-  requestTimeout: 1800000,
+  requestTimeout: 1800000
 };
 
 const DateJoin = (check) => {
-  let date = check.split(" ")[1];
-  let month = check.split(" ")[2];
-  let year = check.split(" ")[3];
-
-  return date + " " + month + " " + year;
+  const [, date, month, year] = check.split(" ");
+  return `${date} ${month} ${year}`;
 };
 
 export const RMThickness = async (excel, period) => {
   try {
     const pool = await get("Production", config);
-    console.log("Connection Successful !");
+    console.log("Connection Successful!");
 
-    if (period == "Last Coil") {
-      let p = excel?.c_PieceName;
-      let r = null;
-      const report = await pool
-        .request()
-        .query(
-          `SELECT [c_PieceName], [f_R2StripThk]
-    FROM [History].[dbo].[r_RMSetup]
-    WHERE [c_PieceName] = '218444071'
-    ORDER BY [c_PieceName];`
-        )
-        .then((resp) => {
-          r = resp.recordset;
-        });
-
-      return r;
+    let query = `SELECT [c_PieceName], [f_R2StripThk] FROM [History].[dbo].[r_RMSetup] WHERE `;
+    if (period === "Last Coil") {
+      query += `[c_PieceName] = '${excel.c_PieceName}' ORDER BY [c_PieceName];`;
     } else {
-      let r = null;
-      let start = excel[0]?.c_PieceName;
-      let end = excel[excel.length - 1]?.c_PieceName;
-
-      const report = await pool
-        .request()
-        .query(
-          `SELECT [c_PieceName], [f_R2StripThk]
-        FROM [History].[dbo].[r_RMSetup]
-      WHERE [c_PieceName] BETWEEN '218444071' AND '218444078'
-      ORDER BY [c_PieceName];`
-        )
-        .then((resp) => {
-          r = resp.recordset;
-        });
-      return r;
+      const start = excel[0].c_PieceName;
+      const end = excel[excel.length - 1].c_PieceName;
+      query += `[c_PieceName] BETWEEN '${start}' AND '${end}' ORDER BY [c_PieceName];`;
     }
+
+    const result = await pool.request().query(query);
+    return result.recordset;
   } catch (err) {
-    console.log(err);
+    console.error("Error in RMThickness:", err);
   }
 };
 
 export const FmDelay = async (excel) => {
-  let startTime = excel[0].gt_HistoryKeyTm;
-  let endTime = excel[excel.length - 1].gt_HistoryKeyTm;
+  const startTime = excel[0].gt_HistoryKeyTm;
+  const endTime = excel[excel.length - 1].gt_HistoryKeyTm;
   try {
     const pool = await get("Operations", config);
-    const pool1 = await get("Operations", config);
-    const pool3 = await get("Operations", config);
 
-    const reportAll = await pool3.request().query(
-      `    SELECT ISNULL(SUM(r_Delay.i_Duration/60),0)
-      FROM Operations.dbo.r_Delay r_Delay
-      WHERE (r_Delay.gt_StartTime>='2022-06-25 04:11:40.000') AND (r_Delay.gt_EndTime<='2022-07-2 12:14:36.000')`
-    );
-    console.log(reportAll);
-    const report2 = await pool1.request().query(
-      `SELECT ISNULL(SUM(r_Delay.i_Duration/60),0)
-      FROM Operations.dbo.r_Delay r_Delay
-      WHERE (r_Delay.i_Duration>=120 And r_Delay.i_Duration<=300) AND  (r_Delay.gt_StartTime>='2022-06-25 04:11:40.000') AND (r_Delay.gt_EndTime<='2022-07-2 12:14:36.000')`
-    );
+    const [reportAll, report2, report5] = await Promise.all([
+      pool
+        .request()
+        .query(
+          `SELECT ISNULL(SUM(r_Delay.i_Duration/60),0) AS total FROM Operations.dbo.r_Delay WHERE r_Delay.gt_StartTime >= '${startTime}' AND r_Delay.gt_EndTime <= '${endTime}'`
+        ),
+      pool
+        .request()
+        .query(
+          `SELECT ISNULL(SUM(r_Delay.i_Duration/60),0) AS two FROM Operations.dbo.r_Delay WHERE r_Delay.i_Duration BETWEEN 120 AND 300 AND r_Delay.gt_StartTime >= '${startTime}' AND r_Delay.gt_EndTime <= '${endTime}'`
+        ),
+      pool
+        .request()
+        .query(
+          `SELECT ISNULL(SUM(r_Delay.i_Duration/60),0) AS five FROM Operations.dbo.r_Delay WHERE r_Delay.i_Duration > 300 AND r_Delay.gt_StartTime >= '${startTime}' AND r_Delay.gt_EndTime <= '${endTime}'`
+        )
+    ]);
 
-    const report5 = await pool.request().query(
-      `SELECT ISNULL(SUM(r_Delay.i_Duration/60),0)
-      FROM Operations.dbo.r_Delay r_Delay
-      WHERE (r_Delay.i_Duration>300) AND  (r_Delay.gt_StartTime>='2022-06-25 04:11:40.000') AND (r_Delay.gt_EndTime<='2022-07-2 12:14:36.000')`
-    );
-
-    if ((reportAll.recordset[0], report2.recordset[0], report5.recordset[0])) {
-      return {
-        total: reportAll.recordset[0][""],
-        two: report2.recordset[0][""],
-        five: report5.recordset[0][""],
-      };
-    }
+    return {
+      total: reportAll.recordset[0].total,
+      two: report2.recordset[0].two,
+      five: report5.recordset[0].five
+    };
   } catch (err) {
-    console.log({ Message: "Failed", err: err });
+    console.error("Error in FmDelay:", err);
   }
 };
 
 export const SendData = async (req, res) => {
   try {
-    if (req?.body?.period == "Last Coil") {
-      let RM = null;
-      const Excel = await ExcelData.find()
-        .sort({ gt_HistoryKeyTm: -1 })
-        .limit(1);
-      const pacing = await PacingData.find()
-        .sort({ gt_HistoryKeyTm: -1 })
-        .limit(1);
+    const period = req.body.period;
+    let RM = null;
+    let RollChange = null;
 
+    const getLastEntries = async (model, limit) =>
+      await model.find().sort({ gt_HistoryKeyTm: -1 }).limit(limit);
+
+    const processPeriod = async (Excel, pacing) => {
       if (Excel.length > 0 && pacing.length > 0) {
-        let RmThickness = await RMThickness(
-          Excel[Excel.length - 1],
-          req?.body?.period
-        ).then((resp) => {
-          RM = resp;
-        });
-
-        res.status(200).json({
-          Excel: Excel[Excel.length - 1],
-          pacing: pacing[pacing.length - 1],
-          RM: RM,
-        });
+        RM = await RMThickness(Excel, period);
+        RollChange = await FmDelay(Excel);
+        return { Excel, pacing, RM, RollChange };
       } else {
-        res.status(202).json("data not yet in DB");
+        return null;
       }
-    } else if (req?.body?.period == "Last 5 Coil") {
-      let RM = null;
-      let RollChange = null;
-      const Excel = await ExcelData.find()
-        .sort({ gt_HistoryKeyTm: -1 })
-        .limit(5);
-      const pacing = await PacingData.find()
-        .sort({ gt_HistoryKeyTm: -1 })
-        .limit(5);
+    };
 
-      if (Excel.length > 0 && pacing.length > 0) {
-        let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-          (resp) => {
-            console.log(resp);
-            RM = resp;
-          }
-        );
-        let FMRollChange = await FmDelay(Excel).then((resp) => {
-          console.log(resp);
-          RollChange = resp;
-        });
-
-        res.status(200).json({
-          Excel: Excel,
-          pacing: pacing,
-          RM: RM,
-          RollChange: RollChange,
-        });
+    if (period === "Last Coil") {
+      const Excel = await getLastEntries(ExcelData, 1);
+      const pacing = await getLastEntries(PacingData, 1);
+      const result = await processPeriod(Excel, pacing);
+      if (result) {
+        res.status(200).json(result);
       } else {
-        res.status(202).json("data not yet in DB");
+        res.status(202).json("Data not yet in DB");
       }
-    } else if (req?.body?.period == "Last Hour") {
-      let RM = null;
-      let RollChange = null;
-      const currentDateTime = new Date(); // Get the current date and time
+    } else if (period === "Last 5 Coil") {
+      const Excel = await getLastEntries(ExcelData, 5);
+      const pacing = await getLastEntries(PacingData, 5);
+      const result = await processPeriod(Excel, pacing);
+      if (result) {
+        res.status(200).json(result);
+      } else {
+        res.status(202).json("Data not yet in DB");
+      }
+    } else if (period === "Last Hour") {
+      const currentDateTime = new Date();
       const oneHourAgo = new Date(
         currentDateTime.getTime() - 60 * 60 * 1000
       ).toISOString();
-
-      const pacing = await PacingData.find({
-        gt_HistoryKeyTm: { $gte: oneHourAgo },
-      }).sort({ gt_HistoryKeyTm: -1 });
       const Excel = await ExcelData.find({
-        gt_HistoryKeyTm: { $gte: oneHourAgo },
+        gt_HistoryKeyTm: { $gte: oneHourAgo }
       }).sort({ gt_HistoryKeyTm: -1 });
-
-      if (Excel.length > 0 && pacing.length > 0) {
-        let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-          (resp) => {
-            console.log(resp);
-            RM = resp;
-          }
-        );
-        let FMRollChange = await FmDelay(Excel).then((resp) => {
-          console.log(resp);
-          RollChange = resp;
-        });
-        res.status(200).json({
-          Excel: Excel,
-          pacing: pacing,
-          RM: RM,
-          RollChange: RollChange,
-        });
+      const pacing = await PacingData.find({
+        gt_HistoryKeyTm: { $gte: oneHourAgo }
+      }).sort({ gt_HistoryKeyTm: -1 });
+      const result = await processPeriod(Excel, pacing);
+      if (result) {
+        res.status(200).json(result);
       } else {
-        res.status(202).json("data not yet in DB");
+        res.status(202).json("Data not yet in DB");
       }
-    } else if (req?.body?.period == "Last Shift") {
-      console.log("Last Shift");
-      let shift;
-      const shift1Start = new Date().setHours(6, 0, 0, 0);
-      const shift1End = new Date().setHours(14, 0, 0, 0);
-      const shift2Start = new Date().setHours(14, 0, 0, 0);
-      const shift2End = new Date().setHours(22, 0, 0, 0);
-      const shift3Start = new Date().setHours(22, 0, 0, 0);
-      const shift3End = new Date();
-      shift3End.setDate(shift3End.getDate() + 1); // Set to the next day
-      shift3End.setHours(6, 0, 0, 0);
-      const currentTime = new Date().toLocaleTimeString("en-US", {
-        hour12: false,
+    } else if (period === "Last Shift") {
+      const getShiftTimes = (shiftStart, shiftEnd) => ({
+        start: new Date().setHours(...shiftStart, 0, 0).toISOString(),
+        end: new Date().setHours(...shiftEnd, 0, 0).toISOString()
       });
 
-      if (
-        currentTime >= shift1Start.toLocaleTimeString() &&
-        currentTime < shift1End.toLocaleTimeString()
-      ) {
-        let RM = null;
-        let RollChange = null;
-
-        const Excel = await ExcelData.find({
-          gt_HistoryKeyTm: {
-            $gte: new Date(shift3Start).toISOString(),
-            $lte: new Date(shift3End).toISOString(),
-          },
-        });
-
-        const pacing = await PacingData.find({
-          gt_HistoryKeyTm: {
-            $gte: new Date(shift3Start).toISOString(),
-            $lte: new Date(shift3End).toISOString(),
-          },
-        });
-
-        if (Excel && pacing) {
-          let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-            (resp) => {
-              console.log(resp);
-              RM = resp;
-            }
-          );
-          let FMRollChange = await FmDelay(Excel).then((resp) => {
-            console.log(resp);
-            RollChange = resp;
-          });
-          res.status(200).json({
-            Excel: Excel,
-            pacing: pacing,
-            RM: RM,
-            RollChange: RollChange,
-          });
+      const shiftTimes = [
+        getShiftTimes([6, 0], [14, 0]),
+        getShiftTimes([14, 0], [22, 0]),
+        {
+          start: new Date().setHours(22, 0, 0, 0).toISOString(),
+          end: new Date().setHours(6, 0, 0, 0).toISOString()
         }
-      } else if (
-        currentTime >= shift2Start.toLocaleTimeString() &&
-        currentTime < shift2End.toLocaleTimeString()
-      ) {
-        console.log("2");
-        let RM = null;
-        let RollChange = null;
+      ];
+
+      for (let { start, end } of shiftTimes) {
         const Excel = await ExcelData.find({
-          gt_HistoryKeyTm: {
-            $gte: new Date(shift1Start).toISOString(),
-            $lte: new Date(shift1End).toISOString(),
-          },
+          gt_HistoryKeyTm: { $gte: start, $lte: end }
         });
-
         const pacing = await PacingData.find({
-          gt_HistoryKeyTm: {
-            $gte: new Date(shift1Start).toISOString(),
-            $lte: new Date(shift1End).toISOString(),
-          },
+          gt_HistoryKeyTm: { $gte: start, $lte: end }
         });
-
-        if (Excel && pacing) {
-          let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-            (resp) => {
-              console.log(resp);
-              RM = resp;
-            }
-          );
-          let FMRollChange = await FmDelay(Excel).then((resp) => {
-            console.log(resp);
-            RollChange = resp;
-          });
-          res.status(200).json({
-            Excel: Excel,
-            pacing: pacing,
-            RM: RM,
-            RollChange: RollChange,
-          });
-        }
-      } else if (
-        currentTime >= shift2Start.toLocaleTimeString() &&
-        currentTime < shift2End.toLocaleTimeString()
-      ) {
-        console.log("3");
-        let RM = null;
-        let RollChange = null;
-        const Excel = await ExcelData.find({
-          gt_HistoryKeyTm: {
-            $gte: new Date(shift2Start).toISOString(),
-            $lte: new Date(shift2End).toISOString(),
-          },
-        });
-
-        const pacing = await PacingData.find({
-          gt_HistoryKeyTm: {
-            $gte: new Date(shift2Start).toISOString(),
-            $lte: new Date(shift2End).toISOString(),
-          },
-        });
-
-        if (Excel && pacing) {
-          let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-            (resp) => {
-              console.log(resp);
-              RM = resp;
-            }
-          );
-          let FMRollChange = await FmDelay(Excel).then((resp) => {
-            console.log(resp);
-            RollChange = resp;
-          });
-          res.status(200).json({
-            Excel: Excel,
-            pacing: pacing,
-            RM: RM,
-            RollChange: RollChange,
-          });
+        const result = await processPeriod(Excel, pacing);
+        if (result) {
+          return res.status(200).json(result);
         }
       }
-    } else if (req?.body?.period.customp) {
-      const customPieceName = req?.body?.period.customp;
+      res.status(400).json("Wait for 1:00");
+    } else if (period.customp) {
+      const customPieceName = period.customp.replace(/\s+/g, "\\s*");
       const Excel = await ExcelData.findOne({
-        c_PieceName: new RegExp(customPieceName.replace(/\s+/g, "\\s*")),
+        c_PieceName: new RegExp(customPieceName)
       });
       const pacing = await PacingData.findOne({
-        c_PieceName: new RegExp(customPieceName.replace(/\s+/g, "\\s*")),
+        c_PieceName: new RegExp(customPieceName)
       });
       if (Excel && pacing) {
         res.status(200).json({ Excel, pacing });
       } else {
-        res.status(202).json("No ID Match found in Db");
+        res.status(202).json("No ID Match found in DB");
       }
-    } else if (req?.body?.period == "Last Day") {
-      let RM = null;
-      let RollChange = null;
+    } else if (period === "Last Day") {
+      const oneDayAgo = new Date(
+        Date.now() - 24 * 60 * 60 * 1000
+      ).toISOString();
       const Excel = await ExcelData.find({
-        gt_HistoryKeyTm: {
-          $gt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        },
+        gt_HistoryKeyTm: { $gte: oneDayAgo }
       }).sort();
-
       const pacing = await PacingData.find({
-        gt_HistoryKeyTm: {
-          $gt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        },
+        gt_HistoryKeyTm: { $gte: oneDayAgo }
       }).sort();
-
-      if (Excel && pacing) {
-        let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-          (resp) => {
-            console.log(resp);
-            RM = resp;
-          }
-        );
-        let FMRollChange = await FmDelay(Excel).then((resp) => {
-          console.log(resp);
-          RollChange = resp;
-        });
-        res.status(200).json({
-          Excel: Excel,
-          pacing: pacing,
-          RM: RM,
-          FMRollChange: FMRollChange,
-        });
+      const result = await processPeriod(Excel, pacing);
+      if (result) {
+        res.status(200).json(result);
       } else {
-        res.status(202).json("No ID Match found in Db");
+        res.status(202).json("No ID Match found in DB");
       }
-    } else if (req?.body?.period?.date && req?.body?.period?.time) {
-      let RM = null;
-      let RollChange = null;
-      const startDate = new Date(
-        req?.body?.period?.date[0] + " " + req?.body?.period?.time[0]
-      );
-      const endDate = new Date(
-        req?.body?.period?.date[1] + " " + req?.body?.period?.time[1]
-      );
-
+    } else if (period.date && period.time) {
+      const startDate = new Date(`${period.date[0]} ${period.time[0]}`);
+      const endDate = new Date(`${period.date[1]} ${period.time[1]}`);
       const Excel = await ExcelData.find({
-        gt_HistoryKeyTm: {
-          $gte: startDate,
-          $lte: endDate,
-        },
+        gt_HistoryKeyTm: { $gte: startDate, $lte: endDate }
       });
-
       const pacing = await PacingData.find({
-        gt_HistoryKeyTm: {
-          $gte: startDate,
-          $lte: endDate,
-        },
+        gt_HistoryKeyTm: { $gte: startDate, $lte: endDate }
       });
-
-      if (Excel && pacing) {
-        let RmThickness = await RMThickness(Excel, req?.body?.period).then(
-          (resp) => {
-            console.log(resp);
-            RM = resp;
-          }
-        );
-        let FMRollChange = await FmDelay(Excel).then((resp) => {
-          console.log(resp);
-          RollChange = resp;
-        });
-        res.status(200).json({
-          Excel: Excel,
-          pacing: pacing,
-          RM: RM,
-          RollChange: RollChange,
-        });
+      const result = await processPeriod(Excel, pacing);
+      if (result) {
+        res.status(200).json(result);
       }
     }
   } catch (error) {
+    console.error("Error in SendData:", error);
     res.status(500).json(error);
   }
 };

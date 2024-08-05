@@ -1,136 +1,66 @@
 export const roundOff = (value) => {
+  console.debug("roundOff - value:", value);
   return Math.round(value);
 };
 
 export const ToMins = (value) => {
+  console.debug("ToMins - value:", value);
   return Math.round(value / 60);
 };
 
 export const ToAverage = (value, length) => {
+  console.debug("ToAverage - value:", value, "length:", length);
   return value / length;
 };
 
 export const getLabels = () => {
-  let arr = [];
-  let arr1 = [0, 1, 2, 3, 4, 5, 6, 7];
+  const labels = [];
+  const hours = Array.from({ length: 8 }, (_, i) => i);
+  const currentDate = new Date();
 
-  var currentdate = new Date();
+  const formatDate = (date, time) =>
+    `${date.getFullYear()} ${date.getMonth() + 1} ${date.getDate()} ${time}`;
 
-  let datetoday =
-    currentdate.getFullYear() +
-    " " +
-    (currentdate.getMonth() + 1) +
-    " " +
-    currentdate.getDate() +
-    " " +
-    currentdate.getHours() +
-    ":" +
-    currentdate.getMinutes();
+  const now = formatDate(currentDate, currentDate.toLocaleTimeString());
+  const shift1Start = formatDate(currentDate, "6:30:00");
+  const shift2Start = formatDate(currentDate, "14:30:00");
+  const shift3Start = formatDate(currentDate, "21:30:00");
+  const shiftEnd = formatDate(
+    new Date(currentDate.setDate(currentDate.getDate() + 1)),
+    "6:30:00"
+  );
 
-  let shift1 =
-    currentdate.getFullYear() +
-    " " +
-    (currentdate.getMonth() + 1) +
-    " " +
-    currentdate.getDate() +
-    " " +
-    "6:30:00";
-
-  let shift2 =
-    currentdate.getFullYear() +
-    " " +
-    (currentdate.getMonth() + 1) +
-    " " +
-    currentdate.getDate() +
-    " " +
-    "14:30:00";
-
-  let shift3 =
-    currentdate.getFullYear() +
-    " " +
-    (currentdate.getMonth() + 1) +
-    " " +
-    currentdate.getDate() +
-    " " +
-    "21:30:00";
-
-  let end =
-    currentdate.getFullYear() +
-    " " +
-    (currentdate.getMonth() + 1) +
-    " " +
-    new Date(new Date().setDate(new Date().getDate() + 1)).getDate() +
-    " " +
-    "6:30:00";
+  const populateLabels = (shiftStart) => {
+    hours.forEach((hour) => {
+      const dateStart = new Date(
+        new Date(shiftStart).setHours(new Date(shiftStart).getHours() + hour)
+      );
+      labels.push(dateStart.toLocaleTimeString());
+    });
+  };
 
   if (
-    new Date(datetoday).getTime() > new Date(shift1).getTime() &&
-    new Date(datetoday).getTime() < new Date(shift2).getTime()
+    new Date(now) > new Date(shift1Start) &&
+    new Date(now) < new Date(shift2Start)
   ) {
-    console.log("shift1");
-    let run = arr1.map(async (item) => {
-      let DateStart = new Date(shift1).setHours(
-        new Date(shift1).getHours() + item
-      );
-      let DateEnd = new Date(DateStart).setHours(
-        new Date(DateStart).getHours() + 1
-      );
-      let plus = new Date(DateStart).toLocaleTimeString();
-      let plusOne = new Date(DateEnd).toLocaleDateString();
-      console.log(new Date(DateStart), new Date(DateEnd).toLocaleTimeString());
-      arr.push(plus);
-    });
-
-    console.log(arr);
+    console.debug("Shift 1 active");
+    populateLabels(shift1Start);
   } else if (
-    new Date(datetoday).getTime() > new Date(shift2).getTime() &&
-    new Date(datetoday).getTime() < new Date(shift3).getTime()
+    new Date(now) > new Date(shift2Start) &&
+    new Date(now) < new Date(shift3Start)
   ) {
-    console.log("shift2");
-    let run = arr1.map(async (item) => {
-      let DateStart = new Date(shift2).setHours(
-        new Date(shift2).getHours() + item
-      );
-      let DateEnd = new Date(DateStart).setHours(
-        new Date(DateStart).getHours() + 1
-      );
-      let plus = new Date(DateStart).toLocaleTimeString();
-      let plusOne = new Date(DateEnd).toISOString();
-      console.log(
-        new Date(DateStart).toLocaleTimeString(),
-        new Date(DateEnd).toLocaleTimeString()
-      );
-
-      arr.push(plus);
-    });
-
-    console.log(arr);
+    console.debug("Shift 2 active");
+    populateLabels(shift2Start);
   } else if (
-    new Date(datetoday).getTime() > new Date(shift3).getTime() &&
-    new Date(datetoday).getTime() < new Date(end).getTime()
+    new Date(now) > new Date(shift3Start) &&
+    new Date(now) < new Date(shiftEnd)
   ) {
-    console.log("shift3");
-
-    let run = arr1.map(async (item) => {
-      let DateStart = new Date(shift3).setHours(
-        new Date(shift3).getHours() + item
-      );
-      let DateEnd = new Date(DateStart).setHours(
-        new Date(DateStart).getHours() + 1
-      );
-      let plus = new Date(DateStart).toLocaleTimeString();
-      let plusOne = new Date(DateEnd).toISOString();
-      console.log(
-        new Date(DateStart).toLocaleTimeString(),
-        new Date(DateEnd).toLocaleTimeString()
-      );
-
-      arr.push(plus);
-    });
-
-    console.log(arr);
+    console.debug("Shift 3 active");
+    populateLabels(shift3Start);
   } else {
-    arr.push(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    labels.push(...Array.from({ length: 9 }, (_, i) => i + 1));
   }
-  return arr;
+
+  console.debug("Generated labels:", labels);
+  return labels;
 };

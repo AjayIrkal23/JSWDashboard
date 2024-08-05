@@ -1,40 +1,31 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import LineChart from "../../charts/LineChart01";
-import Icon from "../../images/icon-03.svg";
-import EditMenu from "../../components/DropdownEditMenu";
-
-// Import utilities
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
 import { getLabels } from "../../utils/roundoff";
 import { AccountContext } from "../../context/context";
 
 function DashboardCard03() {
-  const [dataLine, setDataLine] = useState(null);
-  const [lab, setLab] = useState(null);
-  const [data, setData] = useState(null);
+  const [dataLine, setDataLine] = useState([]);
+  const [data, setData] = useState([]);
   const { eightData } = useContext(AccountContext);
 
-  const getData = () => {
-    const data = eightData?.map(
-      (item) => item?.data?.Delay_2to5 + item?.data["Delay_>5"]
-    );
-    setData(data);
-  };
-
-  console.log(data, "shift");
-
   useEffect(() => {
-    setDataLine(getLabels());
-    getData();
-  }, [eightData]);
+    if (eightData) {
+      const labels = getLabels();
+      setDataLine(labels);
+      console.log("Labels set:", labels);
 
-  console.log(dataLine);
+      const delayData = eightData.map(
+        (item) => item?.data?.Delay_2to5 + item?.data["Delay_>5"]
+      );
+      setData(delayData);
+      console.log("Shift data fetched:", delayData);
+    }
+  }, [eightData]);
 
   const chartData = {
     labels: dataLine,
     datasets: [
-      // Indigo line
       {
         data: data,
         fill: true,
@@ -51,17 +42,15 @@ function DashboardCard03() {
         pointHoverBackgroundColor: tailwindConfig().theme.colors.yellow[500],
         pointBorderWidth: 0,
         pointHoverBorderWidth: 0,
-        clip: 20,
-      },
-      // Gray line
-    ],
+        clip: 20
+      }
+    ]
   };
 
   return (
     <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-3 bg-[#fbc02d]/40 dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700 pb-2">
       <div className="px-5 pt-5 flex items-center justify-between">
         <div>
-          {" "}
           <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase mb-1">
             Current Shift Delays
           </div>
@@ -71,21 +60,18 @@ function DashboardCard03() {
             </div>
           </div>
         </div>
-
         <header className="flex justify-between items-start mb-2">
-          {/* Icon */}
           <img src="/delay.png" width="100" height="100" alt="Icon 01" />
-          {/* Menu button */}
         </header>
       </div>
-      {/* Chart built with Chart.js 3 */}
-      {dataLine ? (
+      {dataLine.length > 0 && data.length > 0 ? (
         <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
-          {/* Change the height attribute to adjust the chart height */}
           <LineChart data={chartData} width={389} height={128} title="Delays" />
         </div>
       ) : (
-        "Loading"
+        <div className="flex items-center justify-center h-32">
+          <p>Loading...</p>
+        </div>
       )}
     </div>
   );

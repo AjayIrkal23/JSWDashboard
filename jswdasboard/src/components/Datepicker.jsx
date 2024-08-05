@@ -1,16 +1,21 @@
-import React from "react";
+import React, { useCallback } from "react";
 import Flatpickr from "react-flatpickr";
+import "flatpickr/dist/themes/light.css"; // Ensure you have the Flatpickr CSS
 
 function Datepicker({ align, setDateValue }) {
-  const setDates = (selectedDates) => {
-    if (selectedDates.length > 1) {
-      const item = selectedDates.map((item) => {
-        return new Date(item).toISOString().split("T")[0];
-      });
+  const setDates = useCallback(
+    (selectedDates) => {
+      if (selectedDates.length > 1) {
+        const formattedDates = selectedDates.map(
+          (date) => new Date(date).toISOString().split("T")[0]
+        );
+        console.log("Selected Dates:", formattedDates); // Debugging statement
+        setDateValue(formattedDates);
+      }
+    },
+    [setDateValue]
+  );
 
-      setDateValue(item);
-    }
-  };
   const options = {
     mode: "range",
     static: true,
@@ -23,13 +28,15 @@ function Datepicker({ align, setDateValue }) {
       '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
     onReady: (selectedDates, dateStr, instance) => {
       instance.element.value = dateStr.replace("to", "-");
-      const customClass = align ? align : "";
+      const customClass = align || "";
       instance.calendarContainer.classList.add(`flatpickr-${customClass}`);
+      console.log("Flatpickr ready with initial dates:", dateStr); // Debugging statement
     },
     onChange: (selectedDates, dateStr, instance) => {
       instance.element.value = dateStr.replace("to", "-");
-      setDates(dateStr.split("to"));
-    },
+      setDates(selectedDates);
+      console.log("Date selection changed:", dateStr); // Debugging statement
+    }
   };
 
   return (
