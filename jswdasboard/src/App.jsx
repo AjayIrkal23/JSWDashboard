@@ -59,7 +59,7 @@ function App() {
         <div className="bg-blue-500 font-semibold text-[60px] text-center text-white w-screen h-screen justify-center items-center flex flex-col">
           <p>No Data Found Please Check if Backend is on</p>
           <Link
-            to="/liveDashboard"
+            to="/"
             className="my-2 underline"
             onClick={() => setPeriod("Last Coil")}
           >
@@ -68,8 +68,7 @@ function App() {
         </div>
       ) : (
         <Routes>
-          <Route exact path="/" element={<Dashboard />} />
-          <Route exact path="/liveDashboard" element={<Live />} />
+          <Route exact path="/" element={<Live />} />
         </Routes>
       )}
     </>

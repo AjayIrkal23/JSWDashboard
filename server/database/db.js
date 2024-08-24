@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017";
+const mongoURI =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://info:loloklol.12A@jsw.6tat7au.mongodb.net/jsw";
 
 /**
  * Establish connection to MongoDB using Mongoose.

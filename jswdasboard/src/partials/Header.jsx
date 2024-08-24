@@ -77,20 +77,14 @@ function Header({ sidebarOpen, setSidebarOpen }) {
           {/* Header: Right side */}
           <div className="flex items-center space-x-3">
             {isLiveDashboard ? (
-              <Link to="/liveDashboard">
-                <p className="text-sm bg-blue-500 text-white py-1.5 px-4 rounded-md cursor-pointer hover:scale-105 hover:animate-pulse transition-all duration-200 ease-in-out">
-                  Live Dashboard
-                </p>
-              </Link>
+              <>
+                <InfoDisplay label="Total Coils" value={totalCoils} />
+                <InfoDisplay label="Piece ID" value={pieceID} />
+              </>
             ) : (
               <>
                 <InfoDisplay label="Total Coils" value={totalCoils} />
                 <InfoDisplay label="Piece ID" value={pieceID} />
-                <Link to="/">
-                  <p className="text-sm bg-blue-500 text-white py-1.5 px-4 rounded-md cursor-pointer hover:scale-105 hover:animate-pulse transition-all duration-200 ease-in-out">
-                    Main Dashboard
-                  </p>
-                </Link>
               </>
             )}
             <hr className="w-px h-6 bg-slate-200 dark:bg-slate-700 border-none" />

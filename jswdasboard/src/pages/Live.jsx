@@ -1,30 +1,28 @@
 import React, { useContext, useState, useMemo } from "react";
 import Header from "../partials/Header";
-import {
-  PMC,
-  Three,
-  Wise,
-  SSP,
-  R1,
-  R2,
-  FM,
-  FME,
-  BottleNeck,
-  DC,
-  Delays,
-  Gaps,
-  Processes,
-  FRC,
-  BN,
-  GRT,
-  WRT,
-  LoadingG,
-  Charging,
-  PieceID,
-  Date as DatePicker,
-  ProcessTime
-} from "../components";
+import PMC from "../components/PMC";
+import Three from "../components/Three";
+import Wise from "../components/Wise";
+import SSP from "../components/SSP";
+import R1 from "../components/R1";
+import R2 from "../components/R2";
+import FM from "../components/FM";
+import FME from "../components/FME";
 import { AccountContext } from "../context/context";
+import BottleNeck from "../components/BottleNeck";
+import DC from "../components/DC";
+import Delays from "../components/Delays";
+import Gaps from "../components/Gaps";
+import Processes from "../components/Processes";
+import FRC from "../components/FRCDelay";
+import BN from "../components/BN";
+import GRT from "../components/GRT";
+import WRT from "../components/WRT";
+import LoadingG from "../components/LoadingG";
+import Charging from "../components/Charging";
+import PieceID from "../components/PieceID";
+import Date from "../components/Date";
+import ProcessTime from "../components/ProcessTime";
 
 const Live = () => {
   const { period, setPeriod, data, setMins, mins } = useContext(AccountContext);
