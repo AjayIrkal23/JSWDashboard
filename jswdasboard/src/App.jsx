@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import "./css/style.css";
@@ -15,14 +15,35 @@ function App() {
     useContext(AccountContext);
 
   useEffect(() => {
-    const handleScroll = () => {
-      document.documentElement.style.scrollBehavior = "auto";
-      window.scrollTo(0, 0);
-      document.documentElement.style.scrollBehavior = "";
-    };
-
-    handleScroll();
+    document.querySelector("html").style.scrollBehavior = "auto";
+    window.scroll({ top: 0 });
+    document.querySelector("html").style.scrollBehavior = "";
   }, [location.pathname]); // triggered on route change
+
+  // Memoizing toast options to prevent unnecessary re-creation on every render
+  const toastOptions = useMemo(
+    () => ({
+      className: "",
+      duration: 5000,
+      style: {
+        background: "#363636",
+        color: "#fff"
+      },
+      success: {
+        duration: 3000,
+        theme: {
+          primary: "green",
+          secondary: "black"
+        }
+      }
+    }),
+    []
+  );
+
+  const noData = useMemo(
+    () => !data || !mainData || !eightData,
+    [data, mainData, eightData]
+  );
 
   return (
     <>
@@ -32,30 +53,11 @@ function App() {
         gutter={8}
         containerClassName=""
         containerStyle={{}}
-        toastOptions={{
-          className: "",
-          duration: 5000,
-          style: {
-            background: "#363636",
-            color: "#fff"
-          },
-          success: {
-            duration: 3000,
-            theme: {
-              primary: "green",
-              secondary: "black"
-            }
-          }
-        }}
+        toastOptions={toastOptions}
       />
-      {data ? (
-        <Routes>
-          <Route exact path="/" element={<Dashboard />} />
-          <Route exact path="/liveDashboard" element={<Live />} />
-        </Routes>
-      ) : (
-        <div className="bg-blue-500 font-semibold text-[60px] text-center text-white w-screen h-screen flex flex-col justify-center items-center">
-          <p>No Data Found. Please Check if Backend is on</p>
+      {noData ? (
+        <div className="bg-blue-500 font-semibold text-[60px] text-center text-white w-screen h-screen justify-center items-center flex flex-col">
+          <p>No Data Found Please Check if Backend is on</p>
           <Link
             to="/liveDashboard"
             className="my-2 underline"
@@ -64,6 +66,11 @@ function App() {
             Go Back
           </Link>
         </div>
+      ) : (
+        <Routes>
+          <Route exact path="/" element={<Dashboard />} />
+          <Route exact path="/liveDashboard" element={<Live />} />
+        </Routes>
       )}
     </>
   );

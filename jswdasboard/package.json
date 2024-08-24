@@ -1,6 +1,6 @@
 {
   "name": "mosaic-react",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -19,9 +19,6 @@
     "@testing-library/user-event": "^13.5.0",
     "apexcharts": "^3.40.0",
     "axios": "^1.4.0",
-    "chart.js": "^4.3.0",
-    "chartjs-adapter-moment": "^1.0.1",
-    "chartjs-plugin-datalabels": "^2.2.0",
     "dotenv": "^16.0.3",
     "moment": "^2.29.4",
     "react": "^18.2.0",

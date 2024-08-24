@@ -1,18 +1,17 @@
-import React, { useContext, useState, useCallback } from "react";
 import { Modal } from "@mui/material";
+import React, { useContext, useState, useCallback } from "react";
+
+// Import utilities
 import "react-time-picker/dist/TimePicker.css";
 import TimePicker from "react-time-picker";
 import "react-clock/dist/Clock.css";
-
-// Import utilities
 import { AccountContext } from "../context/context";
 import Datepicker from "./Datepicker";
 
-const DateModal = ({ open, setOpen }) => {
+const Date = ({ open, setOpen }) => {
   const [start, setStart] = useState("10:00");
   const [end, setEnd] = useState("10:00");
   const [dateValue, setDateValue] = useState(null);
-
   const { setPeriod } = useContext(AccountContext);
 
   const handleClose = useCallback(() => {
@@ -24,8 +23,10 @@ const DateModal = ({ open, setOpen }) => {
       time: [start, end],
       date: dateValue
     });
-    setOpen(false);
-  }, [start, end, dateValue, setPeriod, setOpen]);
+    handleClose();
+  }, [start, end, dateValue, setPeriod, handleClose]);
+
+  if (!open) return null;
 
   return (
     <Modal
@@ -41,9 +42,7 @@ const DateModal = ({ open, setOpen }) => {
               Please Select Date
             </h2>
             <div className="my-4 flex flex-col gap-4 w-full justify-center">
-              <div>
-                <Datepicker setDateValue={setDateValue} />
-              </div>
+              <Datepicker setDateValue={setDateValue} />
               <div>
                 <h2 className="font-semibold text-slate-800 dark:text-slate-100 my-2">
                   Start
@@ -74,4 +73,4 @@ const DateModal = ({ open, setOpen }) => {
   );
 };
 
-export default DateModal;
+export default Date;

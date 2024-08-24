@@ -1,25 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import BarChart from "../../charts/BarChart01";
+
+// Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
-const D15 = () => {
-  const chartData = {
-    labels: ["3+3", "3+5"],
-    datasets: [
-      {
-        data: [8, 2],
-        backgroundColor: tailwindConfig().theme.colors.red[500],
-        hoverBackgroundColor: tailwindConfig().theme.colors.red[600],
-        barPercentage: 0.66,
-        categoryPercentage: 0.66
-      }
-    ]
-  };
-
-  useEffect(() => {
-    console.log("D15 component mounted");
-    return () => {
-      console.log("D15 component unmounted");
+function D15() {
+  // Memoizing the chartData to prevent unnecessary re-renders
+  const chartData = useMemo(() => {
+    const colors = tailwindConfig().theme.colors;
+    return {
+      labels: ["3+3", "3+5"],
+      datasets: [
+        {
+          data: [8, 2],
+          backgroundColor: colors.red[500],
+          hoverBackgroundColor: colors.red[600],
+          barPercentage: 0.66,
+          categoryPercentage: 0.66
+        }
+      ]
     };
   }, []);
 
@@ -30,9 +29,11 @@ const D15 = () => {
           Shift Wise RM Rolling Map
         </h2>
       </header>
+      {/* Chart built with Chart.js 3 */}
+      {/* Change the height attribute to adjust the chart height */}
       <BarChart data={chartData} width={595} height={248} />
     </div>
   );
-};
+}
 
 export default D15;

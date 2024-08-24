@@ -6,38 +6,57 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-def generate_frames():
-    rtsp = "rtsp://admin:admin@10.10.33.213/media/video1"
+class Camera:
+    def __init__(self, rtsp_url):
+        self.rtsp_url = rtsp_url
+        self.camera = None
+        self.connect()
+
+    def connect(self):
+        self.camera = cv2.VideoCapture(self.rtsp_url)
+        self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
+    def read_frame(self):
+        success, frame = self.camera.read()
+        if not success:
+            self.reconnect()
+            success, frame = self.camera.read()
+        return success, frame
+
+    def reconnect(self):
+        self.camera.release()
+        time.sleep(2)  # Wait before reconnecting
+        self.connect()
+
+    def release(self):
+        if self.camera:
+            self.camera.release()
+
+def generate_frames(rtsp_url):
+    camera = Camera(rtsp_url)
+
     while True:
         try:
-            camera = cv2.VideoCapture(rtsp)
-            camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            start_time = time.time()
+            success, frame = camera.read_frame()
             
-            if not camera.isOpened():
-                raise Exception("Failed to open camera stream")
+            if not success:
+                continue
 
-            while camera.isOpened():
-                success, frame = camera.read()
-                if not success:
-                    raise Exception("Failed to read frame from camera")
-
-                ret, buffer = cv2.imencode('.jpg', frame)
-                if not ret:
-                    raise Exception("Failed to encode frame")
-
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            elapsed_time = time.time() - start_time
+            ret, buffer = cv2.imencode(".jpg", frame)
+            frame = buffer.tobytes()
+            yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
         except Exception as e:
-            print(f"Error: {e}. Reconnecting...")
-            time.sleep(2)  # Wait before trying to reconnect
-            continue
-        finally:
-            camera.release()
+            print(f"Exception: {e}")
+            camera.reconnect()
 
 @app.route("/video")
 def video():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    rtsp_url = "rtsp://admin:admin@10.10.33.213/media/video1"
+    return Response(
+        generate_frames(rtsp_url), mimetype="multipart/x-mixed-replace; boundary=frame"
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

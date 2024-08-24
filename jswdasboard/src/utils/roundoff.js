@@ -1,66 +1,52 @@
-export const roundOff = (value) => {
-  console.debug("roundOff - value:", value);
-  return Math.round(value);
-};
+export const roundOff = (value) => Math.round(value);
 
-export const ToMins = (value) => {
-  console.debug("ToMins - value:", value);
-  return Math.round(value / 60);
-};
+export const ToMins = (value) => Math.round(value / 60);
 
-export const ToAverage = (value, length) => {
-  console.debug("ToAverage - value:", value, "length:", length);
-  return value / length;
-};
+export const ToAverage = (value, length) => value / length;
 
 export const getLabels = () => {
-  const labels = [];
-  const hours = Array.from({ length: 8 }, (_, i) => i);
+  const arr = [];
+  const arr1 = [0, 1, 2, 3, 4, 5, 6, 7];
+
   const currentDate = new Date();
 
   const formatDate = (date, time) =>
     `${date.getFullYear()} ${date.getMonth() + 1} ${date.getDate()} ${time}`;
 
-  const now = formatDate(currentDate, currentDate.toLocaleTimeString());
-  const shift1Start = formatDate(currentDate, "6:30:00");
-  const shift2Start = formatDate(currentDate, "14:30:00");
-  const shift3Start = formatDate(currentDate, "21:30:00");
-  const shiftEnd = formatDate(
-    new Date(currentDate.setDate(currentDate.getDate() + 1)),
-    "6:30:00"
-  );
+  const datetoday = currentDate.getTime();
 
-  const populateLabels = (shiftStart) => {
-    hours.forEach((hour) => {
-      const dateStart = new Date(
-        new Date(shiftStart).setHours(new Date(shiftStart).getHours() + hour)
+  const shift1 = new Date(formatDate(currentDate, "6:30:00")).getTime();
+  const shift2 = new Date(formatDate(currentDate, "14:30:00")).getTime();
+  const shift3 = new Date(formatDate(currentDate, "21:30:00")).getTime();
+  const end = new Date(
+    formatDate(
+      new Date(currentDate.setDate(currentDate.getDate() + 1)),
+      "6:30:00"
+    )
+  ).getTime();
+
+  const generateLabels = (shiftStart) => {
+    arr1.forEach((item) => {
+      const dateStart = new Date(shiftStart).setHours(
+        new Date(shiftStart).getHours() + item
       );
-      labels.push(dateStart.toLocaleTimeString());
+      const plus = new Date(dateStart).toLocaleTimeString();
+      arr.push(plus);
     });
   };
 
-  if (
-    new Date(now) > new Date(shift1Start) &&
-    new Date(now) < new Date(shift2Start)
-  ) {
-    console.debug("Shift 1 active");
-    populateLabels(shift1Start);
-  } else if (
-    new Date(now) > new Date(shift2Start) &&
-    new Date(now) < new Date(shift3Start)
-  ) {
-    console.debug("Shift 2 active");
-    populateLabels(shift2Start);
-  } else if (
-    new Date(now) > new Date(shift3Start) &&
-    new Date(now) < new Date(shiftEnd)
-  ) {
-    console.debug("Shift 3 active");
-    populateLabels(shift3Start);
+  if (datetoday > shift1 && datetoday < shift2) {
+    console.log("shift1");
+    generateLabels(shift1);
+  } else if (datetoday > shift2 && datetoday < shift3) {
+    console.log("shift2");
+    generateLabels(shift2);
+  } else if (datetoday > shift3 && datetoday < end) {
+    console.log("shift3");
+    generateLabels(shift3);
   } else {
-    labels.push(...Array.from({ length: 9 }, (_, i) => i + 1));
+    arr.push(1, 2, 3, 4, 5, 6, 7, 8, 9);
   }
 
-  console.debug("Generated labels:", labels);
-  return labels;
+  return arr;
 };

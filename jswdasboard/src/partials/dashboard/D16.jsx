@@ -1,25 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import BarChart from "../../charts/BarChart01";
+
+// Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
-const D16 = () => {
-  const chartData = {
-    labels: ["ISC On Percentage", "Percentage of FT > 890"],
-    datasets: [
-      {
-        data: [1, 2],
-        backgroundColor: tailwindConfig().theme.colors.blue[700],
-        hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
-        barPercentage: 0.66,
-        categoryPercentage: 0.66
-      }
-    ]
-  };
-
-  useEffect(() => {
-    console.log("D16 component mounted");
-    return () => {
-      console.log("D16 component unmounted");
+function D16() {
+  // Memoizing the chartData to prevent unnecessary re-renders
+  const chartData = useMemo(() => {
+    const colors = tailwindConfig().theme.colors;
+    return {
+      labels: ["ISC On Percentage", "Percentage of FT > 890"],
+      datasets: [
+        {
+          data: [1, 2],
+          backgroundColor: colors.blue[700],
+          hoverBackgroundColor: colors.blue[800],
+          barPercentage: 0.66,
+          categoryPercentage: 0.66
+        }
+      ]
     };
   }, []);
 
@@ -30,9 +29,11 @@ const D16 = () => {
           Shift wise ISC Trend
         </h2>
       </header>
+      {/* Chart built with Chart.js 3 */}
+      {/* Change the height attribute to adjust the chart height */}
       <BarChart data={chartData} width={595} height={248} />
     </div>
   );
-};
+}
 
 export default D16;

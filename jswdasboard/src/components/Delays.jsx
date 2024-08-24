@@ -1,98 +1,85 @@
 import { Modal } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
-
-// Import utilities
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { tailwindConfig } from "../utils/Utils";
 import DelayChart from "../charts/DelayChart";
 import { AccountContext } from "../context/context";
 import { ToMins, roundOff } from "../utils/roundoff";
 
 const Delays = ({ open, setOpen }) => {
-  const [chartDataEntry, setChartData] = useState([]);
   const { period, data, mins } = useContext(AccountContext);
+  const [chartDataEntry, setChartDataEntry] = useState([]);
 
-  useEffect(() => {
-    if (data) {
-      const delayData = calculateDelayData();
-      setChartData(delayData);
-    }
-  }, [data]);
+  const calculateDelays = () => {
+    if (!data) return [];
 
-  const calculateDelayData = () => {
-    const arr = [];
-    const roundingFunction = mins ? ToMins : (val) => val;
-    const addDelay = (value) => {
-      arr.push(roundOff(roundingFunction(value?.toFixed(2))));
-    };
+    const delayKeys = [
+      "f_L2L1ExtRdyTimeDiff",
+      "f_ExtractCycleTimeDiff",
+      "f_FCDTravelTmeDelay",
+      "f_SSPR1TravelTimeDelay",
+      "f_R1ProcessTimeDelay",
+      "f_R1R2TravelTimeDelay",
+      "f_R2ProcessTimeDelay",
+      "f_R2FEntTravelTimeDelay",
+      "f_FCE1SSPTravelTimeDelay"
+    ];
 
     if (period === "Last Coil" || period.customp) {
-      addDelay(data?.Excel?.f_L2L1ExtRdyTimeDiff);
-      addDelay(data?.Excel?.f_ExtractCycleTimeDiff);
-      addDelay(data?.Excel?.f_FCDTravelTmeDelay);
-      addDelay(data?.Excel?.f_SSPR1TravelTimeDelay);
-      addDelay(data?.Excel?.f_R1ProcessTimeDelay);
-      addDelay(data?.Excel?.f_R1R2TravelTimeDelay);
-      addDelay(data?.Excel?.f_R2ProcessTimeDelay);
-      addDelay(data?.Excel?.f_R2FEntTravelTimeDelay);
-      addDelay(data?.pacing?.f_FCE1SSPTravelTimeDelay);
-    } else if (
-      period === "Last 5 Coil" ||
-      period === "Last Hour" ||
-      period === "Last Day" ||
-      period?.date
-    ) {
-      const calculateTotalDelay = (key) => {
-        return data?.Excel?.reduce(
-          (accumulator, currentValue) => accumulator + currentValue[key],
-          0
-        );
-      };
-
-      addDelay(calculateTotalDelay("f_L2L1ExtRdyTimeDiff"));
-      addDelay(calculateTotalDelay("f_ExtractCycleTimeDiff"));
-      addDelay(calculateTotalDelay("f_FCDTravelTmeDelay"));
-      addDelay(calculateTotalDelay("f_SSPR1TravelTimeDelay"));
-      addDelay(calculateTotalDelay("f_R1ProcessTimeDelay"));
-      addDelay(calculateTotalDelay("f_R1R2TravelTimeDelay"));
-      addDelay(calculateTotalDelay("f_R2ProcessTimeDelay"));
-      addDelay(calculateTotalDelay("f_R2FEntTravelTimeDelay"));
-
-      const pacingTotalDelay = data?.pacing?.reduce(
-        (accumulator, currentValue) =>
-          accumulator + currentValue.f_FCE1SSPTravelTimeDelay,
-        0
-      );
-      addDelay(pacingTotalDelay);
+      return delayKeys.map((key) => {
+        const value = data?.Excel?.[key] || data?.pacing?.[key];
+        return roundOff(mins ? ToMins(value) : value?.toFixed(2));
+      });
     }
-    return arr;
+
+    const sumDelays = (key) =>
+      data?.Excel?.reduce((acc, cur) => acc + cur[key], 0) || 0;
+
+    const sumPacingDelays = (key) =>
+      data?.pacing?.reduce((acc, cur) => acc + cur[key], 0) || 0;
+
+    const totalDelays = delayKeys.map((key) => {
+      const total =
+        key === "f_FCE1SSPTravelTimeDelay"
+          ? sumPacingDelays(key)
+          : sumDelays(key);
+      return roundOff(mins ? ToMins(total) : total?.toFixed(2));
+    });
+
+    return totalDelays;
   };
 
-  const chartData = {
-    labels: [
-      ["FCEWISE", "Discharge", "Delay"],
-      ["FCEWISE", "Extractor", "Delay"],
-      ["FCE", "slip", "Delay"],
-      ["R1", "Travel", "Delay"],
-      ["R1", "process", "delay"],
-      ["R2", "Travel", "delay"],
-      ["R2", "Process", "Delay"],
-      ["FME", "Travel", "Delay"],
-      ["FCE ", "To", "SSP", "Travel", "Delay"]
-    ],
-    datasets: [
-      {
-        data: chartDataEntry,
-        backgroundColor: tailwindConfig().theme.colors.blue[700],
-        hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
-        barPercentage: 0.66,
-        categoryPercentage: 0.66
-      }
-    ]
-  };
+  useEffect(() => {
+    const calculatedDelays = calculateDelays();
+    setChartDataEntry(calculatedDelays);
+  }, [data, period, mins]);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const chartData = useMemo(
+    () => ({
+      labels: [
+        ["FCEWISE", "Discharge", "Delay"],
+        ["FCEWISE", "Extractor", "Delay"],
+        ["FCE", "slip", "Delay"],
+        ["R1", "Travel", "Delay"],
+        ["R1", "process", "delay"],
+        ["R2", "Travel", "delay"],
+        ["R2", "Process", "Delay"],
+        ["FME", "Travel", "Delay"],
+        ["FCE ", "To", "SSP", "Travel", "Delay"]
+      ],
+      datasets: [
+        {
+          data: chartDataEntry,
+          backgroundColor: tailwindConfig().theme.colors.blue[700],
+          hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
+          barPercentage: 0.66,
+          categoryPercentage: 0.66
+        }
+      ]
+    }),
+    [chartDataEntry]
+  );
+
+  const handleClose = () => setOpen(false);
 
   return (
     <Modal

@@ -1,7 +1,5 @@
 import { Modal } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-
-// Import utilities
 import { tailwindConfig } from "../utils/Utils";
 import GapChart from "../charts/GapChart";
 import { AccountContext } from "../context/context";
@@ -11,44 +9,52 @@ const Gaps = ({ open, setOpen }) => {
   const [chartDataEntry, setChartData] = useState([]);
   const { period, data, mins } = useContext(AccountContext);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const calculateAverage = (total, length) => roundOff(total / length);
-
-  const processData = (dataField) => {
+  function GapData() {
+    let arr = [];
     if (period === "Last Coil" || period.customp) {
-      return roundOff(data?.Excel?.[dataField]?.toFixed(2));
-    } else if (
-      period === "Last 5 Coil" ||
-      period === "Last Hour" ||
-      period === "Last Day" ||
-      period?.date
-    ) {
-      const total = data?.Excel?.reduce(
-        (accumulator, currentValue) => accumulator + currentValue[dataField],
+      arr.push(data?.Excel?.f_SSPGapTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_R1GapTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_R2GapTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_F1GapTimeAct?.toFixed(2));
+      setChartData(arr);
+    } else if (["Last 5 Coil", "Last Hour", "Last Day"].includes(period)) {
+      let total1 = data?.Excel?.reduce(
+        (acc, cur) => acc + cur.f_SSPGapTimeAct,
         0
       );
-      return mins
-        ? ToMins(calculateAverage(total, data?.Excel?.length))
-        : calculateAverage(total, data?.Excel?.length);
+      let total2 = data?.Excel?.reduce(
+        (acc, cur) => acc + cur.f_R1GapTimeAct,
+        0
+      );
+      let total3 = data?.Excel?.reduce(
+        (acc, cur) => acc + cur.f_R2GapTimeAct,
+        0
+      );
+      let total4 = data?.Excel?.reduce(
+        (acc, cur) => acc + cur.f_F1GapTimeAct,
+        0
+      );
+
+      if (mins) {
+        arr.push(roundOff(ToMins(total1 / data?.Excel?.length)));
+        arr.push(roundOff(ToMins(total2 / data?.Excel?.length)));
+        arr.push(roundOff(ToMins(total3 / data?.Excel?.length)));
+        arr.push(roundOff(ToMins(total4 / data?.Excel?.length)));
+      } else {
+        arr.push(roundOff(total1?.toFixed(2) / data?.Excel?.length));
+        arr.push(roundOff(total2?.toFixed(2) / data?.Excel?.length));
+        arr.push(roundOff(total3?.toFixed(2) / data?.Excel?.length));
+        arr.push(roundOff(total4?.toFixed(2) / data?.Excel?.length));
+      }
+      setChartData(arr);
+    } else {
+      setChartData([]);
     }
-    return "--";
-  };
+  }
 
   useEffect(() => {
-    if (data) {
-      const gapData = [
-        processData("f_SSPGapTimeAct"),
-        processData("f_R1GapTimeAct"),
-        processData("f_R2GapTimeAct"),
-        processData("f_F1GapTimeAct")
-      ];
-      setChartData(gapData);
-      console.debug("Gap data processed:", gapData);
-    }
-  }, [data, period, mins]);
+    GapData();
+  }, [data]);
 
   const chartData = {
     labels: [
@@ -66,6 +72,10 @@ const Gaps = ({ open, setOpen }) => {
         categoryPercentage: 0.66
       }
     ]
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (

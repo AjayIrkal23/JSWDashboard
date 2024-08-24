@@ -14,9 +14,6 @@ import {
 } from "chart.js";
 import "chartjs-adapter-moment";
 
-// Import utilities
-import { tailwindConfig, formatValue } from "../utils/Utils";
-
 Chart.register(
   BarController,
   BarElement,
@@ -28,9 +25,9 @@ Chart.register(
   ChartDataLabels
 );
 
-const FCE1BarChart = ({ data, width, height, shift }) => {
+function FCE1BarChart({ data, width, height }) {
+  const canvasRef = useRef(null);
   const [chart, setChart] = useState(null);
-  const canvas = useRef(null);
   const { currentTheme } = useThemeProvider();
   const darkMode = currentTheme === "dark";
   const {
@@ -42,67 +39,75 @@ const FCE1BarChart = ({ data, width, height, shift }) => {
   } = chartColors;
 
   const initializeChart = useCallback(() => {
-    if (canvas.current) {
-      const ctx = canvas.current.getContext("2d");
-      const newChart = new Chart(ctx, {
-        type: "bar",
-        data: data,
-        options: {
-          layout: {
-            padding: { top: 40, bottom: 16, left: 20, right: 20 }
-          },
-          scales: {
-            y: {
-              border: { display: false },
-              ticks: {
-                maxTicksLimit: 4,
-                color: darkMode ? textColor.dark : textColor.light
-              },
-              grid: { color: darkMode ? gridColor.dark : gridColor.light }
+    const ctx = canvasRef.current;
+    const newChart = new Chart(ctx, {
+      type: "bar",
+      data,
+      options: {
+        layout: {
+          padding: {
+            top: 40,
+            bottom: 16,
+            left: 20,
+            right: 20
+          }
+        },
+        scales: {
+          y: {
+            border: { display: false },
+            ticks: {
+              maxTicksLimit: 4,
+              color: darkMode ? textColor.dark : textColor.light
             },
-            x: {
-              border: { display: false },
-              ticks: {
-                font: { size: 8 },
-                color: darkMode ? textColor.dark : textColor.light
-              }
+            grid: {
+              color: darkMode ? gridColor.dark : gridColor.light
             }
           },
-          plugins: {
-            datalabels: {
-              anchor: "end",
-              align: "top",
-              font: { weight: "bold", size: 16 }
-            },
-            tooltip: {
-              enabled: true,
-              callbacks: {
-                title: () => false, // Disable tooltip title
-                label: (context) =>
-                  `${context.label.replaceAll(",", " ")}: ${context.parsed.y}, `
-              },
-              bodyColor: darkMode
-                ? tooltipBodyColor.dark
-                : tooltipBodyColor.light,
-              backgroundColor: darkMode
-                ? tooltipBgColor.dark
-                : tooltipBgColor.light,
-              borderColor: darkMode
-                ? tooltipBorderColor.dark
-                : tooltipBorderColor.light
-            },
-            legend: { display: false }
+          x: {
+            border: { display: false },
+            ticks: {
+              font: { size: 8 },
+              color: darkMode ? textColor.dark : textColor.light
+            }
+          }
+        },
+        plugins: {
+          datalabels: {
+            anchor: "end",
+            align: "top",
+            font: {
+              weight: "bold",
+              size: 16
+            }
           },
-          interaction: { intersect: false, mode: "nearest" },
-          animation: { duration: 500 },
-          maintainAspectRatio: false,
-          resizeDelay: 200
-        }
-      });
-
-      setChart(newChart);
-      return () => newChart.destroy();
-    }
+          tooltip: {
+            callbacks: {
+              title: () => false,
+              label: (context) =>
+                `${context.label.replaceAll(",", " ")}: ${context.parsed.y}`
+            },
+            bodyColor: darkMode
+              ? tooltipBodyColor.dark
+              : tooltipBodyColor.light,
+            backgroundColor: darkMode
+              ? tooltipBgColor.dark
+              : tooltipBgColor.light,
+            borderColor: darkMode
+              ? tooltipBorderColor.dark
+              : tooltipBorderColor.light
+          },
+          legend: { display: false }
+        },
+        interaction: {
+          intersect: false,
+          mode: "nearest"
+        },
+        animation: { duration: 500 },
+        maintainAspectRatio: false,
+        resizeDelay: 200
+      }
+    });
+    setChart(newChart);
   }, [
     data,
     darkMode,
@@ -114,21 +119,13 @@ const FCE1BarChart = ({ data, width, height, shift }) => {
   ]);
 
   useEffect(() => {
-    console.log("Initializing chart...");
-    const cleanup = initializeChart();
-    return () => {
-      if (cleanup) cleanup();
-      console.log("Cleaning up chart...");
-    };
+    initializeChart();
+    return () => chart?.destroy();
   }, [initializeChart]);
 
   useEffect(() => {
     if (!chart) return;
-    console.log("Updating chart theme...");
 
-    chart.options.scales.x.ticks.color = darkMode
-      ? textColor.dark
-      : textColor.light;
     chart.options.scales.y.ticks.color = darkMode
       ? textColor.dark
       : textColor.light;
@@ -144,11 +141,11 @@ const FCE1BarChart = ({ data, width, height, shift }) => {
     chart.options.plugins.tooltip.borderColor = darkMode
       ? tooltipBorderColor.dark
       : tooltipBorderColor.light;
+
     chart.update("none");
   }, [
-    currentTheme,
-    chart,
     darkMode,
+    chart,
     textColor,
     gridColor,
     tooltipBodyColor,
@@ -157,13 +154,10 @@ const FCE1BarChart = ({ data, width, height, shift }) => {
   ]);
 
   return (
-    <React.Fragment>
-      <div className="px-5 py-3"></div>
-      <div className="grow">
-        <canvas ref={canvas} width={width} height={height}></canvas>
-      </div>
-    </React.Fragment>
+    <div className="grow">
+      <canvas ref={canvasRef} width={width} height={height}></canvas>
+    </div>
   );
-};
+}
 
-export default FCE1BarChart;
+export default React.memo(FCE1BarChart);

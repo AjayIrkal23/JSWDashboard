@@ -6,89 +6,89 @@ import cron from "node-cron";
 import { get } from "../database/pool-manager.js";
 
 const config = {
-  user: "sa",
-  password: "loloklol",
-  server: "localhost",
+  user: process.env.DB_USER || "sa",
+  password: process.env.DB_PASSWORD || "loloklol",
+  server: process.env.DB_SERVER || "localhost",
   trustServerCertificate: true,
   encrypt: false,
   port: 1433,
   requestTimeout: 20000000
 };
 
+/**
+ * Start a cron job that runs every minute and triggers data fetching.
+ */
 export const Start = async (req, res) => {
   try {
     const task = cron.schedule(
       "* * * * *",
       async () => {
-        console.log("Running a task every minute");
-        await GetExcelReport();
-        // await CorrectId(); Uncomment if needed
+        try {
+          console.log("Running cron task every minute");
+          await GetExcelReport();
+        } catch (error) {
+          console.error("Cron task error:", error.message);
+        }
       },
-      { scheduled: false }
+      {
+        scheduled: false
+      }
     );
 
     task.start();
-    res.status(200).json("Started Cron Job");
+    res.status(200).json({ message: "Cron job started successfully" });
   } catch (error) {
-    console.error("Error starting cron job:", error);
-    res.status(500).json(error);
+    console.error("Failed to start cron job:", error.message);
+    res
+      .status(500)
+      .json({ message: "Failed to start cron job", error: error.message });
   }
 };
 
+/**
+ * Dump all data from the database and save it to MongoDB.
+ */
 export const DumpAll = async (req, res) => {
-  console.log("hello");
+  console.log("Starting data dump...");
   try {
     const pool = await get("History", config);
-    console.log("Connection Successful !");
+    console.log("Database connection successful");
 
     const start = new Date("Oct 2023 1");
     const end = new Date("Oct 2023 29");
 
-    const queries = [
-      `SELECT * FROM r_PacingExcelReport WHERE gt_HistoryKeyTm >= '${start.toISOString()}' AND gt_HistoryKeyTm <= '${end.toISOString()}'`,
-      `SELECT * FROM r_PacReport2 WHERE gt_HistoryKeyTm >= '${start.toISOString()}' AND gt_HistoryKeyTm <= '${end.toISOString()}'`
-    ];
-
-    const [excelReport, pacReport2] = await Promise.all(
-      queries.map((query) => pool.request().query(query))
-    );
+    const [excelReport, pacReport2] = await Promise.all([
+      pool
+        .request()
+        .query(
+          `SELECT * FROM r_PacingExcelReport WHERE gt_HistoryKeyTm >= '${start.toISOString()}' AND gt_HistoryKeyTm <= '${end.toISOString()}'`
+        ),
+      pool
+        .request()
+        .query(
+          `SELECT * FROM r_PacReport2 WHERE gt_HistoryKeyTm >= '${start.toISOString()}' AND gt_HistoryKeyTm <= '${end.toISOString()}'`
+        )
+    ]);
 
     if (excelReport?.recordset?.length && pacReport2?.recordset?.length) {
-      await Promise.all([
-        ...excelReport.recordset.map(async (item) => {
-          try {
-            await ExcelData.create({
-              ...item,
-              gt_HistoryKeyTm: new Date(item.gt_HistoryKeyTm).toISOString()
-            });
-            console.log(item.c_PieceName, "done");
-          } catch (err) {
-            console.error("Error saving ExcelData:", err);
-          }
-        }),
-        ...pacReport2.recordset.map(async (item) => {
-          try {
-            await PacingData.create({
-              ...item,
-              gt_HistoryKeyTm: new Date(item.gt_HistoryKeyTm).toISOString()
-            });
-            console.log(item.c_PieceName, "done");
-          } catch (err) {
-            console.error("Error saving PacingData:", err);
-          }
-        })
-      ]);
+      await saveDataToMongo(excelReport.recordset, ExcelData);
+      await saveDataToMongo(pacReport2.recordset, PacingData);
 
-      res.status(200).json({ message: "success" });
+      res.status(200).json({ message: "Data dump successful" });
     } else {
-      res.status(404).json({ message: "No data found" });
+      res
+        .status(404)
+        .json({ message: "No data found for the given date range" });
     }
-  } catch (err) {
-    console.error("Error in DumpAll:", err);
-    res.status(500).json({ message: "Failed", err });
+  } catch (error) {
+    console.error("Data dump failed:", error.message);
+    res.status(500).json({ message: "Data dump failed", error: error.message });
   }
 };
 
+/**
+ * Fetch the latest Excel report and Pacing report from the database.
+ */
 export const GetExcelReport = async () => {
   try {
     const pool = await get("History", config);
@@ -107,84 +107,89 @@ export const GetExcelReport = async () => {
     ]);
 
     if (excelReport.recordset[0] && pacReport2.recordset[0]) {
-      const [exists, exists2] = await Promise.all([
-        ExcelData.findOne({
-          c_PieceName: excelReport.recordset[0].c_PieceName
-        }),
-        PacingData.findOne({ c_PieceName: pacReport2.recordset[0].c_PieceName })
-      ]);
+      await saveNewData(excelReport.recordset[0], ExcelData);
+      await saveNewData(pacReport2.recordset[0], PacingData);
 
-      if (!exists) {
-        await ExcelData.create({
-          ...excelReport.recordset[0],
-          gt_HistoryKeyTm: new Date(
-            excelReport.recordset[0].gt_HistoryKeyTm
-          ).toISOString()
-        })
-          .then((resp) => {
-            console.log(excelReport.recordset[0].c_PieceName, "done");
-          })
-          .catch((err) => {
-            console.error("Error creating ExcelData:", err);
-          });
-      }
-
-      if (!exists2) {
-        await PacingData.create({
-          ...pacReport2.recordset[0],
-          gt_HistoryKeyTm: new Date(
-            pacReport2.recordset[0].gt_HistoryKeyTm
-          ).toISOString()
-        })
-          .then((resp) => {
-            console.log(pacReport2.recordset[0].c_PieceName, "done");
-          })
-          .catch((err) => {
-            console.error("Error creating PacingData:", err);
-          });
-      }
-
-      console.log("Success!");
+      console.log("New data saved successfully");
     } else {
-      console.log("Piece Not Found!");
+      console.log("No new data found");
     }
   } catch (error) {
-    console.error("Error in GetExcelReport:", error);
+    console.error("Failed to fetch Excel report:", error.message);
   }
 };
 
+/**
+ * Corrects the ID in the database if the c_PieceName is incorrect.
+ */
 export const CorrectId = async () => {
   try {
-    const [excel, pacing] = await Promise.all([
-      ExcelData.find({}).sort(),
-      PacingData.find({}).sort()
-    ]);
+    const excelData = await ExcelData.find({});
+    const pacingData = await PacingData.find({});
 
-    await Promise.all([
-      ...excel.map(async (item) => {
-        if (item.c_PieceName.length > 10) {
-          const num = item.c_PieceName.trim();
-          const id = item._id.toString();
-          await ExcelData.findByIdAndUpdate(id, { c_PieceName: num });
-          console.log(item.c_PieceName, "done");
-        } else {
-          console.log("is Correct");
-        }
-      }),
-      ...pacing.map(async (item) => {
-        if (item.c_PieceName.length > 10) {
-          const num = item.c_PieceName.trim();
-          const id = item._id.toString();
-          await PacingData.findByIdAndUpdate(id, { c_PieceName: num });
-          console.log(item.c_PieceName, "done");
-        } else {
-          console.log("is Correct");
-        }
-      })
-    ]);
+    await correctPieceNames(excelData, ExcelData);
+    await correctPieceNames(pacingData, PacingData);
 
-    console.log("Success Correct ID");
+    console.log("Successfully corrected IDs");
   } catch (error) {
-    console.error("Error in CorrectId:", error);
+    console.error("Failed to correct IDs:", error.message);
+  }
+};
+
+/**
+ * Save an array of data to MongoDB.
+ * @param {Array} data - Array of records to be saved.
+ * @param {Object} Model - Mongoose model.
+ */
+const saveDataToMongo = async (data, Model) => {
+  for (const item of data) {
+    try {
+      await Model.create({
+        ...item,
+        gt_HistoryKeyTm: new Date(item.gt_HistoryKeyTm).toISOString()
+      });
+      console.log(`${item.c_PieceName} saved successfully`);
+    } catch (error) {
+      console.error(`Failed to save ${item.c_PieceName}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Save a new record to MongoDB if it doesn't already exist.
+ * @param {Object} record - The record to be saved.
+ * @param {Object} Model - Mongoose model.
+ */
+const saveNewData = async (record, Model) => {
+  try {
+    const exists = await Model.findOne({ c_PieceName: record.c_PieceName });
+    if (!exists) {
+      await Model.create({
+        ...record,
+        gt_HistoryKeyTm: new Date(record.gt_HistoryKeyTm).toISOString()
+      });
+      console.log(`${record.c_PieceName} saved successfully`);
+    } else {
+      console.log(`${record.c_PieceName} already exists`);
+    }
+  } catch (error) {
+    console.error(`Failed to save ${record.c_PieceName}:`, error.message);
+  }
+};
+
+/**
+ * Correct the c_PieceName in the database records.
+ * @param {Array} data - Array of records to be corrected.
+ * @param {Object} Model - Mongoose model.
+ */
+const correctPieceNames = async (data, Model) => {
+  for (const item of data) {
+    if (item.c_PieceName.length > 10) {
+      const trimmedName = item.c_PieceName.trim();
+      await Model.findByIdAndUpdate(item._id, { c_PieceName: trimmedName });
+      console.log(`${trimmedName} corrected successfully`);
+    } else {
+      console.log(`${item.c_PieceName} is already correct`);
+    }
   }
 };

@@ -1,76 +1,72 @@
 import { Modal } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-
-// Import utilities
 import { tailwindConfig } from "../utils/Utils";
 import ProcessChart from "../charts/ProcessChart";
 import { AccountContext } from "../context/context";
 import { ToMins } from "../utils/roundoff";
 
 const Processes = ({ open, setOpen }) => {
-  const [chartDataEntry, setChartData] = useState([]);
+  const [chartDataEntry, setChartData] = useState();
   const { period, data, mins } = useContext(AccountContext);
 
-  useEffect(() => {
-    if (data) {
-      Process();
-    }
-  }, [data]);
-
-  const Process = () => {
-    if (!data || !data.Excel || !data.pacing) {
-      console.warn("Data not available");
-      setChartData([]);
-      return;
-    }
-
+  function Process() {
     let arr = [];
     if (period === "Last Coil" || period.customp) {
-      arr.push(data.Excel.f_SSPProcessTimeDelay?.toFixed(2));
-      arr.push(data.Excel.f_R1ProcessTimeDelay?.toFixed(2));
-      arr.push(data.Excel.f_R2ProcessTimeDelay?.toFixed(2));
+      arr.push(data?.Excel?.f_SSPProcessTimeDelay?.toFixed(2));
+      arr.push(data?.Excel?.f_R1ProcessTimeDelay?.toFixed(2));
+      arr.push(data?.Excel?.f_R2ProcessTimeDelay?.toFixed(2));
       arr.push(
         (
-          data.pacing.f_FMProcessTimePred - data.pacing.f_FMProcessTimeAct
-        ).toFixed(2)
+          data?.pacing?.f_FMProcessTimePred - data?.pacing?.f_FMProcessTimeAct
+        )?.toFixed(2)
       );
+      setChartData(arr);
     } else if (
       ["Last 5 Coil", "Last Hour", "Last Day"].includes(period) ||
       period?.date
     ) {
-      const total1 = sumField(data.Excel, "f_SSPProcessTimeDelay");
-      const total2 = sumField(data.Excel, "f_R1ProcessTimeDelay");
-      const total3 = sumField(data.Excel, "f_R2ProcessTimeDelay");
-      const total4 = sumField(data.pacing, "f_FMProcessTimePred");
-      const total5 = sumField(data.pacing, "f_FMProcessTimeAct");
+      let total1 = data?.Excel?.reduce(
+        (acc, curr) => acc + curr.f_SSPProcessTimeDelay,
+        0
+      );
+      let total2 = data?.Excel?.reduce(
+        (acc, curr) => acc + curr.f_R1ProcessTimeDelay,
+        0
+      );
+      let total3 = data?.Excel?.reduce(
+        (acc, curr) => acc + curr.f_R2ProcessTimeDelay,
+        0
+      );
+      let total4 = data?.pacing?.reduce(
+        (acc, curr) => acc + curr.f_FMProcessTimePred,
+        0
+      );
+      let total5 = data?.pacing?.reduce(
+        (acc, curr) => acc + curr.f_FMProcessTimeAct,
+        0
+      );
 
       if (mins) {
-        const total6 = total4 - total5;
+        let total6 = total4 - total5;
         arr.push(ToMins(total1));
         arr.push(ToMins(total2));
         arr.push(ToMins(total3));
         arr.push(ToMins(total6));
       } else {
-        arr.push(total1.toFixed(2));
-        arr.push(total2.toFixed(2));
-        arr.push(total3.toFixed(2));
-        arr.push((total4 - total5).toFixed(2));
+        arr.push(total1?.toFixed(2));
+        arr.push(total2?.toFixed(2));
+        arr.push(total3?.toFixed(2));
+        arr.push((total4 - total5)?.toFixed(2));
       }
+      setChartData(arr);
     } else {
-      arr = ["--", "--", "--", "--"];
+      return "--";
     }
+  }
 
-    setChartData(arr);
-  };
-
-  const sumField = (array, field) => {
-    if (!array.length) return 0;
-    return array.reduce((acc, curr) => acc + (curr[field] || 0), 0);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  useEffect(() => {
+    Process();
+  }, [data]);
 
   const chartData = {
     labels: [
@@ -88,6 +84,10 @@ const Processes = ({ open, setOpen }) => {
         categoryPercentage: 0.66
       }
     ]
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (

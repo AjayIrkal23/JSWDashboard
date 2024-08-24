@@ -1,5 +1,7 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useThemeProvider } from "../utils/ThemeContext";
+
+import { chartColors } from "./ChartjsConfig";
 import {
   Chart,
   BarController,
@@ -7,13 +9,16 @@ import {
   LinearScale,
   TimeScale,
   Tooltip,
-  Legend
+  Legend,
 } from "chart.js";
 import "chartjs-adapter-moment";
 import { CategoryScale } from "chart.js";
 import { Modal } from "@mui/material";
-import { chartColors } from "./ChartjsConfig";
-import { tailwindConfig } from "../utils/Utils";
+
+// Import utilities
+import { tailwindConfig, formatValue } from "../utils/Utils";
+import BarChart02 from "./BarChart02";
+import D15 from "../partials/dashboard/D15";
 import D17 from "../partials/dashboard/D17";
 import D18 from "../partials/dashboard/D18";
 
@@ -29,10 +34,9 @@ Chart.register(
 
 function RejBar({ data, width, height, shift, title }) {
   const [chart, setChart] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [shiftData, setShiftData] = useState("Shift");
-  const canvasRef = useRef(null);
-  const legendRef = useRef(null);
+  const [Shift, setShift] = useState("Shift");
+  const canvas = useRef(null);
+  const legend = useRef(null);
   const { currentTheme } = useThemeProvider();
   const darkMode = currentTheme === "dark";
   const {
@@ -40,51 +44,55 @@ function RejBar({ data, width, height, shift, title }) {
     gridColor,
     tooltipBodyColor,
     tooltipBgColor,
-    tooltipBorderColor
+    tooltipBorderColor,
   } = chartColors;
 
-  const handleClose = useCallback(() => {
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
     setOpen(false);
-  }, []);
+  };
 
-  const initializeChart = useCallback(() => {
-    if (!canvasRef.current) {
-      console.warn("Canvas not found");
-      return;
-    }
-
-    const ctx = canvasRef.current.getContext("2d");
+  useEffect(() => {
+    const ctx = canvas.current;
+    // eslint-disable-next-line no-unused-vars
     const newChart = new Chart(ctx, {
       type: "bar",
-      data,
+      data: data,
       options: {
         layout: {
           padding: {
             top: 12,
             bottom: 16,
             left: 20,
-            right: 20
-          }
+            right: 20,
+          },
         },
         onClick: (evt, element) => {
           if (element.length > 0) {
-            const ind = element[0].index;
-            if (ind === 3) {
-              setShiftData(shift);
+            var ind = element[0].index;
+            if (ind == 3) {
+              setShift(shift);
               setOpen(true);
             }
           }
         },
         scales: {
-          y: { display: false, stacked: true },
-          x: { display: false, stacked: true }
+          y: {
+            display: false,
+            stacked: true,
+          },
+          x: {
+            display: false,
+            stacked: true,
+          },
         },
         plugins: {
           tooltip: {
             callbacks: {
-              title: () => false,
+              title: () => false, // Disable tooltip title
               label: (context) =>
-                `${context.dataset.label}: ${context.parsed.y}, Time: ${context.label}`
+                `${context.dataset.label}:  ${context.parsed.y}, Time: ${context.label}`,
             },
             bodyColor: darkMode
               ? tooltipBodyColor.dark
@@ -94,29 +102,38 @@ function RejBar({ data, width, height, shift, title }) {
               : tooltipBgColor.light,
             borderColor: darkMode
               ? tooltipBorderColor.dark
-              : tooltipBorderColor.light
+              : tooltipBorderColor.light,
           },
-          legend: { display: false }
+          legend: {
+            display: false,
+          },
         },
-        interaction: { intersect: false, mode: "nearest" },
-        animation: { duration: 500 },
+        interaction: {
+          intersect: false,
+          mode: "nearest",
+        },
+        animation: {
+          duration: 500,
+        },
         maintainAspectRatio: false,
-        resizeDelay: 200
+        resizeDelay: 200,
       },
       plugins: [
         {
           id: "htmlLegend",
-          afterUpdate(c) {
-            const ul = legendRef.current;
+          afterUpdate(c, args, options) {
+            const ul = legend.current;
             if (!ul) return;
-
-            while (ul.firstChild) ul.firstChild.remove();
-
+            // Remove old legend items
+            while (ul.firstChild) {
+              ul.firstChild.remove();
+            }
+            // Reuse the built-in legendItems generator
             const items = c.options.plugins.legend.labels.generateLabels(c);
             items.forEach((item) => {
               const li = document.createElement("li");
               li.style.marginRight = tailwindConfig().theme.margin[4];
-
+              // Button element
               const button = document.createElement("button");
               button.style.display = "inline-flex";
               button.style.alignItems = "center";
@@ -128,7 +145,7 @@ function RejBar({ data, width, height, shift, title }) {
                 );
                 c.update();
               };
-
+              // Color box
               const box = document.createElement("span");
               box.style.display = "block";
               box.style.width = tailwindConfig().theme.width[3];
@@ -138,11 +155,10 @@ function RejBar({ data, width, height, shift, title }) {
               box.style.borderWidth = "3px";
               box.style.borderColor = item.fillStyle;
               box.style.pointerEvents = "none";
-
+              // Label
               const labelContainer = document.createElement("span");
               labelContainer.style.display = "flex";
               labelContainer.style.alignItems = "center";
-
               const value = document.createElement("span");
               value.classList.add("text-slate-800", "dark:text-slate-100");
               value.style.fontSize = tailwindConfig().theme.fontSize["3xl"][0];
@@ -151,20 +167,19 @@ function RejBar({ data, width, height, shift, title }) {
               value.style.fontWeight = tailwindConfig().theme.fontWeight.bold;
               value.style.marginRight = tailwindConfig().theme.margin[2];
               value.style.pointerEvents = "none";
-
               const label = document.createElement("span");
               label.classList.add("text-slate-500", "dark:text-slate-400");
               label.style.fontSize = tailwindConfig().theme.fontSize.sm[0];
               label.style.lineHeight =
                 tailwindConfig().theme.fontSize.sm[1].lineHeight;
-
               const theValue = c.data.datasets[item.datasetIndex].data.reduce(
                 (a, b) => a + b,
                 0
               );
-              value.textContent = theValue;
-              label.textContent = item.text;
-
+              const valueText = document.createTextNode(theValue);
+              const labelText = document.createTextNode(item.text);
+              value.appendChild(valueText);
+              label.appendChild(labelText);
               li.appendChild(button);
               button.appendChild(box);
               button.appendChild(labelContainer);
@@ -172,50 +187,36 @@ function RejBar({ data, width, height, shift, title }) {
               labelContainer.appendChild(label);
               ul.appendChild(li);
             });
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     setChart(newChart);
     return () => newChart.destroy();
-  }, [data, darkMode, shift, tailwindConfig]);
-
-  useEffect(() => {
-    initializeChart();
-  }, [initializeChart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   useEffect(() => {
     if (!chart) return;
 
-    const newColor = darkMode ? textColor.dark : textColor.light;
-    const newGridColor = darkMode ? gridColor.dark : gridColor.light;
-    const newTooltipBodyColor = darkMode
-      ? tooltipBodyColor.dark
-      : tooltipBodyColor.light;
-    const newTooltipBgColor = darkMode
-      ? tooltipBgColor.dark
-      : tooltipBgColor.light;
-    const newTooltipBorderColor = darkMode
-      ? tooltipBorderColor.dark
-      : tooltipBorderColor.light;
-
-    chart.options.scales.x.ticks.color = newColor;
-    chart.options.scales.y.ticks.color = newColor;
-    chart.options.scales.y.grid.color = newGridColor;
-    chart.options.plugins.tooltip.bodyColor = newTooltipBodyColor;
-    chart.options.plugins.tooltip.backgroundColor = newTooltipBgColor;
-    chart.options.plugins.tooltip.borderColor = newTooltipBorderColor;
+    if (darkMode) {
+      chart.options.scales.x.ticks.color = textColor.dark;
+      chart.options.scales.y.ticks.color = textColor.dark;
+      chart.options.scales.y.grid.color = gridColor.dark;
+      chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.dark;
+      chart.options.plugins.tooltip.backgroundColor = tooltipBgColor.dark;
+      chart.options.plugins.tooltip.borderColor = tooltipBorderColor.dark;
+    } else {
+      chart.options.scales.x.ticks.color = textColor.light;
+      chart.options.scales.y.ticks.color = textColor.light;
+      chart.options.scales.y.grid.color = gridColor.light;
+      chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.light;
+      chart.options.plugins.tooltip.backgroundColor = tooltipBgColor.light;
+      chart.options.plugins.tooltip.borderColor = tooltipBorderColor.light;
+    }
     chart.update("none");
-  }, [
-    darkMode,
-    chart,
-    textColor,
-    gridColor,
-    tooltipBodyColor,
-    tooltipBgColor,
-    tooltipBorderColor
-  ]);
+  }, [currentTheme]);
 
   return (
     <React.Fragment>
@@ -225,13 +226,13 @@ function RejBar({ data, width, height, shift, title }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <div className="bg-white outline-none absolute top-[10%] left-[50%] -translate-x-[50%]">
-          {shiftData === "Shift" ? <D17 /> : <D18 />}
+        <div className="bg-white outline-none absolute top-[10%] left-[50%] -translate-x-[50%] ">
+          {Shift == "Shift" ? <D17 /> : <D18 />}
         </div>
       </Modal>
       <div className="px-5 py-3"></div>
       <div className="grow">
-        <canvas ref={canvasRef} width={width} height={height}></canvas>
+        <canvas ref={canvas} width={width} height={height}></canvas>
       </div>
     </React.Fragment>
   );

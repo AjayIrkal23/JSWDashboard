@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
 import WelcomeBanner from "../partials/dashboard/WelcomeBanner";
@@ -6,18 +6,20 @@ import WelcomeBanner from "../partials/dashboard/WelcomeBanner";
 import DashboardCard01 from "../partials/dashboard/DashboardCard01";
 import DashboardCard02 from "../partials/dashboard/DashboardCard02";
 import DashboardCard03 from "../partials/dashboard/DashboardCard03";
-
+import DashboardCard04 from "../partials/dashboard/DashboardCard04";
 import DashboardCard06 from "../partials/dashboard/DashboardCard06";
-
 import D15 from "../partials/dashboard/D15";
 import D16 from "../partials/dashboard/D16";
-import DashboardExtra from "../partials/dashboard/Dashboardextra";
+import DashboardExtra from "../partials/dashboard/DashboardExtra";
 import DashboardMain from "../partials/dashboard/DashboardMain";
 import { AccountContext } from "../context/context";
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { mainData } = useContext(AccountContext);
+
+  // Memoizing mainData to avoid unnecessary renders
+  const memoizedMainData = useMemo(() => mainData, [mainData]);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -34,15 +36,13 @@ function Dashboard() {
             {/* Welcome banner */}
             <WelcomeBanner />
 
-            {/* Dashboard actions */}
-
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
               <DashboardCard01 />
               <DashboardCard02 />
               <DashboardExtra />
               <DashboardCard03 />
-              <DashboardMain mainData={mainData} />
+              <DashboardMain mainData={memoizedMainData} />
               <DashboardCard06 />
               <D15 />
               <D16 />

@@ -1,51 +1,51 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import LineChart from "../../charts/LineChart01";
+
+// Import utilities
 import { tailwindConfig, hexToRGB } from "../../utils/Utils";
 import { getLabels } from "../../utils/roundoff";
 import { AccountContext } from "../../context/context";
 
 function DashboardCard03() {
-  const [dataLine, setDataLine] = useState([]);
-  const [data, setData] = useState([]);
+  const [dataLine, setDataLine] = useState(null);
   const { eightData } = useContext(AccountContext);
 
-  useEffect(() => {
-    if (eightData) {
-      const labels = getLabels();
-      setDataLine(labels);
-      console.log("Labels set:", labels);
-
-      const delayData = eightData.map(
-        (item) => item?.data?.Delay_2to5 + item?.data["Delay_>5"]
-      );
-      setData(delayData);
-      console.log("Shift data fetched:", delayData);
-    }
+  // Memoize the data extraction logic
+  const getData = useMemo(() => {
+    return eightData?.map(
+      (item) => item?.data?.Delay_2to5 + item?.data["Delay_>5"]
+    );
   }, [eightData]);
 
-  const chartData = {
-    labels: dataLine,
-    datasets: [
-      {
-        data: data,
-        fill: true,
-        backgroundColor: `rgba(${hexToRGB(
-          tailwindConfig().theme.colors.yellow[500]
-        )}, 0.08)`,
-        borderColor: tailwindConfig().theme.colors.yellow[500],
-        borderWidth: 2,
-        tension: 0,
-        pointStyle: "circle",
-        pointRadius: 3,
-        pointHoverRadius: 5,
-        pointBackgroundColor: tailwindConfig().theme.colors.yellow[500],
-        pointHoverBackgroundColor: tailwindConfig().theme.colors.yellow[500],
-        pointBorderWidth: 0,
-        pointHoverBorderWidth: 0,
-        clip: 20
-      }
-    ]
-  };
+  useEffect(() => {
+    setDataLine(getLabels());
+  }, []);
+
+  // Memoize the chart data to prevent unnecessary re-renders
+  const chartData = useMemo(() => {
+    const colors = tailwindConfig().theme.colors;
+    return {
+      labels: dataLine,
+      datasets: [
+        {
+          data: getData,
+          fill: true,
+          backgroundColor: `rgba(${hexToRGB(colors.yellow[500])}, 0.08)`,
+          borderColor: colors.yellow[500],
+          borderWidth: 2,
+          tension: 0,
+          pointStyle: "circle",
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: colors.yellow[500],
+          pointHoverBackgroundColor: colors.yellow[500],
+          pointBorderWidth: 0,
+          pointHoverBorderWidth: 0,
+          clip: 20
+        }
+      ]
+    };
+  }, [dataLine, getData]);
 
   return (
     <div className="flex flex-col col-span-full sm:col-span-6 xl:col-span-3 bg-[#fbc02d]/40 dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700 pb-2">
@@ -60,18 +60,19 @@ function DashboardCard03() {
             </div>
           </div>
         </div>
+
         <header className="flex justify-between items-start mb-2">
+          {/* Icon */}
           <img src="/delay.png" width="100" height="100" alt="Icon 01" />
         </header>
       </div>
-      {dataLine.length > 0 && data.length > 0 ? (
+      {/* Chart built with Chart.js 3 */}
+      {dataLine ? (
         <div className="grow max-sm:max-h-[128px] xl:max-h-[128px]">
           <LineChart data={chartData} width={389} height={128} title="Delays" />
         </div>
       ) : (
-        <div className="flex items-center justify-center h-32">
-          <p>Loading...</p>
-        </div>
+        "Loading"
       )}
     </div>
   );

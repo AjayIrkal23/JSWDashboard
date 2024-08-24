@@ -6,63 +6,59 @@ import { ToMins, roundOff } from "../utils/roundoff";
 import ProcessTimeChart from "../charts/ProcessTimeChart";
 
 const ProcessTime = ({ open, setOpen }) => {
-  const [chartDataEntry, setChartData] = useState([]);
+  const [chartDataEntry, setChartData] = useState();
   const { period, data, mins } = useContext(AccountContext);
 
-  useEffect(() => {
-    if (data) {
-      processData();
-    }
-  }, [data]);
-
-  const processData = () => {
-    if (!data || !data.Excel || !data.pacing) {
-      console.warn("Data not available");
-      setChartData([]);
-      return;
-    }
-
-    const arr = [];
+  function Process() {
+    let arr = [];
     if (period === "Last Coil" || period.customp) {
-      arr.push(data.Excel.f_SSPProcessTimeAct?.toFixed(2));
-      arr.push(data.Excel.f_R1ProcessTimeAct?.toFixed(2));
-      arr.push(data.Excel.f_R2ProcessTimeAct?.toFixed(2));
-      arr.push(data.pacing.f_FMProcessTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_SSPProcessTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_R1ProcessTimeAct?.toFixed(2));
+      arr.push(data?.Excel?.f_R2ProcessTimeAct?.toFixed(2));
+      arr.push((data?.pacing?.f_FMProcessTimeAct).toFixed(2));
+      setChartData(arr);
     } else if (
       ["Last 5 Coil", "Last Hour", "Last Day"].includes(period) ||
       period?.date
     ) {
-      const total1 = sumField(data.Excel, "f_SSPProcessTimeAct");
-      const total2 = sumField(data.Excel, "f_R1ProcessTimeAct");
-      const total3 = sumField(data.Excel, "f_R2ProcessTimeAct");
-      const total4 = sumField(data.pacing, "f_FMProcessTimeAct");
+      let total1 = data?.Excel?.reduce(
+        (acc, curr) => acc + curr.f_SSPProcessTimeAct,
+        0
+      );
+      let total2 = data?.Excel?.reduce(
+        (acc, curr) => acc + curr.f_R1ProcessTimeAct,
+        0
+      );
+      let total3 = data?.Excel?.reduce(
+        (acc, curr) => acc + curr.f_R2ProcessTimeAct,
+        0
+      );
+      let total4 = data?.pacing?.reduce(
+        (acc, curr) => acc + curr.f_FMProcessTimeAct,
+        0
+      );
 
       if (mins) {
-        arr.push(roundOff(ToMins(total1 / data.Excel.length)));
-        arr.push(roundOff(ToMins(total2 / data.Excel.length)));
-        arr.push(roundOff(ToMins(total3 / data.Excel.length)));
-        arr.push(roundOff(ToMins(total4 / data.Excel.length)));
+        arr.push(roundOff(ToMins(total1 / data?.Excel?.length)));
+        arr.push(roundOff(ToMins(total2 / data?.Excel?.length)));
+        arr.push(roundOff(ToMins(total3 / data?.Excel?.length)));
+        arr.push(roundOff(ToMins(total4 / data?.Excel?.length)));
       } else {
-        arr.push(roundOff(total1 / data.Excel.length));
-        arr.push(roundOff(total2 / data.Excel.length));
-        arr.push(roundOff(total3 / data.Excel.length));
-        arr.push(roundOff(total4 / data.Excel.length));
+        arr.push(roundOff(total1 / data?.Excel?.length));
+        arr.push(roundOff(total2 / data?.Excel?.length));
+        arr.push(roundOff(total3 / data?.Excel?.length));
+        arr.push(roundOff(total4 / data?.Excel?.length));
       }
+
+      setChartData(arr);
     } else {
-      arr.push("--", "--", "--", "--");
+      return "--";
     }
+  }
 
-    setChartData(arr);
-  };
-
-  const sumField = (array, field) => {
-    if (!array.length) return 0;
-    return array.reduce((acc, curr) => acc + (curr[field] || 0), 0);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  useEffect(() => {
+    Process();
+  }, [data]);
 
   const chartData = {
     labels: [
@@ -80,6 +76,10 @@ const ProcessTime = ({ open, setOpen }) => {
         categoryPercentage: 0.66
       }
     ]
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (

@@ -1,24 +1,26 @@
-import React from "react";
+import React, { useMemo } from "react";
 import BarChart from "../../charts/BarChart01";
 
 // Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
 function D18() {
-  const chartData = {
-    labels: ["Runbacks", "Plates", "Kickback", "Cobbles", "Pressback"],
-    datasets: [
-      // Light blue bars
-      {
-        data: [8, 9, 1, 2, 6],
-        backgroundColor: tailwindConfig().theme.colors.orange[400],
-        hoverBackgroundColor: tailwindConfig().theme.colors.orange[600],
-        barPercentage: 0.66,
-        categoryPercentage: 0.66,
-      },
-      // Blue bars
-    ],
-  };
+  // Memoizing the chartData to prevent unnecessary re-renders
+  const chartData = useMemo(() => {
+    const colors = tailwindConfig().theme.colors;
+    return {
+      labels: ["Runbacks", "Plates", "Kickback", "Cobbles", "Pressback"],
+      datasets: [
+        {
+          data: [8, 9, 1, 2, 6],
+          backgroundColor: colors.orange[400],
+          hoverBackgroundColor: colors.orange[600],
+          barPercentage: 0.66,
+          categoryPercentage: 0.66
+        }
+      ]
+    };
+  }, []);
 
   return (
     <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">

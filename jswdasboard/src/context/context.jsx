@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 
 export const AccountContext = createContext(null);
 
-export const AccountProvider = ({ children }) => {
+export const Accountprovider = ({ children }) => {
   const [period, setPeriod] = useState("Last Coil");
   const [mainData, setMainData] = useState(null);
   const [eightData, setEightData] = useState(null);
@@ -13,9 +13,6 @@ export const AccountProvider = ({ children }) => {
   const [rollChange, setRollChange] = useState(null);
   const [mins, setMins] = useState(false);
   const [data, setData] = useState(null);
-
-  console.log(rollChange, "rollChange");
-  console.log(eightData, "eightData");
 
   function useInterval(callback, delay) {
     const savedCallback = useRef();
@@ -26,51 +23,49 @@ export const AccountProvider = ({ children }) => {
 
     useEffect(() => {
       function tick() {
-        if (savedCallback.current) {
-          savedCallback.current();
-        }
+        savedCallback.current();
       }
       if (delay !== null) {
-        const id = setInterval(tick, delay);
+        let id = setInterval(tick, delay);
         return () => clearInterval(id);
       }
     }, [delay]);
   }
 
-  const fetchData = async (url, callback) => {
+  const fetchData = async (
+    url,
+    setter,
+    successMessage = "Data Fetching Successful"
+  ) => {
     try {
       const response = await axios.get(url);
-      callback(response.data);
+      setter(response.data);
+      toast.success(successMessage);
     } catch (error) {
-      console.error(`Error fetching data from ${url}:`, error);
-      toast.error(`Error fetching data from ${url}`);
+      toast.error("Failed to fetch data");
     }
   };
 
-  const postData = async (url, payload, callback) => {
+  const postData = async (
+    url,
+    payload,
+    setter,
+    successMessage = "Data Fetching Successful"
+  ) => {
     try {
       const response = await axios.post(url, payload);
-      callback(response.data);
+      setter(response?.data);
       toast.dismiss();
-      toast.success("Data Fetching Successful");
+      toast.success(successMessage);
     } catch (error) {
       toast.dismiss();
-      toast.error("Data Fetching Failed");
-      console.error(`Error posting data to ${url}:`, error);
+      toast.error("Failed to fetch data");
     }
-  };
-
-  const getData = async () => {
-    toast.loading("Loading Data");
-    const url = "http://localhost:8000/sendData";
-    const payload = { period };
-
-    postData(url, payload, setData);
   };
 
   useInterval(() => {
-    if (period === "Last Coil") {
-      toast.loading("Loading Data");
+    toast.loading("Loading Data...");
+    if (period) {
       postData("http://localhost:8000/sendData", { period }, setData);
     }
   }, 30000);
@@ -79,8 +74,14 @@ export const AccountProvider = ({ children }) => {
     fetchData("http://localhost:8000/add", setMainData);
   }, 120000);
 
+  const getData = () => {
+    if (period) {
+      postData("http://localhost:8000/sendData", { period }, setData);
+    }
+  };
+
   useEffect(() => {
-    fetchData("http://localhost:8000/add1", (data) => setEightData(data?.arr));
+    fetchData("http://localhost:8000/add1", (resp) => setEightData(resp?.arr));
     getData();
     fetchData("http://localhost:8000/add", setMainData);
   }, [period, mins]);

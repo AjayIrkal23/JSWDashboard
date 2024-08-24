@@ -1,22 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Transition from "./Transition";
 
 function Info({ children, className, containerClassName }) {
   const [infoOpen, setInfoOpen] = useState(false);
 
+  // useCallback to memoize the event handlers to avoid re-creating them on every render
+  const handleMouseEnter = useCallback(() => setInfoOpen(true), []);
+  const handleMouseLeave = useCallback(() => setInfoOpen(false), []);
+  const handleFocus = useCallback(() => setInfoOpen(true), []);
+  const handleBlur = useCallback(() => setInfoOpen(false), []);
+  const handleClick = useCallback((e) => e.preventDefault(), []);
+
   return (
     <div
       className={`relative ${className}`}
-      onMouseEnter={() => setInfoOpen(true)}
-      onMouseLeave={() => setInfoOpen(false)}
-      onFocus={() => setInfoOpen(true)}
-      onBlur={() => setInfoOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     >
       <button
         className="block"
         aria-haspopup="true"
         aria-expanded={infoOpen}
-        onClick={(e) => e.preventDefault()}
+        onClick={handleClick}
       >
         <svg
           className="w-4 h-4 fill-current text-slate-400"
@@ -44,8 +51,6 @@ function Info({ children, className, containerClassName }) {
   );
 }
 
-export const roundOff = (value) => {
-  return Math.round(value);
-};
+export const roundOff = (value) => Math.round(value);
 
 export default Info;

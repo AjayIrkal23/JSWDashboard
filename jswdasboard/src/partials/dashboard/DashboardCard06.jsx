@@ -1,68 +1,58 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import DoughnutChart from "../../charts/DoughnutChart";
+
+// Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
 function DashboardCard06() {
-  const [chartData, setChartData] = useState(null);
-
-  useEffect(() => {
-    // Assuming this data comes from an API or a context, you can replace this with actual data fetching logic
-    const fetchData = () => {
-      try {
-        const data = [35, 30, 35, 85, 99, 44, 55, 33, 47, 88]; // Replace with actual data fetching logic
-        const labels = [
-          "API Grades",
-          "CM Grades",
-          "Common Grades",
-          "Electrical Steel Grades",
-          "High Strength Steel Grades",
-          "IF Exposed Grades",
-          "IF Unexposed Grades",
-          "Mandrel Hold Grades",
-          "RR Grades",
-          "Unexposed Grades"
-        ];
-        setChartData({
-          labels: labels,
-          datasets: [
-            {
-              label: "Grade Mix",
-              data: data,
-              backgroundColor: [
-                tailwindConfig().theme.colors.blue[500],
-                tailwindConfig().theme.colors.red[600],
-                tailwindConfig().theme.colors.purple[800],
-                tailwindConfig().theme.colors.green[800],
-                tailwindConfig().theme.colors.pink[800],
-                tailwindConfig().theme.colors.blue[800],
-                tailwindConfig().theme.colors.indigo[800],
-                tailwindConfig().theme.colors.pink[800],
-                tailwindConfig().theme.colors.gray[800],
-                tailwindConfig().theme.colors.red[200]
-              ],
-              hoverBackgroundColor: [
-                tailwindConfig().theme.colors.blue[500],
-                tailwindConfig().theme.colors.red[600],
-                tailwindConfig().theme.colors.purple[800],
-                tailwindConfig().theme.colors.green[800],
-                tailwindConfig().theme.colors.pink[800],
-                tailwindConfig().theme.colors.blue[800],
-                tailwindConfig().theme.colors.indigo[800],
-                tailwindConfig().theme.colors.pink[800],
-                tailwindConfig().theme.colors.gray[800],
-                tailwindConfig().theme.colors.red[200]
-              ],
-              borderWidth: 0
-            }
-          ]
-        });
-        console.log("Data fetched successfully", data);
-      } catch (error) {
-        console.error("Error fetching chart data:", error);
-      }
+  // Memoizing the chartData to prevent unnecessary re-renders
+  const chartData = useMemo(() => {
+    const colors = tailwindConfig().theme.colors;
+    return {
+      labels: [
+        "API Grades",
+        "CM Grades",
+        "Common Grades",
+        "Electrical Steel Grades",
+        "High Strength Steel Grades",
+        "IF Exposed Grades",
+        "IF Unexposed Grades",
+        "Mandrel Hold Grades",
+        "RR Grades",
+        "Unexposed Grades"
+      ],
+      datasets: [
+        {
+          label: "Grades",
+          data: [35, 30, 35, 85, 99, 44, 55, 33, 47, 88],
+          backgroundColor: [
+            colors.blue[500],
+            colors.red[600],
+            colors.purple[800],
+            colors.green[800],
+            colors.pink[800],
+            colors.blue[800],
+            colors.indigo[800],
+            colors.pink[800],
+            colors.gray[800],
+            colors.red[200]
+          ],
+          hoverBackgroundColor: [
+            colors.blue[500],
+            colors.red[600],
+            colors.purple[800],
+            colors.green[800],
+            colors.pink[800],
+            colors.blue[800],
+            colors.indigo[800],
+            colors.pink[800],
+            colors.gray[800],
+            colors.red[200]
+          ],
+          borderWidth: 0
+        }
+      ]
     };
-
-    fetchData();
   }, []);
 
   return (
@@ -72,13 +62,9 @@ function DashboardCard06() {
           Grade Mix Pie Chart
         </h2>
       </header>
-      {chartData ? (
-        <DoughnutChart data={chartData} width={400} height={280} />
-      ) : (
-        <div className="flex items-center justify-center h-32">
-          <p>Loading...</p>
-        </div>
-      )}
+      {/* Chart built with Chart.js 3 */}
+      {/* Change the height attribute to adjust the chart height */}
+      <DoughnutChart data={chartData} width={400} height={280} />
     </div>
   );
 }
