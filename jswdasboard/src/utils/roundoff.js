@@ -1,13 +1,25 @@
 export const roundOff = (value) => {
-  return Math.round(value);
+  if (value) {
+    return Math.round(value);
+  } else {
+    return 0;
+  }
 };
 
 export const ToMins = (value) => {
-  return Math.round(value / 60);
+  if (value) {
+    return Math.round(value / 60);
+  } else {
+    return 0;
+  }
 };
 
 export const ToAverage = (value, length) => {
-  return value / length;
+  if (value) {
+    return value / length;
+  } else {
+    return 0;
+  }
 };
 
 export const getLabels = () => {

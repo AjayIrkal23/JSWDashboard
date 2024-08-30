@@ -23,6 +23,7 @@ import Charging from "../components/Charging";
 import PieceID from "../components/PieceID";
 import Date from "../components/Date";
 import ProcessTime from "../components/ProcessTime";
+import { roundOff } from "../utils/roundoff";
 
 const Live = () => {
   const handleChange = (e) => {
@@ -46,7 +47,7 @@ const Live = () => {
   const getRM = () => {
     if (data?.RM) {
       if (period == "Last Coil" || period.customp) {
-        return data?.RM[0]?.f_R2StripThk;
+        return roundOff(data?.RM[0]?.f_R2StripThk);
       } else if (
         period == "Last 5 Coil" ||
         period == "Last Hour" ||
@@ -62,7 +63,7 @@ const Live = () => {
 
             return accumulator;
           }, 0);
-        return Number(total1 / data?.RM.length);
+        return roundOff(Number(total1 / data?.RM.length));
       } else {
         return 0;
       }
@@ -89,7 +90,7 @@ const Live = () => {
           <div className="sticky top-[25%] px-4 flex gap-6  !text-xs justify-end mr-20">
             {/* <div className=" w-[200px] ">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-                <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
+                <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
                   <p className="font-semibold">Rev Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
@@ -98,7 +99,7 @@ const Live = () => {
             </div>
             <div className=" w-[200px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-                <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
+                <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
                   <p className="font-semibold">Fwd Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
@@ -108,7 +109,7 @@ const Live = () => {
             <div className=" w-[200px] ">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
                 {" "}
-                <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
+                <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
                   <p className="font-semibold">Rev Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
@@ -117,7 +118,7 @@ const Live = () => {
             </div>
             <div className=" w-[200px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-                <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
+                <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
                   <p className="font-semibold">Fwd Pass Kick Out Time</p>
                   <p>-</p>
                   <p className="font-semibold">25</p>
@@ -126,10 +127,10 @@ const Live = () => {
             </div> */}
             <div className=" w-[250px] rounded-md">
               <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-                <div className="flex text-xs justify-between px-1  pb-2 items-center border-black/40 pt-1 italic pr-2 ">
+                <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
                   <p className="font-semibold">RM Transfer Bar Thickness</p>
                   <p>-</p>
-                  <p className="font-semibold">{Math.round(getRM())}</p>
+                  <p className="font-semibold">{getRM()}</p>
                 </div>
               </div>
             </div>
@@ -172,10 +173,10 @@ const Live = () => {
 
           <div className="sticky top-[90%] pl-6 pt- pt-5 flex left-5 text-center gap-24">
             <div>
-              <p className="text-white font-semibold text-sm italic pb-1">
+              <p className="pb-1 text-sm italic font-semibold text-white">
                 Please Select An Option
               </p>
-              <div className="  border flex  justify-center border-black cursor-pointer bg-white shadow-md">
+              <div className="flex justify-center bg-white border border-black shadow-md cursor-pointer ">
                 <div
                   onClick={() => handleChange("Last Coil")}
                   className={`${
@@ -234,10 +235,10 @@ const Live = () => {
             </div>
 
             <div className="">
-              <p className="text-white text-sm italic font-semibold pb-1">
+              <p className="pb-1 text-sm italic font-semibold text-white">
                 Visual Graphs
               </p>
-              <div className="  flex  justify-center border-black cursor-pointer  gap-3">
+              <div className="flex justify-center gap-3 border-black cursor-pointer ">
                 <div
                   onClick={(e) => setOpen(true)}
                   className={`
@@ -296,7 +297,7 @@ const Live = () => {
                 </div>
               </div>
             </div>
-            <div className="flex     justify-center items-center mt-6">
+            <div className="flex items-center justify-center mt-6">
               {" "}
               <div
                 onClick={() => setMins(false)}
