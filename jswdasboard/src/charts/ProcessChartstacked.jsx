@@ -1,3 +1,37 @@
+import React, { useRef, useEffect, useState } from "react";
+import { useThemeProvider } from "../utils/ThemeContext";
+
+import { chartColors } from "./ChartjsConfig";
+import {
+  Chart,
+  BarController,
+  BarElement,
+  LinearScale,
+  TimeScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import "chartjs-adapter-moment";
+import { CategoryScale } from "chart.js";
+import { Modal } from "@mui/material";
+
+// Import utilities
+import { tailwindConfig, formatValue } from "../utils/Utils";
+import BarChart02 from "./BarChart02";
+import D15 from "../partials/dashboard/D15";
+import D17 from "../partials/dashboard/D17";
+import D18 from "../partials/dashboard/D18";
+
+Chart.register(
+  BarController,
+  BarElement,
+  LinearScale,
+  TimeScale,
+  CategoryScale,
+  Tooltip,
+  Legend
+);
+
 function ProcessStacked({ data, width, height, shift, title }) {
   const [chart, setChart] = useState(null);
   const [Shift, setShift] = useState("Shift");
@@ -10,7 +44,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
     gridColor,
     tooltipBodyColor,
     tooltipBgColor,
-    tooltipBorderColor
+    tooltipBorderColor,
   } = chartColors;
 
   const [open, setOpen] = useState(false);
@@ -30,8 +64,8 @@ function ProcessStacked({ data, width, height, shift, title }) {
             top: 40, // Increase the top padding value
             bottom: 16,
             left: 20,
-            right: 20
-          }
+            right: 20,
+          },
         },
         onClick: (evt, element) => {
           if (element.length > 0) {
@@ -46,28 +80,28 @@ function ProcessStacked({ data, width, height, shift, title }) {
           y: {
             stacked: true,
             border: {
-              display: false
+              display: false,
             },
             ticks: {
               maxTicksLimit: 4,
-              color: darkMode ? textColor.dark : textColor.light
+              color: darkMode ? textColor.dark : textColor.light,
             },
             grid: {
-              color: darkMode ? gridColor.dark : gridColor.light
-            }
+              color: darkMode ? gridColor.dark : gridColor.light,
+            },
           },
           x: {
             stacked: true,
             border: {
-              display: false
+              display: false,
             },
             ticks: {
               font: {
-                size: 12 // Adjust font size if needed
+                size: 12, // Adjust font size if needed
               },
-              color: darkMode ? textColor.dark : textColor.light
-            }
-          }
+              color: darkMode ? textColor.dark : textColor.light,
+            },
+          },
         },
         plugins: {
           datalabels: {
@@ -79,13 +113,13 @@ function ProcessStacked({ data, width, height, shift, title }) {
             },
             font: {
               weight: "bold",
-              size: 14 // Adjust font size as needed
-            }
+              size: 14, // Adjust font size as needed
+            },
           },
           tooltip: {
             enabled: true,
             callbacks: {
-              title: () => false // Disable tooltip title
+              title: () => false, // Disable tooltip title
             },
             bodyColor: darkMode
               ? tooltipBodyColor.dark
@@ -95,21 +129,21 @@ function ProcessStacked({ data, width, height, shift, title }) {
               : tooltipBgColor.light,
             borderColor: darkMode
               ? tooltipBorderColor.dark
-              : tooltipBorderColor.light
+              : tooltipBorderColor.light,
           },
           legend: {
-            display: true
-          }
+            display: true,
+          },
         },
         interaction: {
           intersect: false,
-          mode: "nearest"
+          mode: "nearest",
         },
         animation: {
-          duration: 500
+          duration: 500,
         },
         maintainAspectRatio: false,
-        resizeDelay: 200
+        resizeDelay: 200,
       },
       plugins: [
         {
@@ -180,9 +214,9 @@ function ProcessStacked({ data, width, height, shift, title }) {
               labelContainer.appendChild(label);
               ul.appendChild(li);
             });
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     setChart(newChart);
@@ -219,7 +253,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
     gridColor,
     tooltipBodyColor,
     tooltipBgColor,
-    tooltipBorderColor
+    tooltipBorderColor,
   ]);
 
   return (
