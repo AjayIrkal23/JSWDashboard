@@ -1,37 +1,3 @@
-import React, { useRef, useEffect, useState } from "react";
-import { useThemeProvider } from "../utils/ThemeContext";
-
-import { chartColors } from "./ChartjsConfig";
-import {
-  Chart,
-  BarController,
-  BarElement,
-  LinearScale,
-  TimeScale,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import "chartjs-adapter-moment";
-import { CategoryScale } from "chart.js";
-import { Modal } from "@mui/material";
-
-// Import utilities
-import { tailwindConfig, formatValue } from "../utils/Utils";
-import BarChart02 from "./BarChart02";
-import D15 from "../partials/dashboard/D15";
-import D17 from "../partials/dashboard/D17";
-import D18 from "../partials/dashboard/D18";
-
-Chart.register(
-  BarController,
-  BarElement,
-  LinearScale,
-  TimeScale,
-  CategoryScale,
-  Tooltip,
-  Legend
-);
-
 function ProcessStacked({ data, width, height, shift, title }) {
   const [chart, setChart] = useState(null);
   const [Shift, setShift] = useState("Shift");
