@@ -1,143 +1,393 @@
 import { Modal } from "@mui/material";
-import React, { useContext, useEffect, useState, useMemo } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // Import utilities
 import { tailwindConfig } from "../utils/Utils";
+import BarChart01 from "../charts/BarChart01";
+
+import GapChart from "../charts/GapChart";
+import ProcessChart from "../charts/ProcessChart";
 import ProcessStacked from "../charts/ProcessChartstacked";
 import { AccountContext } from "../context/context";
-
 const Processes = ({ open, setOpen }) => {
-  const { period, data: EP } = useContext(AccountContext);
+  const { period, setPeriod, data: EP } = useContext(AccountContext);
 
-  const [bottleNeckData, setBottleNeckData] = useState({
-    one: [],
-    two: [],
-    three: [],
-    four: [],
-    five: [],
-    six: [],
-    seven: []
-  });
+  const [five, setFive] = useState();
+  const [four, setFour] = useState();
+  const [three, setThree] = useState();
+  const [two, setTwo] = useState();
+  const [one, setOne] = useState();
+  const [six, setSix] = useState();
+  const [seven, setSeven] = useState();
 
-  const get135Labels = useMemo(() => {
-    const arr = [];
-    for (let index = 0; index <= 135; index += 5) {
-      arr.push(index);
-    }
-    return arr;
-  }, []);
-
-  useEffect(() => {
-    if (EP) {
-      generateBottleNeckData();
-    }
-  }, [EP, period]);
-
-  const generateBottleNeckData = () => {
-    const data = {
-      one: [],
-      two: [],
-      three: [],
-      four: [],
-      five: [],
-      six: [],
-      seven: []
-    };
-
-    const updateData = (currentValue, index, plus5) => {
-      const bottleNeck = currentValue.c_BottleNeck?.trim();
-      if (
-        currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
-        currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
-      ) {
-        if (bottleNeck === "FCE") data.one.push(1);
-        if (bottleNeck === "HSB") data.two.push(1);
-        if (bottleNeck === "R1R2") data.three.push(1);
-        if (bottleNeck === "FM") data.four.push(1);
-        if (bottleNeck === "DC") data.five.push(1);
-        if (bottleNeck === "R1") data.six.push(1);
-        if (bottleNeck === "R2") data.seven.push(1);
-      } else if (
-        currentValue.f_F1GapTimeAct?.toFixed(2) >= 135 &&
-        index >= 135
-      ) {
-        updateData(currentValue, 135, 140);
+  const get135Labels = () => {
+    let arr = [];
+    for (let index = 0; index < 100; index++) {
+      if (index * 5 != 140) {
+        arr.push(index * 5);
+      } else {
+        return arr;
       }
-    };
-
-    EP?.pacing?.forEach((currentValue) => {
-      for (let index = 0; index < 140; index += 5) {
-        updateData(currentValue, index, index + 5);
-      }
-    });
-
-    setBottleNeckData(data);
+    }
   };
 
-  const chartData3 = useMemo(
-    () => ({
-      labels: get135Labels,
-      datasets: [
-        {
-          data: bottleNeckData.one,
-          label: "BOTTLE NECK [FCE]",
-          backgroundColor: tailwindConfig().theme.colors.orange[700]
-        },
-        {
-          data: bottleNeckData.two,
-          label: "BOTTLE NECK [HSB]",
-          backgroundColor: tailwindConfig().theme.colors.gray[300]
-        },
-        {
-          data: bottleNeckData.six,
-          label: "BOTTLE NECK [R1]",
-          backgroundColor: tailwindConfig().theme.colors.blue[700]
-        },
-        {
-          data: bottleNeckData.seven,
-          label: "BOTTLE NECK [R2]",
-          backgroundColor: tailwindConfig().theme.colors.yellow[700]
-        },
-        {
-          data: bottleNeckData.three,
-          label: "BOTTLE NECK [R1R2]",
-          backgroundColor: tailwindConfig().theme.colors.gray[700]
-        },
-        {
-          data: bottleNeckData.four,
-          label: "BOTTLE NECK [FM]",
-          backgroundColor: tailwindConfig().theme.colors.green[700]
-        },
-        {
-          data: bottleNeckData.five,
-          label: "BOTTLE NECK [DC]",
-          backgroundColor: tailwindConfig().theme.colors.purple[700]
+  useEffect(() => {
+    BottleNeckData();
+  }, [EP]);
+
+  const BottleNeckData = () => {
+    if (period == "Last Coil" || period.customp) {
+      const start = 0;
+      const end = 140;
+      let arr1 = [];
+      let arr2 = [];
+      let arr3 = [];
+      let arr4 = [];
+      let arr5 = [];
+      let arr6 = [];
+      let arr7 = [];
+
+      for (let index = start; index < end; index = index + 5) {
+        let plus5 = index + 5;
+
+        if (
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(1) >= index &&
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(1) <= plus5
+        ) {
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
+            arr1.push(1);
+          } else {
+            arr1.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1") {
+            arr6.push(1);
+          } else {
+            arr6.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R2") {
+            arr7.push(1);
+          } else {
+            arr7.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
+            arr2.push(1);
+          } else {
+            arr2.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1R2") {
+            arr3.push(1);
+          } else {
+            arr3.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
+            arr4.push(1);
+          } else {
+            arr4.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
+            arr3.push(1);
+          } else {
+            arr3.push(0);
+          }
+        } else if (
+          EP?.pacing?.f_F1GapTimeAct?.toFixed(2) >= index &&
+          index >= 135
+        ) {
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
+            arr1.push(1);
+          } else {
+            arr1.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
+            arr2.push(1);
+          } else {
+            arr2.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1R2") {
+            arr3.push(1);
+          } else {
+            arr3.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
+            arr4.push(1);
+          } else {
+            arr4.push(0);
+          }
+          if (EP?.pacing?.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
+            arr3.push(1);
+          } else {
+            arr3.push(0);
+          }
         }
-      ]
-    }),
-    [bottleNeckData, get135Labels]
-  );
+      }
 
-  const handleClose = () => setOpen(false);
+      setOne(arr1);
+      setTwo(arr2);
+      setThree(arr3);
+      setFour(arr4);
+      setFive(arr5);
+      setSix(arr6);
+      setSeven(arr7);
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      const start = 0;
+      const end = 140;
+      let arr1 = [];
+      let arr2 = [];
+      let arr3 = [];
+      let arr4 = [];
+      let arr5 = [];
+      let arr6 = [];
+      let arr7 = [];
 
+      for (let index = start; index < end; index = index + 5) {
+        let plus5 = index + 5;
+
+        let FCE = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FCE") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let HSB = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "HSB") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let R1R2 = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (
+              currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1R2"
+            ) {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (
+              currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1R2"
+            ) {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let R1 = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R1") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let R2 = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R2") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "R2") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let FM = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "FM") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+        let DC = EP?.pacing?.reduce((accumulator, currentValue) => {
+          if (
+            currentValue.f_F1GapTimeAct?.toFixed(1) >= index &&
+            currentValue.f_F1GapTimeAct?.toFixed(1) <= plus5
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
+              accumulator = accumulator + 1;
+            }
+          } else if (
+            currentValue.f_F1GapTimeAct?.toFixed(2) >= index &&
+            index >= 135
+          ) {
+            if (currentValue.c_BottleNeck?.replace(/^\s+|\s+$/g, "") == "DC") {
+              accumulator = accumulator + 1;
+            }
+          }
+          return accumulator;
+        }, 0);
+
+        arr1.push(FCE);
+        arr2.push(HSB);
+        arr3.push(R1R2);
+        arr4.push(FM);
+        arr5.push(DC);
+        arr6.push(R1);
+        arr7.push(R2);
+      }
+
+      setOne(arr1, "arr1");
+      setTwo(arr2, "arr2");
+      setThree(arr3, "arr3");
+      setFour(arr4, "arr4");
+      setFive(arr5, "arr5");
+      setSix(arr6, "arr6");
+      setSeven(arr7, "arr7");
+    }
+  };
+
+  const chartData3 = {
+    labels: get135Labels(),
+    datasets: [
+      // Light blue bars
+      {
+        data: one,
+        label: "BOTTLE NECK [FCE]",
+        backgroundColor: tailwindConfig().theme.colors.orange[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.orange[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: two,
+        label: "BOTTLE NECK [HSB]",
+        backgroundColor: tailwindConfig().theme.colors.gray[300],
+        hoverBackgroundColor: tailwindConfig().theme.colors.gray[300],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: six,
+        label: "BOTTLE NECK [R1]",
+        backgroundColor: tailwindConfig().theme.colors.blue[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: seven,
+        label: "BOTTLE NECK [R2]",
+        backgroundColor: tailwindConfig().theme.colors.yellow[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.yellow[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: three,
+        label: "BOTTLE NECK [R1R2]",
+        backgroundColor: tailwindConfig().theme.colors.gray[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.gray[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: four,
+        label: "BOTTLE NECK [FM]",
+        backgroundColor: tailwindConfig().theme.colors.green[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.green[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      {
+        data: five,
+        label: "BOTTLE NECK [DC]",
+        backgroundColor: tailwindConfig().theme.colors.purple[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.purple[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      // Light blue bars
+
+      // Blue bars
+    ],
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <div className="absolute bg-white outline-none top-[5%] left-[50%] -translate-x-[50%] flex">
-        <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
-          <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
-            <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-              Bottle Neck Visualization
-            </h2>
-          </header>
-          <ProcessStacked data={chartData3} width={1800} height={800} />
+    <>
+      {" "}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <div className="absolute  bg-white outline-none top-[5%] left-[50%] -translate-x-[50%] flex">
+          <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
+            <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
+              <h2 className="font-semibold text-slate-800 dark:text-slate-100">
+                Bottle Neck Visualization
+              </h2>
+            </header>
+            {/* Chart built with Chart.js 3 */}
+            {/* Change the height attribute to adjust the chart height */}
+            <ProcessStacked data={chartData3} width={1800} height={800} />
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 

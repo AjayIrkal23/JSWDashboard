@@ -1,26 +1,24 @@
-import React, { useMemo } from "react";
+import React from "react";
 import BarChart from "../../charts/BarChart01";
 
 // Import utilities
 import { tailwindConfig } from "../../utils/Utils";
 
 function D16() {
-  // Memoizing the chartData to prevent unnecessary re-renders
-  const chartData = useMemo(() => {
-    const colors = tailwindConfig().theme.colors;
-    return {
-      labels: ["ISC On Percentage", "Percentage of FT > 890"],
-      datasets: [
-        {
-          data: [1, 2],
-          backgroundColor: colors.blue[700],
-          hoverBackgroundColor: colors.blue[800],
-          barPercentage: 0.66,
-          categoryPercentage: 0.66
-        }
-      ]
-    };
-  }, []);
+  const chartData = {
+    labels: ["ISC On Percentage", "Percentage of FT > 890"],
+    datasets: [
+      // Light blue bars
+      {
+        data: [1, 2],
+        backgroundColor: tailwindConfig().theme.colors.blue[700],
+        hoverBackgroundColor: tailwindConfig().theme.colors.blue[800],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      // Blue bars
+    ],
+  };
 
   return (
     <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">

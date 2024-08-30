@@ -1,7 +1,7 @@
 import express from "express";
-import { DumpAll, Start } from "../controller/DumpData.js";
+import { DumpAll } from "../controller/DumpData.js";
 import { Check1, Check2 } from "../controller/Production.js";
-import { SendData } from "../controller/sendData.js";
+import { FmDelay, SendData } from "../controller/sendData.js";
 
 // Helper function to wrap async route handlers for centralized error handling
 const asyncHandler = (fn) => (req, res, next) => {
@@ -19,10 +19,13 @@ route.get("/dumpAll", asyncHandler(DumpAll));
 route.post("/sendData", asyncHandler(SendData));
 
 // Check Production (Check2 logic)
-route.get("/check", asyncHandler(Check2));
+route.get("/add", asyncHandler(Check2));
 
 // Check Production alternative (Check1 logic)
-route.get("/check/alt", asyncHandler(Check1));
+route.get("/add1", asyncHandler(Check1));
+
+// FM
+route.get("/FMDelay", asyncHandler(FmDelay));
 
 // Un-comment and implement file upload functionality if needed in the future
 // route.post('/file/upload', upload.single("file"), asyncHandler(uploadFile));

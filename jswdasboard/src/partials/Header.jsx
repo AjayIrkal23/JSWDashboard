@@ -1,65 +1,33 @@
-import React, { useContext, useState, useCallback, useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useContext, useState } from "react";
+
+import SearchModal from "../components/ModalSearch";
+import Notifications from "../components/DropdownNotifications";
+import Help from "../components/DropdownHelp";
 import UserMenu from "../components/DropdownProfile";
+import ThemeToggle from "../components/ThemeToggle";
+import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { AccountContext } from "../context/context";
-
 function Header({ sidebarOpen, setSidebarOpen }) {
-  const { period, data } = useContext(AccountContext);
-  const location = useLocation();
-
-  const handleSidebarToggle = useCallback(
-    (e) => {
-      e.stopPropagation();
-      setSidebarOpen((prevOpen) => !prevOpen);
-    },
-    [setSidebarOpen]
-  );
-
-  const isLiveDashboard = location.pathname === "/";
-
-  const totalCoils = useMemo(() => {
-    if (
-      period === "Last 5 Coil" ||
-      period === "Last Hour" ||
-      period === "Last Shift" ||
-      period === "Last Day" ||
-      period.date
-    ) {
-      return data?.Excel.length || 1;
-    }
-    return 1;
-  }, [period, data]);
-
-  const pieceID = useMemo(() => {
-    if (
-      period === "Last 5 Coil" ||
-      period === "Last Hour" ||
-      period === "Last Shift" ||
-      period === "Last Day" ||
-      period.date
-    ) {
-      const firstPieceName = data?.Excel[0]?.c_PieceName;
-      const lastPieceName = data?.Excel[data?.Excel.length - 1]?.c_PieceName;
-      return firstPieceName && lastPieceName
-        ? `${firstPieceName} - ${lastPieceName}`
-        : firstPieceName;
-    }
-    return data?.Excel?.c_PieceName;
-  }, [period, data]);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const { period, setPeriod, data } = useContext(AccountContext);
 
   return (
     <header className="sticky top-0 bg-white dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 -mb-px">
-          <img src="/logo.png" alt="Logo" className="h-8 w-20" />
-
+          <img src="/logo.png" alt="" className="h-8 w-20  " />
           {/* Header: Left side */}
           <div className="flex">
+            {/* Hamburger button */}
             <button
               className="text-slate-500 hover:text-slate-600 lg:hidden"
               aria-controls="sidebar"
               aria-expanded={sidebarOpen}
-              onClick={handleSidebarToggle}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSidebarOpen(!sidebarOpen);
+              }}
             >
               <span className="sr-only">Open sidebar</span>
               <svg
@@ -76,15 +44,48 @@ function Header({ sidebarOpen, setSidebarOpen }) {
 
           {/* Header: Right side */}
           <div className="flex items-center space-x-3">
-            {isLiveDashboard ? (
-              <>
-                <InfoDisplay label="Total Coils" value={totalCoils} />
-                <InfoDisplay label="Piece ID" value={pieceID} />
-              </>
+            {location.pathname == "/" ? (
+              <Link to="/liveDashboard">
+                <p className="text-sm bg-blue-500 text-white py-1.5 px-4 rounded-md cursor-pointer hover:scale-105 hover:animate-pulse transition-all duration-200 ease-in-out">
+                  {" "}
+                  Live Dashboard
+                </p>
+              </Link>
             ) : (
               <>
-                <InfoDisplay label="Total Coils" value={totalCoils} />
-                <InfoDisplay label="Piece ID" value={pieceID} />
+                <div>
+                  {" "}
+                  <span className=" text-gray-700">Total Coils</span> -
+                  <span className="text-sm text-gray-600 mx-2 border mr-12 px-3 py-1.5 border-black/20 rounded-md shadow-md  font-bold">
+                    {period == "Last 5 Coil" ||
+                    period == "Last Hour" ||
+                    period == "Last Shift" ||
+                    period == "Last Day" ||
+                    period.date
+                      ? `${data?.Excel.length} `
+                      : 1}
+                  </span>
+                </div>
+                <div>
+                  {" "}
+                  <span className=" text-gray-700">Piece ID</span> -
+                  <span className="text-sm text-gray-600 mx-2 border mr-12 px-3 py-1.5 border-black/20 rounded-md shadow-md ">
+                    {period == "Last 5 Coil" ||
+                    period == "Last Hour" ||
+                    period == "Last Shift" ||
+                    period == "Last Day" ||
+                    period.date
+                      ? `${data?.Excel[0]?.c_PieceName} -
+                        ${data?.Excel[data?.Excel.length - 1]?.c_PieceName}`
+                      : data?.Excel?.c_PieceName}
+                  </span>
+                </div>
+                <Link to="/">
+                  <p className="text-sm bg-blue-500 text-white py-1.5 px-4 rounded-md cursor-pointer hover:scale-105 hover:animate-pulse transition-all duration-200 ease-in-out">
+                    {" "}
+                    Main Dashboard
+                  </p>
+                </Link>
               </>
             )}
             <hr className="w-px h-6 bg-slate-200 dark:bg-slate-700 border-none" />
@@ -93,17 +94,6 @@ function Header({ sidebarOpen, setSidebarOpen }) {
         </div>
       </div>
     </header>
-  );
-}
-
-function InfoDisplay({ label, value }) {
-  return (
-    <div>
-      <span className="text-gray-700">{label}</span> -
-      <span className="text-sm text-gray-600 mx-2 border mr-12 px-3 py-1.5 border-black/20 rounded-md shadow-md font-bold">
-        {value}
-      </span>
-    </div>
   );
 }
 

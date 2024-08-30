@@ -11,16 +11,22 @@ export const Accountprovider = ({ children }) => {
   const [eightData, setEightData] = useState(null);
   const [rmBarThickness, setRmBarThickness] = useState(null);
   const [rollChange, setRollChange] = useState(null);
+  console.log(rollChange);
   const [mins, setMins] = useState(false);
+
   const [data, setData] = useState(null);
+
+  console.log(data)
 
   function useInterval(callback, delay) {
     const savedCallback = useRef();
 
+    // Remember the latest function.
     useEffect(() => {
       savedCallback.current = callback;
     }, [callback]);
 
+    // Set up the interval.
     useEffect(() => {
       function tick() {
         savedCallback.current();
@@ -32,58 +38,112 @@ export const Accountprovider = ({ children }) => {
     }, [delay]);
   }
 
-  const fetchData = async (
-    url,
-    setter,
-    successMessage = "Data Fetching Successful"
-  ) => {
-    try {
-      const response = await axios.get(url);
-      setter(response.data);
-      toast.success(successMessage);
-    } catch (error) {
-      toast.error("Failed to fetch data");
-    }
+  const getData2 = async () => {
+    axios.get("http://localhost:8000/add").then((resp) => {
+      if(resp.data){
+        setMainData(resp.data);
+      }
+      else{
+        setMainData([])
+      }
+     
+    });
   };
 
-  const postData = async (
-    url,
-    payload,
-    setter,
-    successMessage = "Data Fetching Successful"
-  ) => {
-    try {
-      const response = await axios.post(url, payload);
-      setter(response?.data);
-      toast.dismiss();
-      toast.success(successMessage);
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Failed to fetch data");
-    }
+  const getData3 = async () => {
+    axios.get("http://localhost:8000/add1").then((resp) => {
+      console.log(resp?.data?.arr);
+      setEightData(resp?.data?.arr);
+    });
   };
-
-  useInterval(() => {
-    toast.loading("Loading Data...");
-    if (period) {
-      postData("http://localhost:8000/sendData", { period }, setData);
+  useInterval(async () => {
+    // Your custom logic here
+    toast.loading("Loading Data");
+    if (period == "Last Coil") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
     }
   }, 30000);
 
-  useInterval(() => {
-    fetchData("http://localhost:8000/add", setMainData);
+  useInterval(async () => {
+    // Your custom logic here
+
+    getData2();
   }, 120000);
 
-  const getData = () => {
-    if (period) {
-      postData("http://localhost:8000/sendData", { period }, setData);
+  const getData = async () => {
+    toast.loading("Loading Data");
+    if (period == "Last Coil") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    } else if (period == "Last 5 Coil") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    } else if (period == "Last Hour") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    } else if (period == "Last Shift") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    } else if (period == "Last Day") {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    } else if (period.customp) {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        });
+    } else if (period.date && period.time) {
+      await axios
+        .post("http://localhost:8000/sendData", { period: period })
+        .then((resp) => {
+          setData(resp?.data);
+          toast.dismiss();
+          toast.success("Data Fetching Successfull");
+        })
+        .catch((resp) => {
+          toast.error("Data Fetching Successfull");
+        });
     }
   };
 
   useEffect(() => {
-    fetchData("http://localhost:8000/add1", (resp) => setEightData(resp?.arr));
+    getData3();
     getData();
-    fetchData("http://localhost:8000/add", setMainData);
+    getData2();
   }, [period, mins]);
 
   return (
@@ -95,7 +155,7 @@ export const Accountprovider = ({ children }) => {
         mainData,
         eightData,
         setMins,
-        mins
+        mins,
       }}
     >
       {children}

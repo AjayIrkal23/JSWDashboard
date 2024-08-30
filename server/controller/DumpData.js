@@ -5,24 +5,31 @@ import PacingData from "../model/pacing.js";
 import cron from "node-cron";
 import { get } from "../database/pool-manager.js";
 
-const config = {
-  user: process.env.DB_USER || "sa",
-  password: process.env.DB_PASSWORD || "loloklol",
-  server: process.env.DB_SERVER || "localhost",
+let config = {
+  user: "Dashboard", //default is sa
+  password: "Dashboard",
+  server: "10.11.2.41", // for local machine
+  database: "History", // name of database
   trustServerCertificate: true,
-  encrypt: false,
-  port: 1433,
-  requestTimeout: 20000000
+  encrypt:false,
+  port:1433,
+  requestTimeout: 20000000,
 };
 
 /**
  * Dump all data from the database and save it to MongoDB.
  */
-export const DumpAll = async (req, res) => {
+export const DumpAll = async () => {
   console.log("Starting data dump...");
   try {
-    const startString = new Date("Oct 2023 1");
-    const endString = new Date("Oct 2023 29");
+    const today = new Date()
+    const end = today
+    const start = new Date(today)
+    start.setMonth(today.getMonth()-1)    
+    start.setDate(today.getDate()-15)   
+
+    console.log(start,end)
+
 
     const pool = await get("History", config);
     console.log("Database connection successful");
@@ -44,15 +51,13 @@ export const DumpAll = async (req, res) => {
       await saveCleanDataToMongoWithCheck(excelReport.recordset, ExcelData);
       await saveCleanDataToMongoWithCheck(pacReport2.recordset, PacingData);
 
-      res.status(200).json({ message: "Data dump successful" });
+     console.log({ message: "Data dump successful" });
     } else {
-      res
-        .status(404)
-        .json({ message: "No data found for the given date range" });
+      
+      console.log({ message: "No data found for the given date range" });
     }
   } catch (error) {
     console.error("Data dump failed:", error.message);
-    res.status(500).json({ message: "Data dump failed", error: error.message });
   }
 };
 

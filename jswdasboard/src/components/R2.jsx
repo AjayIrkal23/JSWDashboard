@@ -1,125 +1,247 @@
-import React, { useContext, useCallback, useMemo } from "react";
-import PropTypes from "prop-types";
+import React, { useContext } from "react";
 import { AccountContext } from "../context/context";
 import { ToAverage, ToMins, roundOff } from "../utils/roundoff";
-
 const R2 = ({ open, setOpen }) => {
-  const { period, data, mins } = useContext(AccountContext);
-
-  const isCustomPeriod = useMemo(
-    () => period === "Last Coil" || period.customp,
-    [period]
-  );
-
-  const getTotalValue = useCallback(
-    (field) => {
-      if (Array.isArray(data?.Excel) && data.Excel.length > 1) {
-        return data.Excel.reduce((acc, cur) => acc + cur[field], 0);
-      }
-      return 0;
-    },
-    [data]
-  );
-
-  const getValue = useCallback(
-    (field) => {
-      if (isCustomPeriod) {
-        return mins ? ToMins(data?.Excel?.[field]) : data?.Excel?.[field];
+  const { period, setPeriod, data, mins } = useContext(AccountContext);
+  function R1R2TimeTravel() {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1R2TravelTimeDelay);
       } else {
-        const totalValue = getTotalValue(field);
-        return mins ? ToMins(totalValue) : totalValue;
+        return data?.Excel?.f_R1R2TravelTimeDelay;
       }
-    },
-    [isCustomPeriod, mins, data, getTotalValue]
-  );
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Shift" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.Excel.length > 1 &&
+        data?.Excel?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_R1R2TravelTimeDelay,
+          0
+        );
 
-  const R1R2TimeTravel = useCallback(() => {
-    return getValue("f_R1R2TravelTimeDelay");
-  }, [getValue]);
-
-  const R1ProcessTimeAct = useCallback(
-    (a) => {
-      if (isCustomPeriod) {
-        return mins
-          ? ToMins(data?.Excel?.f_R2ProcessTimeAct)
-          : data?.Excel?.f_R2ProcessTimeAct;
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
       } else {
-        const total1 = getTotalValue("f_R2ProcessTimeAct");
-        if (a === "a") {
-          const averageValue = total1 / data?.pacing?.length;
-          return mins ? ToMins(averageValue) : averageValue;
-        } else {
-          return mins ? ToMins(total1) : total1;
-        }
+        return value1;
       }
-    },
-    [isCustomPeriod, mins, data, getTotalValue]
-  );
-
-  const R2GapAct = useCallback(() => {
-    if (isCustomPeriod) {
-      return mins
-        ? ToMins(data?.Excel?.f_R2GapTimeAct)
-        : data?.Excel?.f_R2GapTimeAct;
     } else {
-      const total1 = getTotalValue("f_R2GapTimeAct");
-      return mins
-        ? ToAverage(ToMins(total1), data?.Excel?.length)
-        : ToAverage(total1, data?.Excel?.length);
+      return 0;
     }
-  }, [isCustomPeriod, mins, data, getTotalValue]);
+  }
 
-  const GapTimeMinMax = useCallback(
-    (a) => {
-      if (isCustomPeriod) {
-        return mins
-          ? ToMins(data?.Excel?.f_R2GapTimeAct)
-          : data?.Excel?.f_R2GapTimeAct;
+  function R1ProcessTimeAct(a) {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2ProcessTimeAct);
       } else {
-        let min = null;
-        let max = 0;
-
-        if (Array.isArray(data?.Excel) && data.Excel.length > 1) {
-          data.Excel.forEach((item) => {
-            if (item.f_R2GapTimeAct > max) max = item.f_R2GapTimeAct;
-            if (min === null || item.f_R2GapTimeAct < min)
-              min = item.f_R2GapTimeAct;
-          });
-        }
-
-        return a === "min"
-          ? mins
-            ? ToMins(min)
-            : min
-          : mins
-          ? ToMins(max)
-          : max;
+        return data?.Excel?.f_R2ProcessTimeAct;
       }
-    },
-    [isCustomPeriod, mins, data]
-  );
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.Excel.length > 1 &&
+        data?.Excel?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_R2ProcessTimeAct,
+          0
+        );
+
+      if (a == "a") {
+        let value1 = total1 / data?.pacing?.length;
+        if (mins) {
+          return ToMins(value1);
+        } else {
+          return value1;
+        }
+      } else {
+        if (mins) {
+          return ToMins(total1);
+        } else {
+          return total1;
+        }
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  function R2GapAct() {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2GapTimeAct);
+      } else {
+        return data?.Excel?.f_R2GapTimeAct;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.Excel.length > 1 &&
+        data?.Excel?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_R2GapTimeAct,
+          0
+        );
+
+      let value1 = total1;
+      if (mins) {
+        return ToAverage(ToMins(value1), data?.Excel?.length);
+      } else {
+        return ToAverage(value1, data?.Excel?.length);
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  function R2TravelDelay() {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_R1R2TravelTimeDelay);
+      } else {
+        return data?.Excel?.f_R1R2TravelTimeDelay;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.Excel.length > 1 &&
+        data?.Excel?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_R1R2TravelTimeDelay,
+          0
+        );
+
+      let value1 = total1;
+      if (mins) {
+        return ToAverage(ToMins(value1), data?.Excel?.length);
+      } else {
+        return ToAverage(value1, data?.Excel?.length);
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  function R2ProcessDelay() {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2ProcessTimeDelay);
+      } else {
+        return data?.Excel?.f_R2ProcessTimeDelay;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let total1 =
+        data?.Excel.length > 1 &&
+        data?.Excel?.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.f_R2ProcessTimeDelay,
+          0
+        );
+
+      let value1 = total1;
+      if (mins) {
+        return ToMins(value1);
+      } else {
+        return value1;
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  function GapTimeMinMax(a) {
+    if (period == "Last Coil" || period.customp) {
+      if (mins) {
+        return ToMins(data?.Excel?.f_R2GapTimeAct);
+      } else {
+        return data?.Excel?.f_R2GapTimeAct;
+      }
+    } else if (
+      period == "Last 5 Coil" ||
+      period == "Last Hour" ||
+      period == "Last Day" ||
+      period?.date
+    ) {
+      let min = null;
+      let max = 0;
+      let total1 =
+        data?.Excel.length > 1 &&
+        data.Excel.map((item) => {
+          if (item.f_SSPGapTimeAct > max) {
+            max = item.f_R2GapTimeAct;
+          }
+          if (min == null) {
+            min = item.f_R2GapTimeAct;
+          }
+          if (item.f_SSPGapTimeAct < min) {
+            min = item.f_R2GapTimeAct;
+          }
+        });
+
+      if (a == "min") {
+        if (mins) {
+          return ToMins(min);
+        } else {
+          return min;
+        }
+      } else if (a == "max") {
+        if (mins) {
+          return ToMins(max);
+        } else {
+          return max;
+        }
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+  }
 
   return (
-    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md !text-xs bg-[whitesmoke] shadow-md">
+    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p className="font-semibold">R1 R2 Travel Time Delay</p>
+        <p className="font-semibold">R1 R2 Travel Time Delay </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(R1R2TimeTravel())}</p>
       </div>
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-        <p className="font-semibold">R2 Gap Time Actual</p>
+        <p className="font-semibold">R2 Gap Time Actual </p>
         <p>-</p>
         <p className="font-semibold">{roundOff(R2GapAct())}</p>
       </div>
-      {!isCustomPeriod && (
+      {period != "Last Coil" && (
         <>
           <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-            <p className="font-semibold">Gap Time Min</p>
+            <p className="font-semibold">Gap Time Min </p>
             <p>-</p>
             <p className="font-semibold">{roundOff(GapTimeMinMax("min"))}</p>
           </div>
           <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2">
-            <p className="font-semibold">Gap Time Max</p>
+            <p className="font-semibold">Gap Time Max </p>
             <p>-</p>
             <p className="font-semibold">{roundOff(GapTimeMinMax("max"))}</p>
           </div>
@@ -134,24 +256,15 @@ const R2 = ({ open, setOpen }) => {
       <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
         <p className="font-semibold">R2 Travel Delay</p>
         <p>-</p>
-        <p className="font-semibold ">
-          {roundOff(getValue("f_R1R2TravelTimeDelay"))}
-        </p>
+        <p className="font-semibold ">{roundOff(R2TravelDelay())}</p>
       </div>
-      <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2">
+      <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
         <p className="font-semibold">R2 Process Delay</p>
         <p>-</p>
-        <p className="font-semibold ">
-          {roundOff(getValue("f_R2ProcessTimeDelay"))}
-        </p>
+        <p className="font-semibold ">{roundOff(R2ProcessDelay())}</p>
       </div>
     </div>
   );
 };
 
-R2.propTypes = {
-  open: PropTypes.bool.isRequired,
-  setOpen: PropTypes.func.isRequired
-};
-
-export default React.memo(R2);
+export default R2;

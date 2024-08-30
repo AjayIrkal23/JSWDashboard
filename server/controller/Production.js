@@ -1,14 +1,15 @@
 import sql2 from "mssql";
 import { get } from "../database/pool-manager.js";
 
-const config = {
-  user: process.env.DB_USER || "sa",
-  password: process.env.DB_PASSWORD || "loloklol",
-  server: process.env.DB_SERVER || "localhost",
+let config = {
+  user: "Dashboard", //default is sa
+  password: "Dashboard",
+  server: "10.11.2.41", // for local machine
+  database: "Production", // name of database
   trustServerCertificate: true,
-  encrypt: false,
-  port: 1433,
-  requestTimeout: 1800000
+  encrypt:false,
+  port:1433,
+  requestTimeout: 20000000,
 };
 
 /**
@@ -19,6 +20,7 @@ const executeProductionSummaryStats = async (pool, start, end) => {
     const result = await pool
       .request()
       .query(`EXEC spGet_Production_Summary_Stats '${start}','${end}'`);
+      console.log(result.recordset[0])
     return result.recordset[0];
   } catch (error) {
     console.error(`Error fetching production summary stats: ${error.message}`);
@@ -90,7 +92,7 @@ const getShiftTimes = (currentDate) => {
  */
 export const Check1 = async (req, res) => {
   try {
-    const pool = await get("Production2", config);
+    const pool = await get("Production", config);
     const currentDate = new Date();
     const { shift1, shift2, shift3, nextDayShift } = getShiftTimes(currentDate);
 

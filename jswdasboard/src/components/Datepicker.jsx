@@ -1,17 +1,16 @@
 import React from "react";
-import PropTypes from "prop-types";
 import Flatpickr from "react-flatpickr";
 
 function Datepicker({ align, setDateValue }) {
   const setDates = (selectedDates) => {
     if (selectedDates.length > 1) {
-      const formattedDates = selectedDates.map(
-        (date) => new Date(date).toISOString().split("T")[0]
-      );
-      setDateValue(formattedDates);
+      const item = selectedDates.map((item) => {
+        return new Date(item).toISOString().split("T")[0];
+      });
+
+      setDateValue(item);
     }
   };
-
   const options = {
     mode: "range",
     static: true,
@@ -27,7 +26,10 @@ function Datepicker({ align, setDateValue }) {
       const customClass = align ? align : "";
       instance.calendarContainer.classList.add(`flatpickr-${customClass}`);
     },
-    onChange: setDates // Directly using setDates for onChange
+    onChange: (selectedDates, dateStr, instance) => {
+      instance.element.value = dateStr.replace("to", "-");
+      setDates(dateStr.split("to"));
+    },
   };
 
   return (
@@ -47,10 +49,5 @@ function Datepicker({ align, setDateValue }) {
     </div>
   );
 }
-
-Datepicker.propTypes = {
-  align: PropTypes.string,
-  setDateValue: PropTypes.func.isRequired
-};
 
 export default Datepicker;
