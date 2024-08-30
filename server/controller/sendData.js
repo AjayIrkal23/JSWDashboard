@@ -10,9 +10,9 @@ let config = {
   server: "10.11.2.41", // for local machine
   database: "History", // name of database
   trustServerCertificate: true,
-  encrypt:false,
-  port:1433,
-  requestTimeout: 20000000,
+  encrypt: false,
+  port: 1433,
+  requestTimeout: 20000000
 };
 
 /**
@@ -25,7 +25,7 @@ export const RMThickness = async (excel, period) => {
   try {
     const pool = await get("Production", config);
     console.log("Connection Successful!");
- 
+
     let query = "";
     if (period === "Last Coil") {
       query = `SELECT [c_PieceName], [f_R2StripThk]
@@ -40,7 +40,7 @@ export const RMThickness = async (excel, period) => {
                WHERE [c_PieceName] BETWEEN '${start}' AND '${end}'
                ORDER BY [c_PieceName];`;
     }
- 
+
     const result = await pool.request().query(query);
     return result.recordset || null;
   } catch (err) {
@@ -54,46 +54,71 @@ export const RMThickness = async (excel, period) => {
  * @param {Array} excel - The Excel data array.
  * @returns {Promise<Object|null>} - The FM Delay data.
  */
+/**
+ * Fetches FM Delay data based on the Excel data and includes Rollchange data for RM and FM.
+ * @param {Array} excel - The Excel data array.
+ * @returns {Promise<Object|null>} - The FM Delay and Rollchange data.
+ */
 export const FmDelay = async (excel) => {
   const startTime = new Date(excel[0].gt_HistoryKeyTm).toISOString();
-  const endTime = new Date(excel[excel.length - 1].gt_HistoryKeyTm).toISOString();
- 
+  const endTime = new Date(
+    excel[excel.length - 1].gt_HistoryKeyTm
+  ).toISOString();
+
   try {
     const pool = await get("Operations", config);
+
     const query1 = `SELECT ISNULL(SUM(r_Delay.i_Duration/60), 0)
                     FROM Operations.dbo.r_Delay
                     WHERE (r_Delay.gt_StartTime >= '${startTime}')
                       AND (r_Delay.gt_EndTime <= '${endTime}');`;
+
     const query2 = `SELECT ISNULL(SUM(r_Delay.i_Duration/60), 0)
                     FROM Operations.dbo.r_Delay
                     WHERE (r_Delay.i_Duration >= 120 AND r_Delay.i_Duration <= 300)
                       AND (r_Delay.gt_StartTime >= '${startTime}')
                       AND (r_Delay.gt_EndTime <= '${endTime}');`;
+
     const query3 = `SELECT ISNULL(SUM(r_Delay.i_Duration/60), 0)
                     FROM Operations.dbo.r_Delay
                     WHERE (r_Delay.i_Duration > 300)
                       AND (r_Delay.gt_StartTime >= '${startTime}')
                       AND (r_Delay.gt_EndTime <= '${endTime}');`;
- 
-    const [reportAll, report2, report5] = await Promise.all([
-      pool.request().query(query1),
-      pool.request().query(query2),
-      pool.request().query(query3)
-    ]);
- 
+
+    // Rollchange queries for RM and FM
+    const queryRM = `SELECT ISNULL(SUM(r_RchDelay.i_Duration/60), 0)
+                     FROM Operations.dbo.r_RchDelay
+                     WHERE (r_RchDelay.gt_StartTime >= '${startTime}')
+                       AND (r_RchDelay.gt_EndTime <= '${endTime}')
+                       AND (r_RchDelay.c_Location = 'RM');`;
+
+    const queryFM = `SELECT ISNULL(SUM(r_RchDelay.i_Duration/60), 0)
+                     FROM Operations.dbo.r_RchDelay
+                     WHERE (r_RchDelay.gt_StartTime >= '${startTime}')
+                       AND (r_RchDelay.gt_EndTime <= '${endTime}')
+                       AND (r_RchDelay.c_Location = 'FM');`;
+
+    const [reportAll, report2, report5, rmRollChange, fmRollChange] =
+      await Promise.all([
+        pool.request().query(query1),
+        pool.request().query(query2),
+        pool.request().query(query3),
+        pool.request().query(queryRM),
+        pool.request().query(queryFM)
+      ]);
+
     return {
       total: reportAll.recordset[0][""],
       two: report2.recordset[0][""],
-      five: report5.recordset[0][""]
+      five: report5.recordset[0][""],
+      rmRollChange: rmRollChange.recordset[0][""],
+      fmRollChange: fmRollChange.recordset[0][""]
     };
   } catch (err) {
     console.error("Error fetching FM Delay:", err.message);
     throw err;
   }
 };
- 
-
-
 
 /**
  * Handles the API request to send data based on the specified period.
@@ -117,10 +142,9 @@ export const SendData = async (req, res) => {
         await handleLastHour(req, res);
         break;
 
-        case "Last Shift":
-          await handleLastShift(req, res);
-          break;
-  
+      case "Last Shift":
+        await handleLastShift(req, res);
+        break;
 
       case "Last Day":
         await handleLastDay(req, res);
@@ -291,7 +315,6 @@ const handleLastHour = async (req, res) => {
   }
 };
 
-
 /**
  * Handles the "Last Day" period.
  */
@@ -380,11 +403,9 @@ const handleCustomPiece = async (req, res, customPieceName) => {
  */
 const handleCustomDateRange = async (req, res, period) => {
   try {
-    
     // Parse the start and end date-time from the provided period
     const startDate = new Date(`${period.date[0]}`);
     const endDate = new Date(`${period.date[1]}`);
-
 
     // Fetch data from ExcelData within the specified date range
     const Excel = await ExcelData.find({
@@ -455,7 +476,7 @@ const getShiftTimes = () => {
     shift2End,
     shift3Start,
     shift3End,
-    currentTime,
+    currentTime
   };
 };
 
@@ -463,15 +484,23 @@ const getShiftTimes = () => {
  * Determine the current shift based on the current time
  */
 const determineShift = (currentTime, shiftTimes) => {
-  if (currentTime >= shiftTimes.shift1Start && currentTime < shiftTimes.shift1End) {
+  if (
+    currentTime >= shiftTimes.shift1Start &&
+    currentTime < shiftTimes.shift1End
+  ) {
     return "A";
-  } else if (currentTime >= shiftTimes.shift2Start && currentTime < shiftTimes.shift2End) {
+  } else if (
+    currentTime >= shiftTimes.shift2Start &&
+    currentTime < shiftTimes.shift2End
+  ) {
     return "B";
-  } else if (currentTime >= shiftTimes.shift3Start || currentTime < shiftTimes.shift1Start) {
+  } else if (
+    currentTime >= shiftTimes.shift3Start ||
+    currentTime < shiftTimes.shift1Start
+  ) {
     return "C";
   }
 };
-
 
 /**
  * Handles the "Last Shift" period.
@@ -505,8 +534,8 @@ const handleLastShift = async (req, res) => {
     const Excel = await ExcelData.find({
       gt_HistoryKeyTm: {
         $gte: startIso,
-        $lte: endIso,
-      },
+        $lte: endIso
+      }
     });
 
     if (Excel.length > 0) {
@@ -515,7 +544,7 @@ const handleLastShift = async (req, res) => {
 
       // Fetch corresponding pacing data using the extracted c_PieceName values
       const pacing = await PacingData.find({
-        c_PieceName: { $in: pieceNames },
+        c_PieceName: { $in: pieceNames }
       });
 
       if (pacing.length > 0) {
@@ -528,26 +557,29 @@ const handleLastShift = async (req, res) => {
           Excel,
           pacing,
           RM,
-          RollChange,
+          RollChange
         });
 
         console.log({
           Excel,
           pacing,
           RM,
-          RollChange,
-        })
+          RollChange
+        });
       } else {
         res.status(404).json({
-          message: "No matching pacing data found for the last shift.",
+          message: "No matching pacing data found for the last shift."
         });
       }
     } else {
-      res.status(404).json({ message: "No Excel data found for the last shift." });
+      res
+        .status(404)
+        .json({ message: "No Excel data found for the last shift." });
     }
   } catch (error) {
     console.error("Error handling Last Shift:", error.message);
-    res.status(500).json({ message: "Error fetching data.", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching data.", error: error.message });
   }
 };
-
