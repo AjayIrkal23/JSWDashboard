@@ -42,7 +42,11 @@ export const RMThickness = async (excel, period) => {
     }
 
     const result = await pool.request().query(query);
-    return result.recordset || null;
+
+    // Clean the result data before returning
+    const cleanedData = result.recordset.map(cleanData);
+
+    return cleanedData || null;
   } catch (err) {
     console.error("Error fetching RM Thickness:", err.message);
     throw err;
@@ -53,11 +57,6 @@ export const RMThickness = async (excel, period) => {
  * Fetches FM Delay data based on the Excel data.
  * @param {Array} excel - The Excel data array.
  * @returns {Promise<Object|null>} - The FM Delay data.
- */
-/**
- * Fetches FM Delay data based on the Excel data and includes Rollchange data for RM and FM.
- * @param {Array} excel - The Excel data array.
- * @returns {Promise<Object|null>} - The FM Delay and Rollchange data.
  */
 export const FmDelay = async (excel) => {
   const startTime = new Date(excel[0].gt_HistoryKeyTm).toISOString();
@@ -85,7 +84,6 @@ export const FmDelay = async (excel) => {
                       AND (r_Delay.gt_StartTime >= '${startTime}')
                       AND (r_Delay.gt_EndTime <= '${endTime}');`;
 
-    // Rollchange queries for RM and FM
     const queryRM = `SELECT ISNULL(SUM(r_RchDelay.i_Duration/60), 0)
                      FROM Operations.dbo.r_RchDelay
                      WHERE (r_RchDelay.gt_StartTime >= '${startTime}')
@@ -107,19 +105,21 @@ export const FmDelay = async (excel) => {
         pool.request().query(queryFM)
       ]);
 
-    return {
+    const result = {
       total: reportAll.recordset[0][""],
       two: report2.recordset[0][""],
       five: report5.recordset[0][""],
       rmRollChange: rmRollChange.recordset[0][""],
       fmRollChange: fmRollChange.recordset[0][""]
     };
+
+    // Clean the result data before returning
+    return cleanData(result);
   } catch (err) {
     console.error("Error fetching FM Delay:", err.message);
     throw err;
   }
 };
-
 /**
  * Handles the API request to send data based on the specified period.
  * @param {Object} req - The request object.
@@ -582,4 +582,19 @@ const handleLastShift = async (req, res) => {
       .status(500)
       .json({ message: "Error fetching data.", error: error.message });
   }
+};
+
+/**
+ * Cleans an object by removing null or undefined keys and trimming string values.
+ * @param {Object} data - The object to clean.
+ * @returns {Object} - The cleaned object.
+ */
+const cleanData = (data) => {
+  return Object.keys(data).reduce((acc, key) => {
+    const value = data[key];
+    if (value !== null && value !== undefined) {
+      acc[key] = typeof value === "string" ? value.trim() : value;
+    }
+    return acc;
+  }, {});
 };
