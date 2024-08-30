@@ -89,7 +89,7 @@ const saveCleanDataToMongoWithCheck = async (data, Model) => {
 /**
  * Start a cron job that runs every minute and triggers data fetching.
  */
-export const Start = async (req, res) => {
+export const Start = async () => {
   try {
     const task = cron.schedule(
       "* * * * *",
@@ -107,12 +107,8 @@ export const Start = async (req, res) => {
     );
 
     task.start();
-    res.status(200).json({ message: "Cron job started successfully" });
   } catch (error) {
     console.error("Failed to start cron job:", error.message);
-    res
-      .status(500)
-      .json({ message: "Failed to start cron job", error: error.message });
   }
 };
 

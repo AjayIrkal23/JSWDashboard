@@ -12,9 +12,6 @@ const route = express.Router();
 
 // Route definitions with proper HTTP methods and centralized error handling
 
-// Initiate data dump process
-route.get("/start", asyncHandler(Start));
-
 // Dump all data
 route.get("/dumpAll", asyncHandler(DumpAll));
 
