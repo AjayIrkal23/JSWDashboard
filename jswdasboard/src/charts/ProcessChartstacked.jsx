@@ -1,3 +1,36 @@
+import React, { useRef, useEffect, useState } from "react";
+import { useThemeProvider } from "../utils/ThemeContext";
+import { chartColors } from "./ChartjsConfig";
+import {
+  Chart,
+  BarController,
+  BarElement,
+  LinearScale,
+  TimeScale,
+  Tooltip,
+  Legend
+} from "chart.js";
+import "chartjs-adapter-moment";
+import { CategoryScale } from "chart.js";
+import { Modal } from "@mui/material";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // Importing the plugin
+
+// Import utilities
+import { tailwindConfig } from "../utils/Utils";
+import D17 from "../partials/dashboard/D17";
+import D18 from "../partials/dashboard/D18";
+
+Chart.register(
+  BarController,
+  BarElement,
+  LinearScale,
+  TimeScale,
+  CategoryScale,
+  Tooltip,
+  Legend,
+  ChartDataLabels // Registering the plugin
+);
+
 function ProcessStacked({ data, width, height, shift, title }) {
   const [chart, setChart] = useState(null);
   const [Shift, setShift] = useState("Shift");
@@ -75,7 +108,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
             align: "center", // Align the label vertically and horizontally
             color: darkMode ? textColor.dark : textColor.light, // Set label color
             formatter: function (value, context) {
-              return value; // Display the value
+              return value;
             },
             font: {
               weight: "bold",
