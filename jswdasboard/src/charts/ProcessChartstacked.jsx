@@ -1,37 +1,3 @@
-import React, { useRef, useEffect, useState } from "react";
-import { useThemeProvider } from "../utils/ThemeContext";
-
-import { chartColors } from "./ChartjsConfig";
-import {
-  Chart,
-  BarController,
-  BarElement,
-  LinearScale,
-  TimeScale,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import "chartjs-adapter-moment";
-import { CategoryScale } from "chart.js";
-import { Modal } from "@mui/material";
-
-// Import utilities
-import { tailwindConfig, formatValue } from "../utils/Utils";
-import BarChart02 from "./BarChart02";
-import D15 from "../partials/dashboard/D15";
-import D17 from "../partials/dashboard/D17";
-import D18 from "../partials/dashboard/D18";
-
-Chart.register(
-  BarController,
-  BarElement,
-  LinearScale,
-  TimeScale,
-  CategoryScale,
-  Tooltip,
-  Legend
-);
-
 function ProcessStacked({ data, width, height, shift, title }) {
   const [chart, setChart] = useState(null);
   const [Shift, setShift] = useState("Shift");
@@ -44,7 +10,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
     gridColor,
     tooltipBodyColor,
     tooltipBgColor,
-    tooltipBorderColor,
+    tooltipBorderColor
   } = chartColors;
 
   const [open, setOpen] = useState(false);
@@ -54,8 +20,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
   };
 
   useEffect(() => {
-    const ctx = canvas.current;
-    // eslint-disable-next-line no-unused-vars
+    const ctx = canvas.current.getContext("2d");
     const newChart = new Chart(ctx, {
       type: "bar",
       data: data,
@@ -65,13 +30,13 @@ function ProcessStacked({ data, width, height, shift, title }) {
             top: 40, // Increase the top padding value
             bottom: 16,
             left: 20,
-            right: 20,
-          },
+            right: 20
+          }
         },
         onClick: (evt, element) => {
           if (element.length > 0) {
             var ind = element[0].index;
-            if (ind == 3) {
+            if (ind === 3) {
               setShift(shift);
               setOpen(true);
             }
@@ -81,43 +46,46 @@ function ProcessStacked({ data, width, height, shift, title }) {
           y: {
             stacked: true,
             border: {
-              display: false,
+              display: false
             },
             ticks: {
               maxTicksLimit: 4,
-
-              color: darkMode ? textColor.dark : textColor.light,
+              color: darkMode ? textColor.dark : textColor.light
             },
             grid: {
-              color: darkMode ? gridColor.dark : gridColor.light,
-            },
+              color: darkMode ? gridColor.dark : gridColor.light
+            }
           },
           x: {
             stacked: true,
             border: {
-              display: false,
+              display: false
             },
             ticks: {
-              font: 8,
-
-              color: darkMode ? textColor.dark : textColor.light,
-            },
-          },
+              font: {
+                size: 12 // Adjust font size if needed
+              },
+              color: darkMode ? textColor.dark : textColor.light
+            }
+          }
         },
         plugins: {
           datalabels: {
-            anchor: "end",
-            align: "top",
-
+            anchor: "center", // Position the label at the center
+            align: "center", // Align the label vertically and horizontally
+            color: darkMode ? textColor.dark : textColor.light, // Set label color
+            formatter: function (value, context) {
+              return value; // Display the value
+            },
             font: {
               weight: "bold",
-              size: 16,
-            },
+              size: 14 // Adjust font size as needed
+            }
           },
           tooltip: {
             enabled: true,
             callbacks: {
-              title: () => false, // Disable tooltip title
+              title: () => false // Disable tooltip title
             },
             bodyColor: darkMode
               ? tooltipBodyColor.dark
@@ -127,22 +95,21 @@ function ProcessStacked({ data, width, height, shift, title }) {
               : tooltipBgColor.light,
             borderColor: darkMode
               ? tooltipBorderColor.dark
-              : tooltipBorderColor.light,
+              : tooltipBorderColor.light
           },
-
           legend: {
-            display: true,
-          },
+            display: true
+          }
         },
         interaction: {
           intersect: false,
-          mode: "nearest",
+          mode: "nearest"
         },
         animation: {
-          duration: 500,
+          duration: 500
         },
         maintainAspectRatio: false,
-        resizeDelay: 200,
+        resizeDelay: 200
       },
       plugins: [
         {
@@ -213,15 +180,15 @@ function ProcessStacked({ data, width, height, shift, title }) {
               labelContainer.appendChild(label);
               ul.appendChild(li);
             });
-          },
-        },
-      ],
+          }
+        }
+      ]
     });
 
     setChart(newChart);
     return () => newChart.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, darkMode]);
 
   useEffect(() => {
     if (!chart) return;
@@ -233,6 +200,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
       chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.dark;
       chart.options.plugins.tooltip.backgroundColor = tooltipBgColor.dark;
       chart.options.plugins.tooltip.borderColor = tooltipBorderColor.dark;
+      chart.options.plugins.datalabels.color = textColor.dark; // Update label color
     } else {
       chart.options.scales.x.ticks.color = textColor.light;
       chart.options.scales.y.ticks.color = textColor.light;
@@ -240,9 +208,19 @@ function ProcessStacked({ data, width, height, shift, title }) {
       chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.light;
       chart.options.plugins.tooltip.backgroundColor = tooltipBgColor.light;
       chart.options.plugins.tooltip.borderColor = tooltipBorderColor.light;
+      chart.options.plugins.datalabels.color = textColor.light; // Update label color
     }
     chart.update("none");
-  }, [currentTheme]);
+  }, [
+    currentTheme,
+    chart,
+    darkMode,
+    textColor,
+    gridColor,
+    tooltipBodyColor,
+    tooltipBgColor,
+    tooltipBorderColor
+  ]);
 
   return (
     <React.Fragment>
@@ -253,13 +231,14 @@ function ProcessStacked({ data, width, height, shift, title }) {
         aria-describedby="modal-modal-description"
       >
         <div className="bg-white outline-none absolute top-[10%] left-[50%] -translate-x-[50%] ">
-          {Shift == "Shift" ? <D17 /> : <D18 />}
+          {Shift === "Shift" ? <D17 /> : <D18 />}
         </div>
       </Modal>
       <div className="px-5 py-3"></div>
       <div className="grow">
         <canvas ref={canvas} width={width} height={height}></canvas>
       </div>
+      <ul ref={legend} className="flex flex-wrap mt-4"></ul>
     </React.Fragment>
   );
 }
