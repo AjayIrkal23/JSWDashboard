@@ -202,34 +202,55 @@ const PMC = ({ open, setOpen, setTitle }) => {
     }
   }
   return (
-    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-        <p className="font-semibold">Discharge Gap Time</p>
-        <p>-</p>
-        <p className="font-semibold">{roundOff(minutesDiff())}</p>
+    <Card
+      bordered={false}
+      style={{
+        width: 250,
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#f9f9f9"
+      }}
+    >
+      <div className="flex justify-between">
+        <Text strong italic>
+          Discharge Gap Time
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(minutesDiff())}</Text>
       </div>
 
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-        <p className="font-semibold">FCE-SSP Travel Time</p>
-        <p>-</p>
-        <p className="font-semibold">{roundOff(FCESSPTravelTime())}</p>
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          FCE-SSP Travel Time
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(FCESSPTravelTime())}</Text>
       </div>
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-2 ">
-        <p className="font-semibold">PMA Count</p>
-        <p>-</p>
-        <p className="font-semibold">{PMACount()}</p>
+
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          PMA Count
+        </Text>
+        <Text>-</Text>
+        <Text strong>{PMACount()}</Text>
       </div>
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center pt-1 italic pr-2 border-black/40">
-        <p className="font-semibold">Pacing Offset (+)</p>
-        <p>-</p>
-        <p className="font-semibold">{roundOff(PacingOffset("+"))}</p>
+
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          Pacing Offset (+)
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(PacingOffset("+"))}</Text>
       </div>
-      <div className="flex text-xs justify-between px-1  items-center pt-1 italic pb-1 pr-2 border-black/40">
-        <p className="font-semibold">Pacing Offset (-)</p>
-        <p>-</p>
-        <p className="font-semibold ">{roundOff(PacingOffset("-"))}</p>
+
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          Pacing Offset (-)
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(PacingOffset("-"))}</Text>
       </div>
-    </div>
+    </Card>
   );
 };
 

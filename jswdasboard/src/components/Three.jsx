@@ -103,38 +103,59 @@ const Three = ({ open, setOpen }) => {
   }
 
   return (
-    <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-      {period != "Last Coil" && (
-        <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
-          <p className="font-semibold">% of R2 3Passes Count</p>
-          <p>-</p>
-          <p className="font-semibold">{roundOff(Passes(3, "%"))}</p>
+    <Card
+      bordered={false}
+      style={{
+        width: 250,
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#f9f9f9"
+      }}
+    >
+      {period !== "Last Coil" && (
+        <div className="flex justify-between">
+          <Text strong italic>
+            % of R2 3Passes Count
+          </Text>
+          <Text>-</Text>
+          <Text strong>{roundOff(Passes(3, "%"))}</Text>
         </div>
       )}
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
-        <p className="font-semibold">R2 3Passes Count</p>
-        <p>-</p>
-        <p className="font-semibold">{roundOff(Passes(3))}</p>
-      </div>
-      <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
-        <p className="font-semibold">R2 5Passes Count</p>
-        <p>-</p>
-        <p className="font-semibold">{roundOff(Passes(5))}</p>
+
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          R2 3Passes Count
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(Passes(3))}</Text>
       </div>
 
-      {period != "Last Coil" && (
-        <div className="flex text-xs justify-between px-1 border-b pb-2 items-center border-black/40 pt-1 italic pr-1 ">
-          <p className="font-semibold">% of R2 5Passes Count</p>
-          <p>-</p>
-          <p className="font-semibold">{roundOff(Passes(5, "%"))}</p>
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          R2 5Passes Count
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(Passes(5))}</Text>
+      </div>
+
+      {period !== "Last Coil" && (
+        <div className="flex justify-between mt-2">
+          <Text strong italic>
+            % of R2 5Passes Count
+          </Text>
+          <Text>-</Text>
+          <Text strong>{roundOff(Passes(5, "%"))}</Text>
         </div>
       )}
-      <div className="flex text-xs justify-between px-1 pb-1 items-center pt-1 italic pr-2 b ">
-        <p className="font-semibold">FCE to SSP Travel Time Delay</p>
-        <p>-</p>
-        <p className="font-semibold ">{roundOff(FCESSPTravelTimeDelay())}</p>
+
+      <div className="flex justify-between mt-2">
+        <Text strong italic>
+          FCE to SSP Travel Time Delay
+        </Text>
+        <Text>-</Text>
+        <Text strong>{roundOff(FCESSPTravelTimeDelay())}</Text>
       </div>
-    </div>
+    </Card>
   );
 };
 
