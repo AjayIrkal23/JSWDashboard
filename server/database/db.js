@@ -4,7 +4,7 @@ dotenv.config();
 
 const mongoURI =
   process.env.MONGODB_URI ||
-  "mongodb+srv://info:loloklol.12A@jsw.6tat7au.mongodb.net/jsw";
+  "mongodb+srv://info:loloklol.12A@jsw.6tat7au.mongodb.net/hsm2";
 
 /**
  * Establish connection to MongoDB using Mongoose.

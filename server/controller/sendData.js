@@ -144,20 +144,30 @@ export const SendData = async (req, res) => {
  */
 const handleLastCoil = async (req, res) => {
   try {
-    const Excel = await ExcelData.find().sort({ gt_HistoryKeyTm: -1 }).limit(1);
-    const pacing = await PacingData.find()
+    // Get the last entry from ExcelData
+    const lastExcelEntry = await ExcelData.findOne()
       .sort({ gt_HistoryKeyTm: -1 })
-      .limit(1);
+      .exec();
 
-    if (Excel.length > 0 && pacing.length > 0) {
-      const RM = await RMThickness(Excel[0], req?.body?.period);
-      res.status(200).json({
-        Excel: Excel[0],
-        pacing: pacing[0],
-        RM
-      });
+    if (lastExcelEntry) {
+      // Find the corresponding entry in PacingData using c_PieceName
+      const correspondingPacingEntry = await PacingData.findOne({
+        c_PieceName: lastExcelEntry.c_PieceName
+      }).exec();
+
+      if (correspondingPacingEntry) {
+        // Call RMThickness function with the lastExcelEntry and requested period
+        const RM = await RMThickness(lastExcelEntry, req?.body?.period);
+        res.status(200).json({
+          Excel: lastExcelEntry,
+          pacing: correspondingPacingEntry,
+          RM
+        });
+      } else {
+        res.status(404).json({ message: "No matching pacing data found." });
+      }
     } else {
-      res.status(202).json("Data not yet in DB");
+      res.status(404).json({ message: "No Excel data found." });
     }
   } catch (error) {
     console.error("Error handling Last Coil:", error.message);
@@ -172,23 +182,45 @@ const handleLastCoil = async (req, res) => {
  */
 const handleLast5Coils = async (req, res) => {
   try {
-    const Excel = await ExcelData.find().sort({ gt_HistoryKeyTm: -1 }).limit(5);
-    const pacing = await PacingData.find()
+    // Get the last 5 entries from ExcelData
+    const last5ExcelEntries = await ExcelData.find()
       .sort({ gt_HistoryKeyTm: -1 })
-      .limit(5);
+      .limit(5)
+      .exec();
 
-    if (Excel.length > 0 && pacing.length > 0) {
-      const RM = await RMThickness(Excel, req?.body?.period);
-      const RollChange = await FmDelay(Excel);
+    if (last5ExcelEntries.length > 0) {
+      // Find the corresponding entries in PacingData using c_PieceName
+      const correspondingPacingEntries = await Promise.all(
+        last5ExcelEntries.map(async (excelEntry) => {
+          return await PacingData.findOne({
+            c_PieceName: excelEntry.c_PieceName
+          }).exec();
+        })
+      );
 
-      res.status(200).json({
-        Excel,
-        pacing,
-        RM,
-        RollChange
-      });
+      // Filter out any null entries (if no corresponding pacing data was found)
+      const validPacingEntries = correspondingPacingEntries.filter(
+        (entry) => entry !== null
+      );
+
+      if (validPacingEntries.length > 0) {
+        // Call RMThickness and FmDelay functions with the valid data
+        const RM = await RMThickness(last5ExcelEntries, req?.body?.period);
+        const RollChange = await FmDelay(last5ExcelEntries);
+
+        res.status(200).json({
+          Excel: last5ExcelEntries,
+          pacing: validPacingEntries,
+          RM,
+          RollChange
+        });
+      } else {
+        res.status(404).json({
+          message: "No matching pacing data found for the last 5 coils."
+        });
+      }
     } else {
-      res.status(202).json("Data not yet in DB");
+      res.status(404).json({ message: "No Excel data found." });
     }
   } catch (error) {
     console.error("Error handling Last 5 Coils:", error.message);
@@ -197,32 +229,54 @@ const handleLast5Coils = async (req, res) => {
       .json({ message: "Error fetching data.", error: error.message });
   }
 };
-
 /**
  * Handles the "Last Hour" period.
  */
 const handleLastHour = async (req, res) => {
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const Excel = await ExcelData.find({
-      gt_HistoryKeyTm: { $gte: oneHourAgo }
-    }).sort({ gt_HistoryKeyTm: -1 });
-    const pacing = await PacingData.find({
+
+    // Get the last hour's entries from ExcelData
+    const lastHourExcelEntries = await ExcelData.find({
       gt_HistoryKeyTm: { $gte: oneHourAgo }
     }).sort({ gt_HistoryKeyTm: -1 });
 
-    if (Excel.length > 0 && pacing.length > 0) {
-      const RM = await RMThickness(Excel, req?.body?.period);
-      const RollChange = await FmDelay(Excel);
+    if (lastHourExcelEntries.length > 0) {
+      // Find the corresponding pacing entries using c_PieceName
+      const correspondingPacingEntries = await Promise.all(
+        lastHourExcelEntries.map(async (excelEntry) => {
+          return await PacingData.findOne({
+            c_PieceName: excelEntry.c_PieceName,
+            gt_HistoryKeyTm: { $gte: oneHourAgo }
+          }).exec();
+        })
+      );
 
-      res.status(200).json({
-        Excel,
-        pacing,
-        RM,
-        RollChange
-      });
+      // Filter out any null entries (if no corresponding pacing data was found)
+      const validPacingEntries = correspondingPacingEntries.filter(
+        (entry) => entry !== null
+      );
+
+      if (validPacingEntries.length > 0) {
+        // Call RMThickness and FmDelay functions with the valid data
+        const RM = await RMThickness(lastHourExcelEntries, req?.body?.period);
+        const RollChange = await FmDelay(lastHourExcelEntries);
+
+        res.status(200).json({
+          Excel: lastHourExcelEntries,
+          pacing: validPacingEntries,
+          RM,
+          RollChange
+        });
+      } else {
+        res.status(404).json({
+          message: "No matching pacing data found for the last hour."
+        });
+      }
     } else {
-      res.status(202).json("Data not yet in DB");
+      res
+        .status(404)
+        .json({ message: "No Excel data found for the last hour." });
     }
   } catch (error) {
     console.error("Error handling Last Hour:", error.message);
@@ -246,26 +300,53 @@ const handleLastShift = async (req, res) => {
  */
 const handleLastDay = async (req, res) => {
   try {
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const Excel = await ExcelData.find({
-      gt_HistoryKeyTm: { $gte: oneDayAgo }
-    }).sort();
-    const pacing = await PacingData.find({
-      gt_HistoryKeyTm: { $gte: oneDayAgo }
-    }).sort();
+    // Calculate the start and end of the previous day
+    const today = new Date();
+    const startOfLastDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 1,
+      0,
+      0,
+      0
+    ).toISOString();
+    const endOfLastDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 1,
+      23,
+      59,
+      59
+    ).toISOString();
 
-    if (Excel.length > 0 && pacing.length > 0) {
-      const RM = await RMThickness(Excel, req?.body?.period);
-      const RollChange = await FmDelay(Excel);
+    // Get the last day's entries from ExcelData
+    const lastDayExcelEntries = await ExcelData.find({
+      gt_HistoryKeyTm: { $gte: startOfLastDay, $lte: endOfLastDay }
+    }).sort({ gt_HistoryKeyTm: 1 });
+
+    if (lastDayExcelEntries.length > 0) {
+      // Extract the c_PieceName values from the lastDayExcelEntries
+      const pieceNames = lastDayExcelEntries.map((entry) => entry.c_PieceName);
+
+      // Find the corresponding pacing entries using the extracted c_PieceName values
+      const correspondingPacingEntries = await PacingData.find({
+        c_PieceName: { $in: pieceNames }
+      }).sort({ gt_HistoryKeyTm: 1 });
+
+      // Call RMThickness and FmDelay functions with the Excel data
+      const RM = await RMThickness(lastDayExcelEntries, req?.body?.period);
+      const RollChange = await FmDelay(lastDayExcelEntries);
 
       res.status(200).json({
-        Excel,
-        pacing,
+        Excel: lastDayExcelEntries,
+        pacing: correspondingPacingEntries,
         RM,
         RollChange
       });
     } else {
-      res.status(202).json("Data not yet in DB");
+      res
+        .status(404)
+        .json({ message: "No Excel data found for the last day." });
     }
   } catch (error) {
     console.error("Error handling Last Day:", error.message);
@@ -280,9 +361,9 @@ const handleLastDay = async (req, res) => {
  */
 const handleCustomPiece = async (req, res, customPieceName) => {
   try {
-    const regex = new RegExp(customPieceName.replace(/\s+/g, "\\s*"));
-    const Excel = await ExcelData.findOne({ c_PieceName: regex });
-    const pacing = await PacingData.findOne({ c_PieceName: regex });
+    // Find the exact match for the custom piece name in both ExcelData and PacingData
+    const Excel = await ExcelData.findOne({ c_PieceName: customPieceName });
+    const pacing = await PacingData.findOne({ c_PieceName: customPieceName });
 
     if (Excel && pacing) {
       res.status(200).json({ Excel, pacing });
@@ -298,13 +379,15 @@ const handleCustomPiece = async (req, res, customPieceName) => {
 };
 
 /**
- * Handles custom date range data.
+ * Handles custom date range data based on the provided period.
  */
 const handleCustomDateRange = async (req, res, period) => {
   try {
+    // Parse the start and end date-time from the provided period
     const startDate = new Date(`${period.date[0]} ${period.time[0]}`);
     const endDate = new Date(`${period.date[1]} ${period.time[1]}`);
 
+    // Fetch data from ExcelData within the specified date range
     const Excel = await ExcelData.find({
       gt_HistoryKeyTm: {
         $gte: startDate,
@@ -312,25 +395,37 @@ const handleCustomDateRange = async (req, res, period) => {
       }
     });
 
-    const pacing = await PacingData.find({
-      gt_HistoryKeyTm: {
-        $gte: startDate,
-        $lte: endDate
-      }
-    });
+    if (Excel.length > 0) {
+      // Extract the c_PieceName values from the Excel entries
+      const pieceNames = Excel.map((entry) => entry.c_PieceName);
 
-    if (Excel.length > 0 && pacing.length > 0) {
-      const RM = await RMThickness(Excel, req?.body?.period);
-      const RollChange = await FmDelay(Excel);
-
-      res.status(200).json({
-        Excel,
-        pacing,
-        RM,
-        RollChange
+      // Find the corresponding pacing entries using the extracted c_PieceName values
+      const pacing = await PacingData.find({
+        c_PieceName: { $in: pieceNames }
       });
+
+      if (pacing.length > 0) {
+        // Process the data using RMThickness and FmDelay
+        const RM = await RMThickness(Excel, req?.body?.period);
+        const RollChange = await FmDelay(Excel);
+
+        // Respond with the fetched data
+        res.status(200).json({
+          Excel,
+          pacing,
+          RM,
+          RollChange
+        });
+      } else {
+        res.status(404).json({
+          message: "No matching pacing data found for the specified date range."
+        });
+      }
     } else {
-      res.status(202).json("No ID Match found in DB");
+      // Respond with a message if no data was found in ExcelData
+      res
+        .status(404)
+        .json({ message: "No Excel data found for the specified date range." });
     }
   } catch (error) {
     console.error("Error handling custom date range:", error.message);
@@ -340,9 +435,6 @@ const handleCustomDateRange = async (req, res, period) => {
   }
 };
 
-/**
- * Retrieves shift times for the current day.
- */
 const getShiftTimes = () => {
   const shift1Start = new Date().setHours(6, 0, 0, 0);
   const shift1End = new Date().setHours(14, 0, 0, 0);

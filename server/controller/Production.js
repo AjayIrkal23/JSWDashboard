@@ -66,12 +66,10 @@ export const Check2 = async (req, res) => {
     res.status(200).json({ results });
   } catch (error) {
     console.error("Failed to retrieve production data:", error.message);
-    res
-      .status(500)
-      .json({
-        message: "Failed to retrieve production data",
-        error: error.message
-      });
+    res.status(500).json({
+      message: "Failed to retrieve production data",
+      error: error.message
+    });
   }
 };
 
@@ -133,11 +131,9 @@ export const Check1 = async (req, res) => {
     res.status(200).json({ results });
   } catch (error) {
     console.error("Failed to retrieve production data:", error.message);
-    res
-      .status(500)
-      .json({
-        message: "Failed to retrieve production data",
-        error: error.message
-      });
+    res.status(500).json({
+      message: "Failed to retrieve production data",
+      error: error.message
+    });
   }
 };
