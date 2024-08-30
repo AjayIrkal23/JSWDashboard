@@ -98,7 +98,7 @@ function ProcessStacked({ data, width, height, shift, title }) {
               font: {
                 size: 12, // Adjust font size if needed
               },
-              color: darkMode ? textColor.dark : textColor.light,
+              color: "gray",
             },
           },
         },
@@ -106,13 +106,17 @@ function ProcessStacked({ data, width, height, shift, title }) {
           datalabels: {
             anchor: "center", // Position the label at the center
             align: "center", // Align the label vertically and horizontally
-            color: darkMode ? textColor.dark : textColor.light, // Set label color
+            color: "black", // Set label color
             formatter: function (value, context) {
-              return value; // Display the value
+              if (value == 0) {
+                return null;
+              } else {
+                return value;
+              }
             },
             font: {
               weight: "bold",
-              size: 14, // Adjust font size as needed
+              size: 13, // Adjust font size as needed
             },
           },
           tooltip: {
@@ -181,36 +185,6 @@ function ProcessStacked({ data, width, height, shift, title }) {
               box.style.borderWidth = "3px";
               box.style.borderColor = item.fillStyle;
               box.style.pointerEvents = "none";
-              // Label
-              const labelContainer = document.createElement("span");
-              labelContainer.style.display = "flex";
-              labelContainer.style.alignItems = "center";
-              const value = document.createElement("span");
-              value.classList.add("text-slate-800", "dark:text-slate-100");
-              value.style.fontSize = tailwindConfig().theme.fontSize["3xl"][0];
-              value.style.lineHeight =
-                tailwindConfig().theme.fontSize["3xl"][1].lineHeight;
-              value.style.fontWeight = tailwindConfig().theme.fontWeight.bold;
-              value.style.marginRight = tailwindConfig().theme.margin[2];
-              value.style.pointerEvents = "none";
-              const label = document.createElement("span");
-              label.classList.add("text-slate-500", "dark:text-slate-400");
-              label.style.fontSize = tailwindConfig().theme.fontSize.sm[0];
-              label.style.lineHeight =
-                tailwindConfig().theme.fontSize.sm[1].lineHeight;
-              const theValue = c.data.datasets[item.datasetIndex].data.reduce(
-                (a, b) => a + b,
-                0
-              );
-              const valueText = document.createTextNode(theValue);
-              const labelText = document.createTextNode(item.text);
-              value.appendChild(valueText);
-              label.appendChild(labelText);
-              li.appendChild(button);
-              button.appendChild(box);
-              button.appendChild(labelContainer);
-              labelContainer.appendChild(value);
-              labelContainer.appendChild(label);
               ul.appendChild(li);
             });
           },
@@ -222,38 +196,6 @@ function ProcessStacked({ data, width, height, shift, title }) {
     return () => newChart.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, darkMode]);
-
-  useEffect(() => {
-    if (!chart) return;
-
-    if (darkMode) {
-      chart.options.scales.x.ticks.color = textColor.dark;
-      chart.options.scales.y.ticks.color = textColor.dark;
-      chart.options.scales.y.grid.color = gridColor.dark;
-      chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.dark;
-      chart.options.plugins.tooltip.backgroundColor = tooltipBgColor.dark;
-      chart.options.plugins.tooltip.borderColor = tooltipBorderColor.dark;
-      chart.options.plugins.datalabels.color = textColor.dark; // Update label color
-    } else {
-      chart.options.scales.x.ticks.color = textColor.light;
-      chart.options.scales.y.ticks.color = textColor.light;
-      chart.options.scales.y.grid.color = gridColor.light;
-      chart.options.plugins.tooltip.bodyColor = tooltipBodyColor.light;
-      chart.options.plugins.tooltip.backgroundColor = tooltipBgColor.light;
-      chart.options.plugins.tooltip.borderColor = tooltipBorderColor.light;
-      chart.options.plugins.datalabels.color = textColor.light; // Update label color
-    }
-    chart.update("none");
-  }, [
-    currentTheme,
-    chart,
-    darkMode,
-    textColor,
-    gridColor,
-    tooltipBodyColor,
-    tooltipBgColor,
-    tooltipBorderColor,
-  ]);
 
   return (
     <React.Fragment>

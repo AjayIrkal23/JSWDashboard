@@ -336,8 +336,8 @@ const Processes = ({ open, setOpen }) => {
       {
         data: three,
         label: "BOTTLE NECK [R1R2]",
-        backgroundColor: tailwindConfig().theme.colors.gray[700],
-        hoverBackgroundColor: tailwindConfig().theme.colors.gray[800],
+        backgroundColor: tailwindConfig().theme.colors.purple[400],
+        hoverBackgroundColor: tailwindConfig().theme.colors.purple[500],
         barPercentage: 0.66,
         categoryPercentage: 0.66,
       },
@@ -375,7 +375,7 @@ const Processes = ({ open, setOpen }) => {
         aria-describedby="modal-modal-description"
       >
         <div className="absolute  bg-white outline-none top-[5%] left-[50%] -translate-x-[50%] flex">
-          <div className="flex flex-col col-span-full sm:col-span-6 bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
+          <div className="flex flex-col bg-white border rounded-sm shadow-lg col-span-full sm:col-span-6 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
             <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
               <h2 className="font-semibold text-slate-800 dark:text-slate-100">
                 Bottle Neck Visualization
