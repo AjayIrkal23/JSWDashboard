@@ -12,7 +12,7 @@ let config = {
   trustServerCertificate: true,
   encrypt: false,
   port: 1433,
-  requestTimeout: 20000000,
+  requestTimeout: 20000000
 };
 
 /**
@@ -102,7 +102,7 @@ export const FmDelay = async (excel) => {
         pool.request().query(query2),
         pool.request().query(query3),
         pool.request().query(queryRM),
-        pool.request().query(queryFM),
+        pool.request().query(queryFM)
       ]);
 
     console.log(
@@ -118,7 +118,7 @@ export const FmDelay = async (excel) => {
       two: report2.recordset[0][""],
       five: report5.recordset[0][""],
       rmRollChange: rmRollChange.recordset[0][""],
-      fmRollChange: fmRollChange.recordset[0][""],
+      fmRollChange: fmRollChange.recordset[0][""]
     };
 
     // Clean the result data before returning
@@ -189,7 +189,7 @@ const handleLastCoil = async (req, res) => {
     if (lastExcelEntry) {
       // Find the corresponding entry in PacingData using c_PieceName
       const correspondingPacingEntry = await PacingData.findOne({
-        c_PieceName: lastExcelEntry.c_PieceName,
+        c_PieceName: lastExcelEntry.c_PieceName
       }).exec();
 
       if (correspondingPacingEntry) {
@@ -198,7 +198,7 @@ const handleLastCoil = async (req, res) => {
         res.status(200).json({
           Excel: lastExcelEntry,
           pacing: correspondingPacingEntry,
-          RM,
+          RM
         });
       } else {
         res.status(404).json({ message: "No matching pacing data found." });
@@ -230,7 +230,7 @@ const handleLast5Coils = async (req, res) => {
       const correspondingPacingEntries = await Promise.all(
         last5ExcelEntries.map(async (excelEntry) => {
           return await PacingData.findOne({
-            c_PieceName: excelEntry.c_PieceName,
+            c_PieceName: excelEntry.c_PieceName
           }).exec();
         })
       );
@@ -249,11 +249,11 @@ const handleLast5Coils = async (req, res) => {
           Excel: last5ExcelEntries,
           pacing: validPacingEntries,
           RM,
-          RollChange,
+          RollChange
         });
       } else {
         res.status(404).json({
-          message: "No matching pacing data found for the last 5 coils.",
+          message: "No matching pacing data found for the last 5 coils."
         });
       }
     } else {
@@ -275,7 +275,7 @@ const handleLastHour = async (req, res) => {
 
     // Get the last hour's entries from ExcelData
     const lastHourExcelEntries = await ExcelData.find({
-      gt_HistoryKeyTm: { $gte: oneHourAgo },
+      gt_HistoryKeyTm: { $gte: oneHourAgo }
     }).sort({ gt_HistoryKeyTm: -1 });
 
     if (lastHourExcelEntries.length > 0) {
@@ -284,7 +284,7 @@ const handleLastHour = async (req, res) => {
         lastHourExcelEntries.map(async (excelEntry) => {
           return await PacingData.findOne({
             c_PieceName: excelEntry.c_PieceName,
-            gt_HistoryKeyTm: { $gte: oneHourAgo },
+            gt_HistoryKeyTm: { $gte: oneHourAgo }
           }).exec();
         })
       );
@@ -303,11 +303,11 @@ const handleLastHour = async (req, res) => {
           Excel: lastHourExcelEntries,
           pacing: validPacingEntries,
           RM,
-          RollChange,
+          RollChange
         });
       } else {
         res.status(404).json({
-          message: "No matching pacing data found for the last hour.",
+          message: "No matching pacing data found for the last hour."
         });
       }
     } else {
@@ -349,7 +349,7 @@ const handleLastDay = async (req, res) => {
 
     // Get the last day's entries from ExcelData
     const lastDayExcelEntries = await ExcelData.find({
-      gt_HistoryKeyTm: { $gte: startOfLastDay, $lte: endOfLastDay },
+      gt_HistoryKeyTm: { $gte: startOfLastDay, $lte: endOfLastDay }
     }).sort({ gt_HistoryKeyTm: 1 });
 
     if (lastDayExcelEntries.length > 0) {
@@ -358,7 +358,7 @@ const handleLastDay = async (req, res) => {
 
       // Find the corresponding pacing entries using the extracted c_PieceName values
       const correspondingPacingEntries = await PacingData.find({
-        c_PieceName: { $in: pieceNames },
+        c_PieceName: { $in: pieceNames }
       }).sort({ gt_HistoryKeyTm: 1 });
 
       // Call RMThickness and FmDelay functions with the Excel data
@@ -369,7 +369,7 @@ const handleLastDay = async (req, res) => {
         Excel: lastDayExcelEntries,
         pacing: correspondingPacingEntries,
         RM,
-        RollChange,
+        RollChange
       });
     } else {
       res
@@ -419,8 +419,8 @@ const handleCustomDateRange = async (req, res, period) => {
     const Excel = await ExcelData.find({
       gt_HistoryKeyTm: {
         $gte: startDate,
-        $lte: endDate,
-      },
+        $lte: endDate
+      }
     });
 
     if (Excel.length > 0) {
@@ -429,7 +429,7 @@ const handleCustomDateRange = async (req, res, period) => {
 
       // Find the corresponding pacing entries using the extracted c_PieceName values
       const pacing = await PacingData.find({
-        c_PieceName: { $in: pieceNames },
+        c_PieceName: { $in: pieceNames }
       });
 
       if (pacing.length > 0) {
@@ -442,12 +442,11 @@ const handleCustomDateRange = async (req, res, period) => {
           Excel,
           pacing,
           RM,
-          RollChange,
+          RollChange
         });
       } else {
         res.status(404).json({
-          message:
-            "No matching pacing data found for the specified date range.",
+          message: "No matching pacing data found for the specified date range."
         });
       }
     } else {
@@ -485,7 +484,7 @@ const getShiftTimes = () => {
     shift2End,
     shift3Start,
     shift3End,
-    currentTime,
+    currentTime
   };
 };
 
@@ -543,8 +542,8 @@ const handleLastShift = async (req, res) => {
     const Excel = await ExcelData.find({
       gt_HistoryKeyTm: {
         $gte: startIso,
-        $lte: endIso,
-      },
+        $lte: endIso
+      }
     });
 
     if (Excel.length > 0) {
@@ -553,7 +552,7 @@ const handleLastShift = async (req, res) => {
 
       // Fetch corresponding pacing data using the extracted c_PieceName values
       const pacing = await PacingData.find({
-        c_PieceName: { $in: pieceNames },
+        c_PieceName: { $in: pieceNames }
       });
 
       if (pacing.length > 0) {
@@ -566,18 +565,18 @@ const handleLastShift = async (req, res) => {
           Excel,
           pacing,
           RM,
-          RollChange,
+          RollChange
         });
 
         console.log({
           Excel,
           pacing,
           RM,
-          RollChange,
+          RollChange
         });
       } else {
         res.status(404).json({
-          message: "No matching pacing data found for the last shift.",
+          message: "No matching pacing data found for the last shift."
         });
       }
     } else {
