@@ -125,15 +125,42 @@ const Live = () => {
                 </div>
               </div>
             </div> */}
-            <div className=" w-[250px] rounded-md">
-              <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
-                <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
-                  <p className="font-semibold">RM Transfer Bar Thickness</p>
-                  <p>-</p>
-                  <p className="font-semibold">{getRM()}</p>
+            {period != "Last Coil" && (
+              <>
+                {" "}
+                <div className=" w-[250px] rounded-md">
+                  <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
+                    <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
+                      <p className="font-semibold">RM Transfer Bar Thickness</p>
+                      <p>-</p>
+                      <p className="font-semibold">{getRM()}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+                <div className=" w-[250px] rounded-md">
+                  <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
+                    <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
+                      <p className="font-semibold">FM RollChange Delay</p>
+                      <p>-</p>
+                      <p className="font-semibold">
+                        {roundOff(data?.RollChange?.rmRollChange)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className=" w-[250px] rounded-md">
+                  <div className="flex flex-col justify-center border border-black/40 p-1 rounded-md   !text-xs bg-[whitesmoke] shadow-md">
+                    <div className="flex items-center justify-between px-1 pt-1 pb-2 pr-2 text-xs italic border-black/40 ">
+                      <p className="font-semibold">FM RollChange Delay</p>
+                      <p>-</p>
+                      <p className="font-semibold">
+                        {roundOff(data?.RollChange?.fmRollChange)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           <div className="sticky top-[47%] px-4 flex gap-24  !text-xs justify-center">
             <div className=" w-[250px] ">

@@ -16,8 +16,6 @@ export const Accountprovider = ({ children }) => {
 
   const [data, setData] = useState(null);
 
-  console.log(data)
-
   function useInterval(callback, delay) {
     const savedCallback = useRef();
 
@@ -40,13 +38,11 @@ export const Accountprovider = ({ children }) => {
 
   const getData2 = async () => {
     axios.get("http://localhost:8000/add").then((resp) => {
-      if(resp.data){
+      if (resp.data) {
         setMainData(resp.data);
+      } else {
+        setMainData([]);
       }
-      else{
-        setMainData([])
-      }
-     
     });
   };
 
